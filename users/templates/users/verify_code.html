@@ -1,0 +1,56 @@
+<h2>Verify Code</h2>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Verify</button>
+</form>
+
+<hr>
+
+<p id="timer"></p>
+
+<a
+    id="resend-link"
+    href="{% url 'users:resend-code' %}"
+    style="display:none;"
+>
+    Resend Code
+</a>
+
+<script>
+let timeLeft = {{ remaining_seconds|default:0 }};
+
+const timer = document.getElementById("timer");
+const resendLink = document.getElementById("resend-link");
+
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    timer.textContent =
+        `Code expires in ${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
+updateTimer();
+
+const countdown = setInterval(() => {
+    timeLeft--;
+
+    if (timeLeft < 0) {
+        clearInterval(countdown);
+
+        timer.textContent = "Code expired";
+        resendLink.style.display = "inline";
+
+        return;
+    }
+
+    updateTimer();
+}, 1000);
+</script>
