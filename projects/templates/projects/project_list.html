@@ -1,0 +1,38 @@
+<h1>My Projects</h1>
+
+<a href="{% url 'projects:create-project' %}">
+    Create New Project
+</a>
+
+<hr>
+
+{% for project in projects %}
+
+    <h3>
+        <a href="{% url 'projects:project-detail' project.id %}">
+            {{ project.title }}
+        </a>
+    </h3>
+
+    <p>
+        Status:
+        {{ project.get_status_display }}
+    </p>
+
+    <p>
+        Visibility:
+        {{ project.get_visibility_display }}
+    </p>
+
+    <p>
+        Created:
+        {{ project.created_at }}
+    </p>
+
+    <hr>
+
+{% empty %}
+
+    <p>No projects yet.</p>
+
+{% endfor %}

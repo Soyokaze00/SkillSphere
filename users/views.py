@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth.decorators import login_required
 from .models import EmailVerification, CustomUser
 from .utils import generate_code, send_verification_email
@@ -223,6 +223,7 @@ def complete_signup(request):
     return render(request, "users/signup.html", {"form": form})
 
 
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -235,18 +236,21 @@ def login_view(request):
 
         print("AUTH RESULT:", user)
 
-        if user is None:
+        if user is not None:
+            login(request, user)
+            return redirect("dashboard:home") 
+        else:
             return render(request, "users/login.html", {
                 "error": "Invalid credentials"
             })
 
-        login(request, user)
-        return render(request, "dashboard/home.html")
+    return render(request, "users/login.html")
 
-    return redirect("dashboard:home")
 
 
 @login_required
 def logout_view(request):
     logout(request)
     return redirect("users:login")
+
+
