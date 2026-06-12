@@ -4,9 +4,9 @@ Learning & Project Collaboration Platform
 
 ## Team Members
 
-- Person A (Backend Lead)
-- Person B
-- Person C
+- Person A ==> Nasim
+- Person B ==> Zahra
+- Person C ==> Elyana
 
 ## Stack
 
