@@ -1,0 +1,40 @@
+<h1>{{ project.title }}</h1>
+
+<p>
+    <strong>Owner:</strong>
+    {{ project.owner.username }}
+</p>
+
+<p>
+    <strong>Status:</strong>
+    {{ project.get_status_display }}
+</p>
+
+<p>
+    <strong>Visibility:</strong>
+    {{ project.get_visibility_display }}
+</p>
+
+<p>
+    <strong>Description:</strong>
+</p>
+
+<p>
+    {{ project.description }}
+</p>
+
+{% if project.deadline %}
+<p>
+    <strong>Deadline:</strong>
+    {{ project.deadline }}
+</p>
+{% endif %}
+
+<p>
+    <strong>Created:</strong>
+    {{ project.created_at }}
+</p>
+
+<a href="{% url 'projects:project-list' %}">
+    Back
+</a>

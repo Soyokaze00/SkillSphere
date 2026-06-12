@@ -1,9 +1,8 @@
 <h1>Dashboard 🧭</h1>
 
 <p>Welcome {{ user.username }} :)</p>
-
 <ul>
-    <li><a href="/projects/">Projects</a></li>
+    <li><a href="{% url 'projects:project-list' %}">Projects</a></li>
     <li><a href="/notifications/">Notifications</a></li>
     <li><a href="/feedback/">Feedback</a></li>
 </ul>

@@ -1,0 +1,15 @@
+<h1>Create Project</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Create Project
+    </button>
+</form>
+
+<a href="{% url 'projects:project-list' %}">
+    Back to Projects
+</a>
