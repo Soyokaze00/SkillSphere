@@ -1,0 +1,58 @@
+<h2>Signup Verification</h2>
+
+{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+<form method="POST" id="verification-form">
+    {% csrf_token %}
+    
+    <div class="field-wrapper">
+        <label for="id_email">Email:</label>
+        <input type="email" name="email" id="id_email" value="{{ request.session.email|default:'' }}" required>
+        <button type="submit" name="send_code" id="send-code-btn">Request Code</button>
+        <span id="timer" style="margin-left: 10px;"></span>
+    </div>
+
+    <div class="field-wrapper">
+        <label for="id_code">Verification Code:</label>
+        <input type="text" name="code" id="id_code" disabled placeholder="Enter code" required>
+        <button type="submit" name="verify_code" id="verify-btn" disabled>Verify & Continue</button>
+    </div>
+</form>
+
+<style>
+    .field-wrapper { margin-bottom: 20px; }
+    
+    input:disabled {
+        background-color: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+        border: 1px solid #ccc;
+    }
+</style>
+
+<script>
+    const emailInput = document.getElementById('id_email');
+    const codeInput = document.getElementById('id_code');
+    const verifyBtn = document.getElementById('verify-btn');
+    const timerDisplay = document.getElementById('timer');
+
+    {% if code_sent %}
+        codeInput.disabled = false;
+        verifyBtn.disabled = false;
+        
+        let timeLeft = {{ remaining_seconds|default:300 }};
+        const countdown = setInterval(() => {
+            timeLeft--;
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerDisplay.textContent = `Expires in ${m}:${s.toString().padStart(2, '0')}`;
+            
+            if (timeLeft < 0) {
+                clearInterval(countdown);
+                timerDisplay.textContent = "Code expired";
+                codeInput.disabled = true; 
+                verifyBtn.disabled = true;
+            }
+        }, 1000);
+    {% endif %}
+</script>

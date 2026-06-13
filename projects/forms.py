@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project
+from .models import Project, ProjectFile
 
 
 class ProjectForm(forms.ModelForm):
@@ -13,3 +13,8 @@ class ProjectForm(forms.ModelForm):
             "status",
             "visibility",
         ]
+
+class ProjectFileForm(forms.ModelForm):
+    class Meta:
+        model = ProjectFile
+        fields = ['file']

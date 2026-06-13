@@ -35,6 +35,28 @@
     {{ project.created_at }}
 </p>
 
+<h3>Files</h3>
+<ul>
+    {% for file in project.files.all %}
+        <li>
+            <a href="{% url 'projects:file-detail' file.id %}">{{ file.file.name|cut:"project_files/" }}</a>
+
+            (Uploaded by: {{ file.uploaded_by.username }})
+        </li>
+    {% empty %}
+        <li>No files uploaded yet.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Upload New File</h3>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ file_form.as_p }}
+    <button type="submit" name="file_upload">Upload File</button>
+</form>
+
 <a href="{% url 'projects:project-list' %}">
     Back
 </a>
