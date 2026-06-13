@@ -1,6 +1,5 @@
-from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect, resolve_url
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import EmailVerification, CustomUser
 from .utils import generate_code, send_verification_email
@@ -9,132 +8,177 @@ from django.utils import timezone
 from datetime import timedelta
 
 
-def request_code(request):
-    form = EmailRequestForm(request.POST or None)
+# def request_code(request):
+#     form = EmailRequestForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data["email"]
+#     if request.method == "POST" and form.is_valid():
+#         email = form.cleaned_data["email"]
+
+#         if CustomUser.objects.filter(email=email).exists():
+#             return render(
+#                 request,
+#                 "users/request_code.html",
+#                 {
+#                     "form": form,
+#                     "error": "An account with this email already exists."
+#                 }
+#             )
+
+#         code = generate_code()
+
+#         EmailVerification.objects.update_or_create(
+#             email=email,
+#             defaults={
+#                 "code": code, 
+#                 "is_verified": False,
+#                 "created_at": timezone.now(),
+#                 }
+#         )
+#         print("POST DATA:", request.POST)
+#         print("FORM VALID:", form.is_valid())
+#         print("FORM ERRORS:", form.errors)
+
+#         send_verification_email(email, code)
+
+#         request.session["email"] = email
+
+#         return redirect("users:verify-code")
+
+#     return render(request, "users/request_code.html", {"form": form})
+
+
+
+# def verify_code(request):
+#     email = request.session.get("email")
+
+#     if not email:
+#         return redirect("users:request-code")
+
+#     verification = EmailVerification.objects.filter(
+#         email=email
+#     ).first()
+
+#     if not verification:
+#         return redirect("users:request-code")
+
+#     expiration_time = verification.created_at + timedelta(minutes=5)
+
+#     print("EMAIL:", verification.email)
+#     print("CREATED:", verification.created_at)
+#     print("NOW:", timezone.now())
+#     print("EXPIRES:", expiration_time)
+
+#     remaining_seconds = max(
+#         0,
+#         int((expiration_time - timezone.now()).total_seconds())
+#     )
+
+#     print("REMAINING:", remaining_seconds)
+
+#     remaining_seconds = max(
+#         0,
+#         int((expiration_time - timezone.now()).total_seconds())
+#     )
+
+#     form = CodeVerificationForm(request.POST or None)
+
+#     if request.method == "POST" and form.is_valid():
+#         code = form.cleaned_data["code"]
+
+#         record = EmailVerification.objects.filter(
+#             email=email,
+#             code=code,
+#             is_verified=False
+#         ).first()
+
+#         if not record:
+#             return render(
+#                 request,
+#                 "users/verify_code.html",
+#                 {
+#                     "form": form,
+#                     "remaining_seconds": remaining_seconds,
+#                     "error": "Invalid code"
+#                 }
+#             )
+
+#         if timezone.now() > expiration_time:
+#             return render(
+#                 request,
+#                 "users/verify_code.html",
+#                 {
+#                     "form": form,
+#                     "remaining_seconds": 0,
+#                     "error": "Code expired. Request a new one."
+#                 }
+#             )
+
+#         record.is_verified = True
+#         record.save()
+
+#         return redirect("users:signup")
+
+#     return render(
+#         request,
+#         "users/verify_code.html",
+#         {
+#             "form": form,
+#             "remaining_seconds": remaining_seconds,
+#         }
+#     )
+
+
+
+def email_verification_view(request):
+
+    email_form = EmailRequestForm(request.POST or None)
+    code_form = CodeVerificationForm(request.POST or None)
+    context = {'email_form': email_form, 'code_form': code_form}
+
+    if 'send_code' in request.POST and email_form.is_valid():
+        email = email_form.cleaned_data['email']
 
         if CustomUser.objects.filter(email=email).exists():
-            return render(
-                request,
-                "users/request_code.html",
-                {
-                    "form": form,
-                    "error": "An account with this email already exists."
-                }
+            email_form.add_error('email', "User with this email already exists.")
+        else:
+            code = generate_code()
+            verification, _ = EmailVerification.objects.update_or_create(
+                email=email,
+                defaults={'code': code, 'is_verified': False, 'created_at': timezone.now()}
             )
+            send_verification_email(email, code)
+            request.session['email'] = email
+            context['code_sent'] = True
+            context['remaining_seconds'] = 300
 
-        code = generate_code()
+    elif 'verify_code' in request.POST and code_form.is_valid():
+        email = request.session.get('email')
+        code = code_form.cleaned_data['code']
+        
+        if not email:
+            return redirect('users:email-verification')
 
-        EmailVerification.objects.update_or_create(
-            email=email,
-            defaults={
-                "code": code, 
-                "is_verified": False,
-                "created_at": timezone.now(),
-                }
-        )
-        print("POST DATA:", request.POST)
-        print("FORM VALID:", form.is_valid())
-        print("FORM ERRORS:", form.errors)
+        verification = EmailVerification.objects.filter(email=email).first()
+        
+        if verification and verification.code == code:
+            if timezone.now() < (verification.created_at + timedelta(minutes=5)):
+                verification.is_verified = True
+                verification.save()
+                return redirect('users:signup')
+            else:
+                context['error'] = "Code expired. Please request a new one."
+        else:
+            context['error'] = "Invalid code."
+            context['code_sent'] = True
 
-        send_verification_email(email, code)
-
-        request.session["email"] = email
-
-        return redirect("users:verify-code")
-
-    return render(request, "users/request_code.html", {"form": form})
-
-
-
-def verify_code(request):
-    email = request.session.get("email")
-
-    if not email:
-        return redirect("users:request-code")
-
-    verification = EmailVerification.objects.filter(
-        email=email
-    ).first()
-
-    if not verification:
-        return redirect("users:request-code")
-
-    expiration_time = verification.created_at + timedelta(minutes=5)
-
-    print("EMAIL:", verification.email)
-    print("CREATED:", verification.created_at)
-    print("NOW:", timezone.now())
-    print("EXPIRES:", expiration_time)
-
-    remaining_seconds = max(
-        0,
-        int((expiration_time - timezone.now()).total_seconds())
-    )
-
-    print("REMAINING:", remaining_seconds)
-
-    remaining_seconds = max(
-        0,
-        int((expiration_time - timezone.now()).total_seconds())
-    )
-
-    form = CodeVerificationForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        code = form.cleaned_data["code"]
-
-        record = EmailVerification.objects.filter(
-            email=email,
-            code=code,
-            is_verified=False
-        ).first()
-
-        if not record:
-            return render(
-                request,
-                "users/verify_code.html",
-                {
-                    "form": form,
-                    "remaining_seconds": remaining_seconds,
-                    "error": "Invalid code"
-                }
-            )
-
-        if timezone.now() > expiration_time:
-            return render(
-                request,
-                "users/verify_code.html",
-                {
-                    "form": form,
-                    "remaining_seconds": 0,
-                    "error": "Code expired. Request a new one."
-                }
-            )
-
-        record.is_verified = True
-        record.save()
-
-        return redirect("users:signup")
-
-    return render(
-        request,
-        "users/verify_code.html",
-        {
-            "form": form,
-            "remaining_seconds": remaining_seconds,
-        }
-    )
-
+    return render(request, 'users/email_verification.html', context)
 
 
 def resend_code(request):
     email = request.session.get("email")
 
     if not email:
-        return redirect("users:request-code")
+        return redirect("users:email-verification")
 
     verification = EmailVerification.objects.filter(
         email=email
