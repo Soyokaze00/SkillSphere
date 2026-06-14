@@ -1,0 +1,30 @@
+{% load tailwind_tags %}
+{% load lucide %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    {% tailwind_css %}
+</head>
+<body class="bg-white text-slate-900">
+  <div class="min-h-screen flex bg-white">
+        
+        <!-- Left Panel (سایدبار ثابت برای لاگین و ساین‌آپ) -->
+                        {% include "users/includes/sidebar.html" %}
+
+
+        <!-- Right Panel (محتوای متغیر لاگین یا ساین‌آپ) -->
+        <div class="flex-1 flex items-center justify-center p-8">
+            <div class="w-full max-w-[420px]">
+                {% block auth_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

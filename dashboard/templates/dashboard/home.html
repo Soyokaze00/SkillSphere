@@ -2,10 +2,323 @@
 
 <p>Welcome {{ user.username }} :)</p>
 <ul>
-    <li><a href="{% url 'projects:project-list' %}">Projects</a></li>
-    <li><a href="/notifications/">Notifications</a></li>
-    <li><a href="/feedback/">Feedback</a></li>
+  <li><a href="{% url 'projects:project-list' %}">Projects</a></li>
+  <li><a href="/notifications/">Notifications</a></li>
+  <li><a href="/feedback/">Feedback</a></li>
 </ul>
 
 <a href="{% url 'users:logout' %}">Logout</a>
 <a href="{% url 'users:login' %}">Login</a>
+
+{% load tailwind_tags %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Dashboard</title>
+    {% tailwind_css %}
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+      body {
+        background: #f8fafc;
+      }
+    </style>
+  </head>
+
+  <body class="text-slate-900">
+    <div class="p-6 space-y-6">
+      <!-- HEADER -->
+      <div
+        class="rounded-2xl p-6 text-white relative overflow-hidden"
+        style="background: linear-gradient(135deg, #312e81, #4f46e5, #7c3aed)"
+      >
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-white/70 text-sm">Good morning</div>
+            <h1 class="text-3xl font-bold">Alex Johnson</h1>
+            <p class="text-white/70 text-sm mt-1">
+              3 unread notifications • 2 pending reviews
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              class="bg-white text-indigo-600 px-4 py-2 rounded-xl font-semibold"
+            >
+              + New Project
+            </button>
+            <button class="bg-white/20 px-4 py-2 rounded-xl">Activity</button>
+          </div>
+        </div>
+
+        <!-- stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+          <div class="bg-white/10 p-3 rounded-xl">
+            <div class="text-xs text-white/70">Projects</div>
+            <div class="text-2xl font-bold">24</div>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl">
+            <div class="text-xs text-white/70">Downloads</div>
+            <div class="text-2xl font-bold">8,432</div>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl">
+            <div class="text-xs text-white/70">Views</div>
+            <div class="text-2xl font-bold">14,721</div>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl">
+            <div class="text-xs text-white/70">Followers</div>
+            <div class="text-2xl font-bold">1,284</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Projects -->
+        <div
+          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200"
+        >
+          <div class="flex items-start justify-between">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-100"
+            >
+              <i data-lucide="folder-open" class="w-5 h-5 text-indigo-600"></i>
+            </div>
+
+            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+          </div>
+
+          <div class="text-[26px] font-extrabold mt-3">24</div>
+
+          <div class="text-sm text-slate-500">Projects</div>
+
+          <div class="text-xs font-semibold text-indigo-600 mt-1">
+            3 this month
+          </div>
+        </div>
+
+        <!-- Uploads -->
+
+        <div
+          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200"
+        >
+          <div class="flex items-start justify-between">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-purple-100"
+            >
+              <i data-lucide="upload" class="w-5 h-5 text-purple-600"></i>
+            </div>
+
+            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+          </div>
+
+          <div class="text-[26px] font-extrabold mt-3">147</div>
+
+          <div class="text-sm text-slate-500">Uploads</div>
+
+          <div class="text-xs font-semibold text-purple-600 mt-1">
+            12 this week
+          </div>
+        </div>
+
+        <!-- Downloads -->
+
+        <div
+          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200 shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-green-50"
+            >
+              <i data-lucide="download" class="w-5 h-5 text-green-500"></i>
+            </div>
+
+            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+          </div>
+
+          <div
+            class="text-[26px] font-extrabold text-slate-900 mt-3 tracking-tight"
+          >
+            8,432
+          </div>
+
+          <div class="text-sm text-slate-500 mt-1">Downloads</div>
+
+          <div class="text-xs font-medium text-green-500 mt-1">
+            +12% this month
+          </div>
+        </div>
+
+        <!-- Followers -->
+
+        <div
+          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200 shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50"
+            >
+              <i data-lucide="users" class="w-5 h-5 text-amber-500"></i>
+            </div>
+
+            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+          </div>
+
+          <div
+            class="text-[26px] font-extrabold text-slate-900 mt-3 tracking-tight"
+          >
+            1,284
+          </div>
+
+          <div class="text-sm text-slate-500 mt-1">Followers</div>
+
+          <div class="text-xs font-medium text-amber-500 mt-1">
+            +47 this week
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="grid lg:grid-cols-3 gap-4">
+        <!-- LINE CHART -->
+        <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow">
+          <div class="flex justify-between mb-4">
+            <h2 class="font-bold">Weekly Activity</h2>
+          </div>
+
+          <canvas id="lineChart"></canvas>
+        </div>
+
+        <!-- PIE -->
+        <div class="bg-white p-5 rounded-2xl shadow">
+          <h2 class="font-bold mb-2">Storage Usage</h2>
+          <p class="text-sm text-slate-500">8.0 GB / 10 GB used</p>
+
+          <canvas id="pieChart" class="mt-4"></canvas>
+
+          <div class="text-center mt-3 font-bold">80% used</div>
+        </div>
+      </div>
+
+      <!-- BAR CHART -->
+      <div class="bg-white p-5 rounded-2xl shadow">
+        <h2 class="font-bold mb-4">Project Performance</h2>
+        <canvas id="barChart"></canvas>
+      </div>
+
+      <!-- BOTTOM -->
+      <div class="grid lg:grid-cols-3 gap-4">
+        <!-- PROJECTS -->
+        <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow">
+          <h2 class="font-bold mb-4">Recent Projects</h2>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="border rounded-xl p-3">
+              <div class="h-24 bg-slate-200 rounded"></div>
+              <div class="mt-2 font-semibold">Brand Identity Kit</div>
+              <div class="text-xs text-slate-500">UI / Branding</div>
+            </div>
+
+            <div class="border rounded-xl p-3">
+              <div class="h-24 bg-slate-200 rounded"></div>
+              <div class="mt-2 font-semibold">Mobile UI Kit</div>
+              <div class="text-xs text-slate-500">Figma / Mobile</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY -->
+        <div class="bg-white p-5 rounded-2xl shadow">
+          <h2 class="font-bold mb-4">Recent Activity</h2>
+
+          <div class="space-y-3 text-sm">
+            <div>📥 Sarah downloaded your file</div>
+            <div>⭐ Someone starred your project</div>
+            <div>👁 Dashboard reached 1500 views</div>
+            <div>👤 New follower joined</div>
+            <div>⬇ Icon Pack hit 500 downloads</div>
+          </div>
+
+          <button
+            class="w-full mt-4 bg-slate-100 py-2 rounded-xl text-sm font-semibold"
+          >
+            View Full Activity
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      // LINE CHART
+      new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          datasets: [
+            {
+              label: "Downloads",
+              data: [18, 24, 31, 42, 38, 29, 35],
+              borderColor: "#4F46E5",
+              tension: 0.4,
+            },
+            {
+              label: "Views",
+              data: [45, 62, 58, 87, 94, 71, 83],
+              borderColor: "#7C3AED",
+              tension: 0.4,
+            },
+          ],
+        },
+      });
+
+      // PIE CHART
+      new Chart(document.getElementById("pieChart"), {
+        type: "doughnut",
+        data: {
+          labels: ["Images", "Videos", "Docs", "Other"],
+          datasets: [
+            {
+              data: [38, 22, 18, 22],
+              backgroundColor: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
+            },
+          ],
+        },
+      });
+
+      // BAR CHART
+      new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+          labels: ["Brand", "UI Lib", "Dashboard", "Icon Pack", "Fonts"],
+          datasets: [
+            {
+              label: "Downloads",
+              data: [412, 387, 298, 521, 164],
+              backgroundColor: "#4F46E5",
+            },
+            {
+              label: "Stars",
+              data: [88, 142, 76, 193, 41],
+              backgroundColor: "#7C3AED",
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>

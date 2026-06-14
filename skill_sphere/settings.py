@@ -52,7 +52,16 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
+    'tailwind',
+
+    'theme',  
+        'lucide', # <-- این خط را اضافه کنید
+
 ]
+
+TAILWIND_APP_NAME = 'theme'
+
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 SITE_ID = 1
 
