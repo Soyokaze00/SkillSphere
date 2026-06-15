@@ -1,0 +1,281 @@
+<aside
+  id="sidebar"
+  class="fixed left-0 top-0 h-screen flex flex-col z-40 transition-all duration-300"
+  style="
+    width: 256px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
+  "
+>
+  <!-- Logo -->
+  <div
+    class="flex items-center h-16 px-4 gap-3 border-b"
+    style="border-color: var(--sidebar-border)"
+  >
+    <div
+      class="w-9 h-9 rounded-xl flex items-center justify-center"
+      style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+    >
+      <!-- zap icon -->
+      <svg
+        class="w-4 h-4 text-white"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+      </svg>
+    </div>
+
+    <div>
+      <div class="text-[17px] font-bold tracking-tight text-gray-900">
+        SkillSphere
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Project -->
+  <div class="px-3 py-4">
+    <button
+      class="flex items-center gap-2 w-full rounded-xl text-white transition active:scale-95 px-4 py-2 shadow-lg"
+      style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+    >
+      <!-- plus -->
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M12 5v14M5 12h14" />
+      </svg>
+
+      <span class="text-sm font-semibold">New Project</span>
+    </button>
+  </div>
+
+  <!-- NAV -->
+  <nav class="flex-1 overflow-y-auto px-3 space-y-1 text-sm">
+    <!-- Dashboard -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 bg-gray-100 text-gray-900 font-semibold"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M3 13h8V3H3v10zm10 8h8V11h-8v10z" />
+      </svg>
+      <span>Dashboard</span>
+    </button>
+
+    <!-- Projects -->
+    <a href="{% url 'projects:project-list' %}">
+      <button
+        class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+        </svg>
+        <span>Projects</span>
+      </button>
+    </a>
+
+    <!-- Files -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M4 4h16v16H4z" />
+      </svg>
+      <span>Files</span>
+    </button>
+
+    <!-- Activity -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M3 12h4l3 8 4-16 3 8h4" />
+      </svg>
+      <span>Activity</span>
+    </button>
+
+    <!-- Notifications -->
+    <a href="/notifications/">
+      <button
+        class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100 relative"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            stroke-width="2"
+            d="M18 8a6 6 0 10-12 0c0 7-3 7-3 7h18s-3 0-3-7"
+          />
+        </svg>
+        <span>Notifications</span>
+        <span
+          class="absolute right-3 top-2 w-2 h-2 bg-red-500 rounded-full"
+        ></span>
+      </button>
+    </a>
+
+    <!-- Search -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          stroke-width="2"
+          d="M21 21l-4-4m1-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+      <span>Search</span>
+    </button>
+
+    <div class="my-3 h-px bg-gray-200"></div>
+
+    <!-- Profile -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M20 21a8 8 0 10-16 0" />
+      </svg>
+      <span>Profile</span>
+    </button>
+
+    <!-- Feedback -->
+
+    <a href="/feedback/">
+      <button
+        class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            stroke-width="2"
+            d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"
+          />
+        </svg>
+        <span>Feedback</span>
+      </button>
+    </a>
+
+    <!-- Admin -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M12 1l3 6 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1z" />
+      </svg>
+      <span>Admin</span>
+    </button>
+
+    <!-- Logout -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M12 1l3 6 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1z" />
+      </svg>
+      <a href="{% url 'users:logout' %}">Logout</a>
+    </button>
+
+    <!-- Login -->
+    <button
+      class="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-gray-500 hover:bg-gray-100"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M12 1l3 6 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1z" />
+      </svg>
+      <a href="{% url 'users:login' %}">Login</a>
+    </button>
+  </nav>
+
+  <!-- Footer -->
+  <div
+    class="px-3 pb-4 border-t pt-3"
+    style="border-color: var(--sidebar-border)"
+  >
+    <div
+      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 cursor-pointer"
+    >
+      <div
+        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+      >
+        AJ
+      </div>
+
+      <div class="flex-1">
+        <div class="text-sm font-semibold">{{ user.username }}</div>
+        <div class="text-xs text-gray-500">Pro Plan</div>
+      </div>
+
+      <!-- settings -->
+      <svg
+        class="w-4 h-4 text-gray-500"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          stroke-width="2"
+          d="M12 1v2m0 18v2m9-11h2M1 12H3m15.364-6.364l1.414-1.414M4.222 19.778l1.414-1.414"
+        />
+      </svg>
+    </div>
+  </div>
+</aside>
