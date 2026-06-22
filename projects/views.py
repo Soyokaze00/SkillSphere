@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Q
+from notifications.utils import create_notification
 from projects.tasks import process_uploaded_file
 from .models import Project, ProjectMember, ProjectFile
 from .forms import ProjectForm, ProjectFileForm
@@ -11,11 +12,19 @@ def create_project(request):
     project_form = ProjectForm(request.POST or None)
     file_form = ProjectFileForm(request.POST or None, request.FILES or None)
 
+
     if request.method == "POST":
         if project_form.is_valid():
             project = project_form.save(commit=False)
             project.owner = request.user
             project.save()
+  
+            create_notification(
+               user=project.owner,
+               title="New project created",
+               message=f"The project '{project.title}' has been created.",             notification_type="project",
+               link=f"/projects/{project.id}/"
+             )
             
             if request.FILES.get('file'):
                 if file_form.is_valid():
@@ -26,13 +35,13 @@ def create_project(request):
                     process_uploaded_file.delay(new_file.id)
             
             return redirect("projects:project-list")
-
+        
     return render(
         request,
         "projects/create_project.html",
         {
             "project_form": project_form,
-            "file_form": file_form
+            "file_form": file_form,
         }
     )
 
@@ -59,6 +68,10 @@ def project_list(request):
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
+    total_size = sum(f.file.size for f in project.files.all())
+    last_file = project.files.order_by('-uploaded_at').first()
+    project_count = Project.objects.filter(owner=request.user).count()   
+    
     if project.visibility == Project.PRIVATE:
         is_owner = project.owner == request.user
         is_member = ProjectMember.objects.filter(
@@ -84,7 +97,11 @@ def project_detail(request, project_id):
 
     return render(request, "projects/project_detail.html", {
         "project": project,
-        "file_form": file_form
+        "file_form": file_form,
+        "total_size": total_size,
+        "last_file":last_file,
+        "project_count":project_count
+
     })
 
 

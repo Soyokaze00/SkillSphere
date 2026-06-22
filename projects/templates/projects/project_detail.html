@@ -1,62 +1,597 @@
-<h1>{{ project.title }}</h1>
+{% extends "base.html" %} {% load static %} {% block content %}
+ {% load humanize%} {% load file_tags %}
+<!-- <h1>{{ project.title }}</h1>
 
 <p>
-    <strong>Owner:</strong>
-    {{ project.owner.username }}
+  <strong>Owner:</strong>
+  {{ project.owner.username }}
 </p>
 
 <p>
-    <strong>Status:</strong>
-    {{ project.get_status_display }}
+  <strong>Status:</strong>
+  {{ project.get_status_display }}
 </p>
 
 <p>
-    <strong>Visibility:</strong>
-    {{ project.get_visibility_display }}
+  <strong>Visibility:</strong>
+  {{ project.get_visibility_display }}
 </p>
 
 <p>
-    <strong>Description:</strong>
+  <strong>Description:</strong>
 </p>
 
-<p>
-    {{ project.description }}
-</p>
+<p>{{ project.description }}</p>
 
 {% if project.deadline %}
 <p>
-    <strong>Deadline:</strong>
-    {{ project.deadline }}
+  <strong>Deadline:</strong>
+  {{ project.deadline }}
 </p>
 {% endif %}
 
 <p>
-    <strong>Created:</strong>
-    {{ project.created_at }}
+  <strong>Created:</strong>
+  {{ project.created_at }}
 </p>
 
 <h3>Files</h3>
 <ul>
-    {% for file in project.files.all %}
-        <li>
-            <a href="{% url 'projects:file-detail' file.id %}">{{ file.file.name|cut:"project_files/" }}</a>
+  {% for file in project.files.all %}
+  <li>
+    <a href="{% url 'projects:file-detail' file.id %}"
+      >{{ file.file.name|cut:"project_files/" }}</a
+    >
 
-            (Uploaded by: {{ file.uploaded_by.username }})
-        </li>
-    {% empty %}
-        <li>No files uploaded yet.</li>
-    {% endfor %}
+    (Uploaded by: {{ file.uploaded_by.username }})
+  </li>
+  {% empty %}
+  <li>No files uploaded yet.</li>
+  {% endfor %}
 </ul>
 
-<hr>
+<hr />
 
 <h3>Upload New File</h3>
 <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ file_form.as_p }}
-    <button type="submit" name="file_upload">Upload File</button>
+  {% csrf_token %} {{ file_form.as_p }}
+  <button type="submit" name="file_upload">Upload File</button>
 </form>
 
-<a href="{% url 'projects:project-list' %}">
-    Back
-</a>
+<a href="{% url 'projects:project-list' %}"> Back </a> -->
+
+<div class="max-w-6xl mx-auto p-6 space-y-6">
+  <!-- ===== BACK BUTTON ===== -->
+  <a
+    href="{% url 'projects:project-list' %}"
+    onclick="history.back()"
+    class="flex items-center gap-2 transition-all hover:opacity-70 text-sm text-gray-500"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+      ></path>
+    </svg>
+    Back to Projects
+  </a>
+
+  <!-- ===== HERO ===== -->
+  <div class="rounded-2xl overflow-hidden shadow-lg bg-indigo-500">
+    <div class="relative h-72">
+      {% with url=project.files.first.file.url|lower %} {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
+      <img
+        loading="lazy"
+        src="{{ project.files.first.file.url }}"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        alt="{{ project.title }}"
+        decoding="async"
+      />
+      {% else %}
+      <div class="w-full h-full flex items-center justify-center text-6xl">
+        📄
+      </div>
+      {% endif %} {% endwith %}
+      <div
+        class="absolute inset-0 bg-linear-to-t from-gray-900/80 via-transparent to-transparent"
+      ></div>
+      <div class="absolute bottom-6 left-6 right-6">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span
+                class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-indigo-700/80 text-white"
+              >
+                {{ project.get_visibility_display }}</span
+              >
+              <span
+                class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600"
+              >
+                {{ project.get_status_display }}</span
+              >
+            </div>
+            <h1
+              class="text-2xl md:text-3xl font-extrabold text-white tracking-tight"
+            >
+              {{ project.title }}
+            </h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="flex items-center gap-2 rounded-xl px-4 py-2 transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                ></path>
+              </svg>
+              Like
+            </button>
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONTENT GRID ===== -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="lg:col-span-2 space-y-5">
+      <!-- Stats Bar -->
+      <div
+        class="flex flex-wrap items-center gap-6 rounded-2xl px-6 py-4 bg-white border border-gray-200"
+      >
+        <div class="flex items-center gap-2">
+          <svg
+            class="w-4 h-4 text-indigo-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            ></path>
+          </svg>
+          <div>
+            <div id="statDownloads" class="text-base font-bold text-gray-900">
+              11
+            </div>
+            <div class="text-xs text-gray-500">Downloads</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg
+            class="w-4 h-4 text-indigo-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+            ></path>
+          </svg>
+          <div>
+            <div id="statStars" class="text-base font-bold text-gray-900">
+              52
+            </div>
+            <div class="text-xs text-gray-500">Stars</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg
+            class="w-4 h-4 text-indigo-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            ></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            ></path>
+          </svg>
+          <div>
+            <div id="statViews" class="text-base font-bold text-gray-900">
+              88
+            </div>
+            <div class="text-xs text-gray-500">Views</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg
+            class="w-4 h-4 text-indigo-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            ></path>
+          </svg>
+          <div>
+            <div id="statComments" class="text-base font-bold text-gray-900">
+              24
+            </div>
+            <div class="text-xs text-gray-500">Comments</div>
+          </div>
+        </div>
+        <button
+          class="ml-auto flex items-center gap-2 rounded-xl px-4 py-2 transition-all hover:opacity-90 bg-gray-100 text-gray-500 border border-gray-200 font-semibold text-sm"
+        >
+          <svg
+            class="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+            ></path>
+          </svg>
+          Star
+        </button>
+      </div>
+
+      <!-- Description -->
+      <div class="rounded-2xl p-6 bg-white border border-gray-200">
+        <h2 class="text-base font-bold text-gray-900 mb-3">About</h2>
+        <p
+          id="projectDesc"
+          class="text-sm text-gray-700 leading-relaxed whitespace-pre-line wrap-break-word"
+        >
+          {{ project.description }}
+        </p>
+        <div id="tagsContainer" class="flex flex-wrap gap-2 mt-4"></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="rounded-2xl overflow-hidden bg-white border border-gray-200">
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200">
+          <button
+            class="tab-btn px-6 py-4 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+            onclick="switchTab('files')"
+            data-tab="files"
+          >
+            Files ({{ project.files.count }})
+          </button>
+
+          <button
+            class="tab-btn px-6 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700"
+            onclick="switchTab('comments')"
+            data-tab="comments"
+          >
+            Comments ({{ comments.count }})
+          </button>
+
+          <button
+            class="tab-btn px-6 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700"
+            onclick="switchTab('activity')"
+            data-tab="activity"
+          >
+            Activity
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-5">
+          <!-- Files -->
+          <div id="tab-files" class="tab-panel space-y-2">
+            {% for file in project.files.all %}
+            <div
+              class="flex items-center gap-4 p-3 border border-gray-200 rounded-2xl hover:bg-gray-50"
+            >
+              <div
+                class="w-10 h-10 flex items-center justify-center rounded-full {{ file.file.name|file_color }}"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-file-icon lucide-file"
+                >
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                  />
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                </svg>
+              </div>
+
+              <div class="flex-1">
+                <a  href="{% url 'projects:file-detail' file.id %}" class="text-sm font-semibold">
+                  {{ file.file.name|cut:"project_files/" }}
+                </a>
+                <div class="text-xs text-gray-500">
+                  {{ file.file.size|filesizeformat }}
+                </div>
+              </div>
+
+              <a
+                href="{{ file.file.url }}"
+                class="flex items-center justify-between font-bold gap-2 text-xs px-3 py-2 bg-indigo-50 text-indigo-600 rounded-3xl"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-download-icon lucide-download"
+                >
+                  <path d="M12 15V3" />
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+                Download
+              </a>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-500">No files uploaded</p>
+            {% endfor %}
+            <div class="grid py-2 w-full">
+              <button
+                class="flex items-center justify-center gap-2 text-md font-bold px-3 py-2.5 bg-linear-60 to-violet-600 via-violet-700 from-indigo-700 text-white rounded-2xl"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-download-icon lucide-download"
+                >
+                  <path d="M12 15V3" />
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+                Download All
+              </button>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div id="tab-comments" class="tab-panel hidden space-y-4">
+            {% for comment in comments %}
+            <div class="flex gap-3">
+              <div
+                class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs"
+              >
+                {{ comment.user.username|first|upper }}
+              </div>
+
+              <div>
+                <div class="text-sm font-semibold">
+                  {{ comment.user.username }}
+                </div>
+                <div class="text-sm text-gray-600">{{ comment.text }}</div>
+                <div class="text-xs text-gray-400">
+                  {{ comment.created_at|timesince }} ago
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-500">No comments yet</p>
+            {% endfor %}
+          </div>
+
+          <!-- Activity -->
+          <div id="tab-activity" class="tab-panel hidden">
+            <p class="text-sm text-gray-500">No activity yet</p>
+          </div>
+
+          
+        </div>
+        
+      </div>
+       <!-- ===== UPLOAD SECTION (فقط برای نویسنده) ===== -->
+      {% if user == project.owner %}
+      <div class="rounded-2xl bg-linear-to-br from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-300/50 p-6 transition-all hover:border-indigo-400 hover:shadow-lg">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-bold text-gray-900">Upload New File</h3>
+            <p class="text-sm text-gray-500 mt-0.5">Add files to your project. Supported formats: PDF, Images, Documents, and more.</p>
+            
+            <form method="POST" enctype="multipart/form-data" class="mt-4">
+              {% csrf_token %}
+              
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div class="flex-1 w-full">
+                  {{ file_form.file }}
+                  {% if file_form.file.errors %}
+                    <p class="text-xs text-red-500 mt-1">{{ file_form.file.errors.0 }}</p>
+                  {% endif %}
+                </div>
+                <button 
+                  type="submit" 
+                  name="file_upload"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all hover:shadow-md hover:-translate-y-0.5 whitespace-nowrap"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                  </svg>
+                  Upload File
+                </button>
+              </div>
+              
+              <!-- نمایش خطاهای فرم -->
+              {% if file_form.non_field_errors %}
+                <div class="mt-2 text-xs text-red-500">
+                  {% for error in file_form.non_field_errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </form>
+            
+            <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-400">
+              <span class="flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Max size: 10MB
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                PDF, JPG, PNG, DOC, etc.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="space-y-4">
+      <!-- Owner Card -->
+
+      <div class="rounded-2xl p-5 bg-white border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-900 mb-4">Creator</h3>
+        <div class="flex items-center gap-3">
+          <div
+            id="ownerAvatar"
+            class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-white text-base font-bold bg-gradient-to-r from-indigo-600 to-purple-600"
+          >
+            {{ project.owner.username|slice:":2"|upper }}
+          </div>
+          <div>
+            <div class="text-sm font-bold text-gray-900">
+              {{ project.owner.username }}
+            </div>
+            <div id="ownerRole" class="text-xs text-gray-500">
+              {{ project.created_at }}
+            </div>
+          </div>
+        </div>
+        <p id="ownerBio" class="text-xs text-gray-500 leading-relaxed mt-3"></p>
+        <div class="flex gap-4 mt-4">
+          <div>
+            <div id="ownerProjects" class="text-base font-bold text-gray-900">
+              {{ project_count }}
+            </div>
+            <div class="text-xs text-gray-500">Projects</div>
+          </div>
+          <div>
+            <div id="ownerFollowers" class="text-base font-bold text-gray-900">
+              22
+            </div>
+            <div class="text-xs text-gray-500">Followers</div>
+          </div>
+        </div>
+        <button
+          class="w-full mt-4 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 bg-indigo-50 text-indigo-600"
+        >
+          View Profile
+        </button>
+      </div>
+
+      <!-- Project Info -->
+      <div class="rounded-2xl p-5 bg-white border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-900 mb-3">Details</h3>
+        <div class="flex justify-between py-2 border-b border-gray-200">
+          <span class="text-xs text-gray-500">Files</span>
+          <span id="detailFiles" class="text-xs font-semibold text-gray-900">
+            {{ project.files.count }}</span
+          >
+        </div>
+        <div class="flex justify-between py-2 border-b border-gray-200">
+          <span class="text-xs text-gray-500">Total Size</span>
+          <span id="detailSize" class="text-xs font-semibold text-gray-900"
+            >{{ total_size|filesizeformat }}</span
+          >
+        </div>
+        <div class="flex justify-between py-2 border-b border-gray-200">
+          <span class="text-xs text-gray-500">Published</span>
+          <span id="detailCreated" class="text-xs font-semibold text-gray-900">
+            {{ project.created_at }}
+          </span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-xs text-gray-500">Last Update</span>
+          <span id="detailUpdated" class="text-xs font-semibold text-gray-900">
+            {% if last_file %}
+            <!-- {{ last_file.filename }} -->
+            {{ last_file.uploaded_at }} {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Related Projects -->
+      <div class="rounded-2xl p-5 bg-white border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-900 mb-3">Related Projects</h3>
+        <div id="relatedList" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'projects/js/project_detail.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,177 @@
+{% load tailwind_tags %} {% tailwind_css %}
+
+<!DOCTYPE html>
+
+<html lang="en" class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %}">
+<head>
+    <script
+  src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+  defer
+></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    
+    <div x-data="layout()" x-cloak class="min-h-screen over">
+  {% if show_loader %}
+
+  <div id="boot-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+  
+  <div class="relative flex flex-col items-center gap-6">
+
+    <!-- Glow background -->
+    <div class="absolute w-24 h-24 bg-indigo-400/20 blur-2xl rounded-full animate-pulse"></div>
+
+    <!-- Spinner gradient ring -->
+    <div class="w-14 h-14  rounded-full border-4 border-gray-200 relative">
+      <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-600 border-r-purple-500 animate-spin"></div>
+    </div>
+
+    <!-- Text -->
+    <div class="text-sm  text-gray-500 font-medium tracking-wide">
+      Loading dashboard...
+    </div>
+
+  </div>
+</div>
+  {% endif %} 
+  {% include "includes/sidebar.html" %} 
+  {% include "includes/navbar.html" %} 
+  {% include "notifications/notification_drawer.html" %}
+
+  <main
+    :style="notificationOpen
+            ? 'margin-left:220px; margin-right:320px'
+            : 'margin-left:220px; margin-right:2px'"
+    class="transition-all duration-300 pt-16 min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden"
+  >
+    <div class="p-6 max-w-350">
+    {% block content %} {% endblock %}
+    </div>
+    {% block extra_js %} {% endblock %}
+  </main>
+</div>
+
+
+
+<script>
+  function layout() {
+    return {
+      notificationOpen: false,
+
+      toggleNotification() {
+        this.notificationOpen = !this.notificationOpen;
+      },
+    };
+  }
+</script>
+
+<script>
+  window.addEventListener("load", function () {
+    const loader = document.getElementById("boot-loader");
+
+    if (!loader) return;
+
+    loader.style.transition = "opacity 0.4s ease";
+    loader.style.opacity = "0";
+
+    setTimeout(() => {
+      loader.remove();
+    }, 400);
+  });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // تابع دریافت تم از کوکی
+        function getTheme() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'theme') return value;
+            }
+            return null;
+        }
+        
+        // تابع تنظیم تم
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+            document.cookie = `theme=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
+        }
+        
+        // تابع تغییر تم
+        function toggleTheme() {
+            const currentTheme = getTheme();
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
+        
+        // مقداردهی اولیه
+        const savedTheme = getTheme();
+        if (savedTheme === 'dark') {
+            setTheme('dark');
+        } else {
+            setTheme('light');
+        }
+        
+        // رویداد کلیک
+        toggleBtn.addEventListener('click', toggleTheme);
+    });
+</script>
+<style>
+    [x-cloak] {
+  display: none !important;
+}
+
+</style>
+</body>
+
+
+</html>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+<!-- <style>
+        :root {
+            --card: #fff;
+            --border: #e5e7eb;
+            --muted: #6b7280;
+            --accent: #eef2ff;
+            --primary: #4f46e5;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Status colors */
+        .status-open {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .status-in_progress {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .status-completed {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+</style> -->

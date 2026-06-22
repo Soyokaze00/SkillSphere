@@ -1,0 +1,49 @@
+<div
+
+    x-show="notificationOpen"
+
+    x-transition
+
+    class="fixed  top-16 right-0 w-87.5 h-[calc(100vh-64px)] bg-white shadow-lg border-l border-l-gray-300 overflow-y-auto z-50"
+
+>
+
+    <div class="p-4 border-b border-b-gray-300">
+
+        <h3 class="font-bold">
+
+            نوتیفیکیشن‌ها
+
+        </h3>
+
+    </div>
+
+    <div class="p-4">
+
+        {% for notification in notifications %}
+
+            <div class="border-b border-b-gray-300 py-3">
+
+                <h5 class="font-semibold">
+
+                    {{ notification.title }}
+
+                </h5>
+
+                <p class="text-sm text-gray-500">
+
+                    {{ notification.message }}
+
+                </p>
+
+            </div>
+
+        {% empty %}
+
+            <p>اعلانی وجود ندارد.</p>
+
+        {% endfor %}
+
+    </div>
+
+</div>

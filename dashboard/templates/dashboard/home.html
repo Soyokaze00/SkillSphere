@@ -1,35 +1,27 @@
-{% extends "dashboard/dashboard_base.html" %} 
+{% extends "base.html" %}
+{% load static %}
+
 <!-- {% load tailwind_tags %}  -->
 {% block content %} 
+{% with show_loader=True %}
+
+
 {{ weekly_activity|json_script:"weekly-data" }} 
 {{ project_perf|json_script:"project-data" }}
 
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Full Dashboard</title>
+
     <!-- {% tailwind_css %} -->
 
     <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- <script src="https://unpkg.com/lucide@latest"></script> -->
 
-    <style>
-      body {
-        background: #f8fafc;
-      }
-    </style>
-  </head>
-
-  <body class="text-slate-900">
     <div class="px-6 space-y-6">
       <!-- HEADER -->
       <div
@@ -88,7 +80,7 @@
         {% for stat in stats %}
 
         <div
-          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200"
+          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200 dark:border-gray-700"
         >
           <div class="flex items-start justify-between">
             <div
@@ -122,7 +114,7 @@
       <div class="grid lg:grid-cols-3 gap-4">
         <!-- LINE CHART -->
         <div
-          class="lg:col-span-2 rounded-2xl bg-white border border-slate-200 p-5 shadow-sm"
+          class="lg:col-span-2 rounded-2xl bg-white border border-slate-200  dark:border-gray-700 p-5 shadow-sm"
         >
           <div class="flex items-center justify-between mb-5">
             <div>
@@ -172,7 +164,7 @@
       </div>
 
       <!-- BAR CHART -->
-      <div class="rounded-2xl p-5 bg-white border border-slate-200 shadow-sm">
+      <div class="rounded-2xl p-5 bg-white border border-slate-200  dark:border-gray-700 shadow-sm">
         <div class="flex items-center justify-between mb-5">
           <div>
             <h3 class="text-[15px] font-bold text-slate-900">
@@ -201,7 +193,7 @@
       <div class="grid lg:grid-cols-3 gap-4">
         <!-- PROJECTS -->
         <div
-          class="lg:col-span-2 rounded-2xl p-5 bg-white border border-slate-200 shadow-sm"
+          class="lg:col-span-2 rounded-2xl p-5 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
         >
           <!-- header -->
           <div class="flex items-center justify-between mb-4">
@@ -221,16 +213,27 @@
             {% for p in recent_projects %}
 
             <div
-              onclick="window.location.href='/project/{{ p.id }}/'"
-              class="rounded-xl overflow-hidden cursor-pointer border border-slate-200 hover:shadow-md transition group"
+              onclick="window.location.href='/projects/{{ p.id }}/'"
+              class="rounded-xl overflow-hidden cursor-pointer border border-slate-200  dark:border-gray-700 hover:shadow-md transition group"
             >
               <!-- image -->
               <div class="h-32 overflow-hidden relative">
-                <img
-                  src="{{ p.image }}"
-                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                />
+                {% with url=p.files.first.file.url|lower %} 
+          {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
+          <img
+           loading="lazy"
+            src="{{ p.files.first.file.url }}"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            alt="{{ p.title }}"
+              decoding="async"
 
+          />
+          {% else %}
+          <div class="w-full h-full flex items-center justify-center text-6xl">
+            📄
+          </div>
+          {% endif %} {% endwith %}
+                 
                 <!-- status badge -->
                 <div class="absolute top-2 right-2">
                   {% if p.status == 'published' %}
@@ -283,7 +286,7 @@
         <div class="space-y-4">
           <!-- Quick Actions -->
           <div
-            class="rounded-2xl p-3 bg-white border border-slate-200 shadow-sm"
+            class="rounded-2xl p-3 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
           >
             <h3 class="text-sm font-bold text-slate-900 mb-3">Quick Actions</h3>
 
@@ -315,7 +318,7 @@
           </div>
           <!-- ACTIVITY -->
           <div
-            class="rounded-2xl p-4 bg-white border border-slate-200 shadow-sm"
+            class="rounded-2xl p-4 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
           >
             <h3 class="text-sm font-bold text-slate-900 mb-3">
               Recent Activity
@@ -325,306 +328,39 @@
               {% for a in recent_activity %}
 
               <div class="flex items-start gap-3">
-                <div
-                  class="w-7 h-7 rounded-full flex items-center  justify-center {{ a.bg }} {{ a.text_color }}"
-                >
-                  <i data-lucide="{{ a.icon }}" class="w-4 h-4"></i>
-                </div>
+                 <div class="shrink-0 mt-0.5">
+          <div
+            class="w-10 h-10 rounded-full {{ a.style.color }} flex items-center justify-center"
+          >
+            {{ a.style.icon|safe }}
+          </div>
+        </div>
 
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs text-slate-900 leading-5">{{ a.text }}</p>
+                  <p class="text-xs text-slate-900 leading-5">{{ a.title }}</p>
 
-                  <p class="text-[11px] text-slate-500 mt-0.5">{{ a.time }}</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">{{ a.created_at|timesince }} ago </p>
                 </div>
               </div>
 
               {% endfor %}
             </div>
 
-            <button
-              onclick="window.location.href = '/activity'"
-              class="w-full mt-3 rounded-xl py-2 text-xs font-semibold bg-slate-100 text-indigo-600 hover:bg-slate-200 transition"
+            <a 
+              href="/notifications/"
+              class="w-full mt-3 flex justify-center rounded-xl py-2 text-xs font-semibold bg-slate-100 text-indigo-600 hover:bg-slate-200 transition"
             >
               View Full Activity
-            </button>
+            </a>
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-      lucide.createIcons();
 
-      // LINE CHART
-      new Chart(document.getElementById("lineChart"), {
-        type: "line",
-        data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [
-            {
-              label: "Downloads",
-              data: [18, 24, 31, 42, 38, 29, 35],
-              borderColor: "#4F46E5",
-              tension: 0.4,
-            },
-            {
-              label: "Views",
-              data: [45, 62, 58, 87, 94, 71, 83],
-              borderColor: "#7C3AED",
-              tension: 0.4,
-            },
-          ],
-        },
-      });
+<script src="{% static 'dashboard/js/dashboard_charts.js' %}" defer></script>
+<script src="{% static 'dashboard/js/apexcharts.min.js' %}" defer></script>
 
-      // PIE CHART
-      new Chart(document.getElementById("pieChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Images", "Videos", "Docs", "Other"],
-          datasets: [
-            {
-              data: [38, 22, 18, 22],
-              backgroundColor: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-            },
-          ],
-        },
-      });
+{% endwith %}
 
-      // BAR CHART
-      new Chart(document.getElementById("barChart"), {
-        type: "bar",
-        data: {
-          labels: ["Brand", "UI Lib", "Dashboard", "Icon Pack", "Fonts"],
-          datasets: [
-            {
-              label: "Downloads",
-              data: [412, 387, 298, 521, 164],
-              backgroundColor: "#4F46E5",
-            },
-            {
-              label: "Stars",
-              data: [88, 142, 76, 193, 41],
-              backgroundColor: "#7C3AED",
-            },
-          ],
-        },
-      });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <script>
-      const weeklyData = JSON.parse(
-        document.getElementById("weekly-data").textContent,
-      );
-
-      console.log(typeof weeklyData);
-
-      console.log(weeklyData);
-      console.log(Array.isArray(weeklyData));
-      console.log(weeklyData);
-
-      const categories = weeklyData.map((item) => item.day);
-
-      const downloads = weeklyData.map((item) => item.downloads);
-
-      const views = weeklyData.map((item) => item.views);
-
-      const uploads = weeklyData.map((item) => item.uploads);
-
-      var optionsChart = {
-        series: [
-          {
-            name: "Downloads",
-            data: downloads,
-          },
-        ],
-
-        chart: {
-          type: "area",
-          height: 220,
-          toolbar: {
-            show: false,
-          },
-        },
-
-        stroke: {
-          curve: "smooth",
-          width: 3,
-        },
-
-        dataLabels: {
-          enabled: false,
-        },
-
-        fill: {
-          type: "gradient",
-          gradient: {
-            opacityFrom: 0.3,
-            opacityTo: 0,
-          },
-        },
-
-        colors: ["#4F46E5"],
-
-        xaxis: {
-          categories: categories,
-        },
-      };
-
-      const chart = new ApexCharts(
-        document.querySelector("#activityChart"),
-        optionsChart,
-      );
-
-      chart.render();
-
-      const chartData = {
-        downloads: weeklyData.map((x) => x.downloads),
-        views: weeklyData.map((x) => x.views),
-        uploads: weeklyData.map((x) => x.uploads),
-      };
-      function changeChart(type) {
-        chart.updateSeries([
-          {
-            data: chartData[type],
-          },
-        ]);
-      }
-
-      function changeChart(type, element) {
-        chart.updateSeries([
-          {
-            name: type,
-            data: chartData[type],
-          },
-        ]);
-
-        document.querySelectorAll(".chart-btn").forEach((btn) => {
-          btn.classList.remove(
-            "bg-white",
-            "text-indigo-600",
-            "font-semibold",
-            "shadow-sm",
-          );
-
-          btn.classList.add("text-slate-500");
-        });
-
-        element.classList.add(
-          "bg-white",
-          "text-indigo-600",
-          "font-semibold",
-          "shadow-sm",
-        );
-
-        element.classList.remove("text-slate-500");
-      }
-    </script>
-    <script>
-      var options = {
-        series: [38, 22, 18, 22],
-
-        chart: {
-          type: "donut",
-
-          height: 220,
-        },
-
-        labels: ["Images", "Videos", "Docs", "Other"],
-
-        colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-
-        legend: {
-          position: "bottom",
-        },
-
-        plotOptions: {
-          pie: {
-            donut: {
-              size: "65%",
-            },
-          },
-        },
-      };
-
-      new ApexCharts(document.querySelector("#storageChart"), options).render();
-    </script>
-    <script>
-      const projectData = JSON.parse(
-        document.getElementById("project-data").textContent,
-      );
-
-      const names = projectData.map((x) => x.name);
-
-      const downloads1 = projectData.map((x) => x.downloads);
-
-      const stars = projectData.map((x) => x.stars);
-
-      var options = {
-        series: [
-          {
-            name: "Downloads",
-            data: downloads1,
-          },
-
-          {
-            name: "Stars",
-            data: stars,
-          },
-        ],
-
-        chart: {
-          type: "bar",
-          height: 250,
-          toolbar: {
-            show: false,
-          },
-        },
-
-        plotOptions: {
-          bar: {
-            borderRadius: 4,
-            borderRadiusApplication: "end",
-            groupPadding: 3,
-
-            columnWidth: "20%",
-          },
-        },
-
-        dataLabels: {
-          enabled: false,
-        },
-
-        stroke: {
-          show: false,
-        },
-
-        colors: ["#4F46E5", "#7C3AED"],
-
-        xaxis: {
-          categories: names,
-        },
-
-        grid: {
-          borderColor: "#e5e7eb",
-          strokeDashArray: 4,
-        },
-
-        legend: {
-          position: "bottom",
-        },
-
-        tooltip: {
-          theme: "light",
-        },
-      };
-
-      new ApexCharts(
-        document.querySelector("#performanceChart"),
-        options,
-      ).render();
-    </script>
-  </body>
-</html>
 {% endblock %}

@@ -1,0 +1,119 @@
+<aside
+  id="sidebar"
+  class="fixed bg-white left-0 top-0 h-screen flex flex-col z-40 transition-all duration-300 border-r border-r-[#0f172a14] dark:bg-gray-900 dark:text-white dark:border-r-gray-700"
+  style="
+    width: 256px;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
+  "
+>
+  <!-- Logo -->
+  <div
+    class="flex items-center h-16 px-4 gap-3 border-b border-b-[#0f172a14]"
+  >
+    <div
+      class="w-10 h-10 rounded-full flex items-center justify-center"
+      style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+    >
+      <!-- zap icon -->
+      <svg
+        class="w-5 h-5 text-white"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+      </svg>
+    </div>
+
+    <div>
+      <div class="text-[17px] font-bold tracking-tight text-gray-900">
+        SkillSphere
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Project -->
+   
+  
+  <a class="px-3 py-4" href="{% url 'projects:create-project' %}">
+    <d
+      class="flex items-center gap-2 w-full rounded-3xl text-white transition active:scale-95 px-4 py-3 shadow-lg"
+      style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+    >
+      <!-- plus -->
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path stroke-width="2" d="M12 5v14M5 12h14" />
+      </svg>
+
+      <span class="text-sm font-semibold">New Project</span>
+    </d>
+  </a>
+
+  <!-- NAV -->
+{% with request.resolver_match.url_name as url_name %}
+
+<nav class="flex-1 overflow-y-auto px-3 space-y-1 text-sm">
+
+  {% for item in sidebar_items %}
+
+  <a
+    href="{{ item.url }}"
+    class="flex items-center gap-3 w-full rounded-3xl p-3  transition
+    {% if url_name == item.url_name %}
+      bg-indigo-50 text-indigo-500 font-bold
+    {% else %}
+      text-gray-500 hover:bg-gray-100
+    {% endif %}"
+  >
+
+    {{ item.icon|safe }}
+
+    <span>{{ item.name }}</span>
+  </a>
+
+  {% endfor %}
+
+</nav>
+
+{% endwith %}
+  <!-- Footer -->
+  <div
+    class="px-3 pb-4 border-t pt-3"
+    style="border-color: var(--sidebar-border)"
+  >
+    <div
+      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 cursor-pointer"
+    >
+      <div
+        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+      >
+        AJ
+      </div>
+
+      <div class="flex-1">
+        <div class="text-sm font-semibold">{{ user.username }}</div>
+        <div class="text-xs text-gray-500">Pro Plan</div>
+      </div>
+
+      <!-- settings -->
+      <svg
+        class="w-4 h-4 text-gray-500"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          stroke-width="2"
+          d="M12 1v2m0 18v2m9-11h2M1 12H3m15.364-6.364l1.414-1.414M4.222 19.778l1.414-1.414"
+        />
+      </svg>
+    </div>
+  </div>
+  
+</aside>

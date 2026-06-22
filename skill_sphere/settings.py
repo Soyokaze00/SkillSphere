@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
     'tailwind',
+    "django.contrib.humanize",
 
     'theme',  
         'lucide', # <-- این خط را اضافه کنید
@@ -83,14 +84,17 @@ LOGIN_URL = "/users/login/"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # "DIRS": [],
         "APP_DIRS": True,
+         "DIRS": [BASE_DIR / "templates"], 
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'notifications.context_processors.notifications',
+                "skill_sphere.context_processors.sidebar_menu",
             ],
         },
     },
