@@ -17,13 +17,28 @@
     </button>
 </form>
 
-<a href="{% url 'projects:project-list' %}">
+<a href="{% url 'projects:project-list' %}"
+>
     Back to Projects
 </a>
 <form method="POST" enctype="multipart/form-data" id="projectForm">
   {% csrf_token %}
-
+   
   <div class="max-w-4xl mx-auto p-6 space-y-6">
+      <a
+    onclick="history.back()"
+         class="flex items-center gap-2 transition-all hover:opacity-70 text-sm text-gray-500"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+      ></path>
+    </svg>
+    Back to Projects
+  </a>
     <!-- HEADER -->
     <div>
       <h1 class="text-2xl font-bold">Create Project</h1>

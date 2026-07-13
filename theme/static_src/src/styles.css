@@ -3,24 +3,20 @@
 
 @source "../../../**/*.{html,py,js}";
 
-/* فعال‌سازی دارک مود با کلاس */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* استایل‌های پایه دارک مود */
 .dark {
     --tw-bg-opacity: 1;
     background-color: #0f172a;
     color: #e2e8f0;
 }
 
-/* کلاس‌های کمکی دارک مود */
 @layer base {
     .dark {
         color-scheme: dark;
     }
 }
 
-/* استایل‌های دستی برای دارک مود (در صورت نیاز) */
 .dark .bg-white {
     background-color: #1e293b !important;
 }
@@ -41,7 +37,6 @@
     border-color: #334155 !important;
 }
 
-/* transition برای تغییر تم */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

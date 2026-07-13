@@ -30,6 +30,7 @@ urlpatterns = [
         "notifications/",
         include("notifications.urls")
     ),
+    path('search/', include('search.urls')),
 ]
 
 

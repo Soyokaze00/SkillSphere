@@ -1,15 +1,12 @@
 console.time("project-detail-js");
 
-// کل کد
 
 function switchTab(tab) {
 
-  // hide all tabs
   document.querySelectorAll(".tab-panel").forEach(el => {
     el.classList.add("hidden");
   });
 
-  // show active tab
   const target = document.getElementById("tab-" + tab);
   if (target) {
     target.classList.remove("hidden")
@@ -17,13 +14,11 @@ function switchTab(tab) {
   }
 ;
 
-  // reset buttons
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.remove("text-indigo-600", "border-indigo-600");
     btn.classList.add("text-gray-500", "border-transparent");
   });
 
-  // active button
   const activeBtn = document.querySelector(`[data-tab="${tab}"]`);
   if (activeBtn) {
     activeBtn.classList.add("text-indigo-600", "border-indigo-600");
@@ -31,8 +26,27 @@ function switchTab(tab) {
   }
 }
 
-// default tab
-document.addEventListener("DOMContentLoaded", () => {
-  switchTab("files");
+document.addEventListener('DOMContentLoaded', function() {
+  var label = document.querySelector('.file-upload-label');
+  var wrapper = document.querySelector('.file-input-wrapper');
+  var input = wrapper ? wrapper.querySelector('input[type="file"]') : null;
+
+  console.log('label پیدا شد؟', label);
+  console.log('wrapper پیدا شد؟', wrapper);
+  console.log('input پیدا شد؟', input);
+
+  if (label && input) {
+    label.addEventListener('click', function() {
+      console.log('کلیک شد، دارم input.click() صدا می‌زنم');
+      input.click();
+    });
+
+    input.addEventListener('change', function() {
+      console.log('فایل انتخاب شد:', input.files);
+      var nameText = document.querySelector('.file-name-text');
+      if (nameText) {
+        nameText.textContent = input.files.length > 0 ? input.files[0].name : 'No file chosen';
+      }
+    });
+  }
 });
-console.timeEnd("project-detail-js");

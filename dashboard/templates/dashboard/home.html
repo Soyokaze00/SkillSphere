@@ -8,6 +8,7 @@
 
 {{ weekly_activity|json_script:"weekly-data" }} 
 {{ project_perf|json_script:"project-data" }}
+{{ storage_pie|json_script:"storage-data" }}
 
 
 
@@ -84,12 +85,13 @@
         >
           <div class="flex items-start justify-between">
             <div
-              class="w-10 h-10 rounded-xl flex items-center justify-center {{ stat.icon_bg }}"
+              class="w-10 h-10 rounded-xl flex items-center justify-center {{ stat.icon_bg }} {{ stat.icon_color }}"
             >
-              <i
-                data-lucide="{{ stat.icon }}"
-                class="w-5 h-5 {{ stat.icon_color }}"
-              ></i>
+              <div
+              >
+                {{ stat.icon|safe }}
+
+            </div>
             </div>
 
             <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
@@ -158,8 +160,12 @@
         </div> -->
 
         <!-- PIE -->
+        <!-- Storage Usage -->
         <div class="bg-white p-5 rounded-2xl shadow">
+          <h3 class="font-bold text-[15px]">Storage Usage</h3>
           <div id="storageChart"></div>
+           <div id="storageLegend"></div>
+
         </div>
       </div>
 
@@ -219,7 +225,7 @@
               <!-- image -->
               <div class="h-32 overflow-hidden relative">
                 {% with url=p.files.first.file.url|lower %} 
-          {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
+                {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
           <img
            loading="lazy"
             src="{{ p.files.first.file.url }}"
@@ -301,7 +307,9 @@
                 <div
                   class="w-7 h-7  flex items-center justify-start  {{ a.text_color }}"
                 >
-                  <i data-lucide="{{ a.icon }}" class="w-5 h-5"></i>
+                <div>
+                  {{ a.icon|safe }}
+                </div>
                 </div>
 
                 <!-- title -->

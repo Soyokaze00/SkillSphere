@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+{% extends "base.html" %} 
+{% block content %}
+ {% load humanize%} 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillSphere | {{ project_file.filename }}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Prism Syntax Highlighting -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -28,7 +26,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<!-- <body class="bg-slate-50 min-h-screen"> -->
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
     
@@ -113,7 +111,7 @@
                             <a href="{{ project_file.file.url }}" download 
                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all">
                                 <i class="fas fa-download"></i>
-                                دانلود PDF
+                                download PDF
                             </a>
                         </div>
                     </object>
@@ -165,16 +163,15 @@
             <a href="{% url 'projects:project-detail' project_file.project.id %}" 
                class="text-indigo-600 hover:text-indigo-800 transition-colors font-medium inline-flex items-center gap-1.5">
                 <i class="fas fa-arrow-left"></i>
-                بازگشت به پروژه
+            go to back
             </a>
         </div>
     </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
 
-</body>
-</html>
+
+{% endblock %}

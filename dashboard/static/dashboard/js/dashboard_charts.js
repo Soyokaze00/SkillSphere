@@ -1,11 +1,8 @@
-
 document.addEventListener("DOMContentLoaded", function () {
- 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
 
-  /* ---------------- CHART.JS ---------------- */
 
   const lineEl = document.getElementById("lineChart");
   if (lineEl) {
@@ -31,21 +28,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  const pieEl = document.getElementById("pieChart");
-  if (pieEl) {
-    new Chart(pieEl, {
-      type: "doughnut",
-      data: {
-        labels: ["Images", "Videos", "Docs", "Other"],
-        datasets: [
-          {
-            data: [38, 22, 18, 22],
-            backgroundColor: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-          },
-        ],
-      },
-    });
-  }
+  // const pieEl = document.getElementById("pieChart");
+  // if (pieEl) {
+  //   new Chart(pieEl, {
+  //     type: "doughnut",
+  //     data: {
+  //       labels: ["Images", "Videos", "Docs", "Other"],
+  //       datasets: [
+  //         {
+  //           data: [38, 22, 18, 22],
+  //           backgroundColor: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
+  //         },
+  //       ],
+  //     },
+  //   });
+  // }
 
   // const barEl = document.getElementById("barChart");
   // if (barEl) {
@@ -66,21 +63,20 @@ document.addEventListener("DOMContentLoaded", function () {
   //         },
   //       ],
   //     },
-      
-      
+
   //   });
   // }
 
 
-  /* ---------------- APX ---------------- */
-
   const weeklyEl = document.getElementById("weekly-data");
   const projectEl = document.getElementById("project-data");
+  const storageElData = document.getElementById("storage-data");
 
   if (!weeklyEl || !projectEl) return;
 
   const weeklyData = JSON.parse(weeklyEl.textContent);
   const projectData = JSON.parse(projectEl.textContent);
+  const storageData = JSON.parse(storageElData.textContent);
 
   const categories = weeklyData.map((i) => i.day);
 
@@ -106,32 +102,69 @@ document.addEventListener("DOMContentLoaded", function () {
     chart.render();
 
     window.changeChart = function (type, el) {
-      chart.updateSeries([
-        { name: type, data: chartData[type] },
-      ]);
+      chart.updateSeries([{ name: type, data: chartData[type] }]);
 
       document.querySelectorAll(".chart-btn").forEach((btn) => {
-        btn.classList.remove("bg-white", "text-indigo-600", "font-semibold", "shadow-sm");
+        btn.classList.remove(
+          "bg-white",
+          "text-indigo-600",
+          "font-semibold",
+          "shadow-sm",
+        );
         btn.classList.add("text-slate-500");
       });
 
       if (el) {
-        el.classList.add("bg-white", "text-indigo-600", "font-semibold", "shadow-sm");
+        el.classList.add(
+          "bg-white",
+          "text-indigo-600",
+          "font-semibold",
+          "shadow-sm",
+        );
         el.classList.remove("text-slate-500");
       }
     };
   }
 
+  const images = storageData.images;
+  const PDFs = storageData.PDFs;
+  const docs = storageData.docs;
+  const other = storageData.other;
+
   const storageEl = document.querySelector("#storageChart");
   if (storageEl && window.ApexCharts) {
     new ApexCharts(storageEl, {
-      series: [38, 22, 18, 22],
+      series: [images, PDFs, docs, other],
       chart: { type: "donut", height: 220 },
-      labels: ["Images", "Videos", "Docs", "Other"],
+      labels: ["Images", "PDFs", "Docs", "Other"],
       colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-      legend: { position: "bottom" },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
       plotOptions: {
-        pie: { donut: { size: "65%" } },
+        pie: {
+          donut: {
+            size: "65%",
+            labels: {
+              show: true,
+
+              total: {
+                show: true,
+                label: "Total Files",
+                formatter: function (w) {
+                  const total = w.globals.seriesTotals.reduce(
+                    (a, b) => a + b,
+                    0,
+                  );
+                  return total;
+                },
+              },
+            },
+          },
+        },
       },
     }).render();
   }
@@ -143,24 +176,58 @@ document.addEventListener("DOMContentLoaded", function () {
         { name: "Downloads", data: projectData.map((x) => x.downloads) },
         { name: "Stars", data: projectData.map((x) => x.stars) },
       ],
-    chart: {
-      type: "bar",
-      height: 250,
-      width: "100%", 
-      toolbar: { show: false },
-    },
-    plotOptions: {
-      bar: {
-        columnWidth: "20%",
-        borderRadius: 4,
+      chart: {
+        type: "bar",
+        height: 250,
+        width: "100%",
+        toolbar: { show: false },
       },
-    },
- 
-    colors: ["#4F46E5", "#7C3AED"],
-    dataLabels: { enabled: false },      colors: ["#4F46E5", "#7C3AED"],
+      plotOptions: {
+        bar: {
+          columnWidth: "20%",
+          borderRadius: 4,
+        },
+      },
+
+      colors: ["#4F46E5", "#7C3AED"],
+      dataLabels: { enabled: false },
+      colors: ["#4F46E5", "#7C3AED"],
       xaxis: { categories: projectData.map((x) => x.name) },
       dataLabels: { enabled: false },
       grid: { borderColor: "#e5e7eb", strokeDashArray: 4 },
     }).render();
   }
+
+  const total = images + PDFs + docs + other;
+
+  const items = [
+    { label: "Images", value: images, color: "#4F46E5" },
+    { label: "PDFs", value: PDFs, color: "#7C3AED" },
+    { label: "Docs", value: docs, color: "#22C55E" },
+    { label: "Other", value: other, color: "#F59E0B" },
+  ];
+
+  const legend = document.getElementById("storageLegend");
+
+  legend.innerHTML = items
+    .map((item) => {
+      const percent = total ? ((item.value / total) * 100).toFixed(1) : 0;
+
+      return `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span
+            class="w-3 h-3 rounded-full"
+            style="background:${item.color}">
+          </span>
+          <span>${item.label}</span>
+        </div>
+
+        <span class="font-medium text-slate-600">
+          ${percent}%
+        </span>
+      </div>
+    `;
+    })
+    .join("");
 });

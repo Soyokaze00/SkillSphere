@@ -1,10 +1,8 @@
-/* ---------------- DATA ---------------- */
 const categories = ["Design", "UI/UX", "Templates", "Code", "Other"];
 let selectedCategory = "{{ project_form.category.value|default:'' }}";
 let status = "{{ project_form.status.value|default:'open' }}";
 let tags = [];
 
-/* ---------------- ELEMENTS ---------------- */
 const title = document.getElementById("title");
 const desc = document.getElementById("desc");
 const titleCount = document.getElementById("titleCount");
@@ -20,7 +18,6 @@ const categoryInput = document.getElementById("categoryInput");
 const statusInput = document.getElementById("statusInput");
 const tagsInput = document.getElementById("tagsInput");
 
-/* ---------------- COUNT ---------------- */
 function updateCounts() {
   titleCount.textContent = title.value.length;
   descCount.textContent = desc.value.length;
@@ -30,10 +27,8 @@ function updateCounts() {
 title.addEventListener("input", updateCounts);
 desc.addEventListener("input", updateCounts);
 
-// Initial counts
 updateCounts();
 
-/* ---------------- CATEGORY ---------------- */
 const catBox = document.getElementById("categories");
 
 categories.forEach((c) => {
@@ -61,7 +56,6 @@ if (selectedCategory) {
   categoryInput.value = selectedCategory;
 }
 
-/* ---------------- STATUS TOGGLE ---------------- */
 const statusBtns = document.querySelectorAll(".status-btn");
 
 statusBtns.forEach((btn) => {
@@ -98,7 +92,6 @@ statusBtns.forEach((btn) => {
   });
 });
 
-/* ---------------- TAGS ---------------- */
 function renderTags() {
   tagBox.innerHTML = "";
   tags.forEach((t, i) => {
@@ -139,7 +132,6 @@ tagInput.addEventListener("keypress", (e) => {
   }
 });
 
-/* ---------------- UPLOAD ---------------- */
 dropzone.onclick = () => fileInput.click();
 
 fileInput.onchange = (e) => {
@@ -156,7 +148,6 @@ fileInput.onchange = (e) => {
   validate();
 };
 
-// Drag and drop support
 dropzone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropzone.classList.add("border-indigo-500", "bg-indigo-50");
@@ -179,7 +170,6 @@ dropzone.addEventListener("drop", (e) => {
   fileInput.dispatchEvent(new Event("change"));
 });
 
-/* ---------------- VALIDATION ---------------- */
 function validate() {
   const ok =
     title.value.trim() &&
@@ -201,11 +191,8 @@ function validate() {
     publishBtn.classList.add("bg-gray-300", "text-gray-600");
   }
 }
-/* ---------------- FORM SUBMIT ---------------- */
-// در JavaScript - حذف publishBtn.onclick و جایگزینی با این:
 
 document.getElementById("projectForm").addEventListener("submit", function (e) {
-  // اعتبارسنجی
   const ok =
     title.value.trim() &&
     desc.value.trim() &&
@@ -218,11 +205,9 @@ document.getElementById("projectForm").addEventListener("submit", function (e) {
     return;
   }
 
-  // اگر اعتبارسنجی موفق بود، فرم ارسال میشه
-  // می‌تونید یک loading indicator اضافه کنید
+
   const btn = document.getElementById("publishBtn");
   btn.textContent = "⏳ Publishing...";
   btn.disabled = true;
 
-  // توجه: اینجا نیازی به setTimeout نیست چون فرم خودش ارسال میشه
 });

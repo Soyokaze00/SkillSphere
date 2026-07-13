@@ -443,7 +443,6 @@
         </div>
         
       </div>
-       <!-- ===== UPLOAD SECTION (فقط برای نویسنده) ===== -->
       {% if user == project.owner %}
       <div class="rounded-2xl bg-linear-to-br from-indigo-50 to-purple-50 border-2 border-dashed border-indigo-300/50 p-6 transition-all hover:border-indigo-400 hover:shadow-lg">
         <div class="flex items-start gap-4">
@@ -461,7 +460,17 @@
               
               <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <div class="flex-1 w-full">
-                  {{ file_form.file }}
+                  <div class="hidden file-input-wrapper">
+                    {{ file_form.file }}
+                  </div>
+
+                  <label class="file-upload-label flex items-center gap-2 text-sm text-gray-500 cursor-pointer hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span class="file-name-text truncate">No file chosen</span>
+                  </label>
+
                   {% if file_form.file.errors %}
                     <p class="text-xs text-red-500 mt-1">{{ file_form.file.errors.0 }}</p>
                   {% endif %}
@@ -478,7 +487,6 @@
                 </button>
               </div>
               
-              <!-- نمایش خطاهای فرم -->
               {% if file_form.non_field_errors %}
                 <div class="mt-2 text-xs text-red-500">
                   {% for error in file_form.non_field_errors %}

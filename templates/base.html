@@ -8,7 +8,7 @@
   src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
   defer
 ></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- <script src="https://unpkg.com/lucide@latest"></script> -->
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,15 +22,12 @@
   
   <div class="relative flex flex-col items-center gap-6">
 
-    <!-- Glow background -->
     <div class="absolute w-24 h-24 bg-indigo-400/20 blur-2xl rounded-full animate-pulse"></div>
 
-    <!-- Spinner gradient ring -->
     <div class="w-14 h-14  rounded-full border-4 border-gray-200 relative">
       <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-600 border-r-purple-500 animate-spin"></div>
     </div>
 
-    <!-- Text -->
     <div class="text-sm  text-gray-500 font-medium tracking-wide">
       Loading dashboard...
     </div>
@@ -88,7 +85,6 @@
         const toggleBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
         
-        // تابع دریافت تم از کوکی
         function getTheme() {
             const cookies = document.cookie.split(';');
             for (let cookie of cookies) {
@@ -98,7 +94,6 @@
             return null;
         }
         
-        // تابع تنظیم تم
         function setTheme(theme) {
             if (theme === 'dark') {
                 html.classList.add('dark');
@@ -108,14 +103,12 @@
             document.cookie = `theme=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
         }
         
-        // تابع تغییر تم
         function toggleTheme() {
             const currentTheme = getTheme();
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             setTheme(newTheme);
         }
         
-        // مقداردهی اولیه
         const savedTheme = getTheme();
         if (savedTheme === 'dark') {
             setTheme('dark');
@@ -123,7 +116,6 @@
             setTheme('light');
         }
         
-        // رویداد کلیک
         toggleBtn.addEventListener('click', toggleTheme);
     });
 </script>

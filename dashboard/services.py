@@ -50,64 +50,22 @@ def get_dashboard_data(user,projects):
     ]
 
 
-    recent_activity = [
-        {
-            "icon": "download",
-            "text": "Sarah Chen downloaded your Brand Identity Kit",
-            "time": "2m ago",
-            "color": "#4F46E5",
-            "bg": "bg-indigo-50",
-            "text_color": "text-indigo-600",
-        },
-        {
-            "icon": "star",
-            "text": "Marcus Rivera starred Mobile App UI Kit",
-            "time": "18m ago",
-            "color": "#F59E0B",
-            "bg": "bg-amber-50",
-            "text_color": "text-amber-500",
-        },
-        {
-            "icon": "eye",
-            "text": "Your Analytics Dashboard reached 1,500 views",
-            "time": "1h ago",
-            "color": "#7C3AED",
-            "bg": "bg-purple-50",
-            "text_color": "text-purple-600",
-        },
-        {
-            "icon": "users",
-            "text": "Daniel Kim started following you",
-            "time": "3h ago",
-            "color": "#22C55E",
-            "bg": "bg-green-50",
-            "text_color": "text-green-600",
-        },
-        {
-            "icon": "download",
-            "text": "Icon Pack reached 500 downloads",
-            "time": "5h ago",
-            "color": "#4F46E5",
-            "bg": "bg-indigo-50",
-            "text_color": "text-indigo-600",
-        },
-    ]
 
     quick_actions = [
     {
         "label": "New Project",
         "desc": "Upload your work",
-        "icon": "plus",
+        "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
         "color": "#4F46E5",
         "bg": "bg-indigo-50",
         "text_color": "text-indigo-600",
         "border_color": "border-indigo-200",
-        "page": "/create-project/",
+        "page": "/projects/create-project/",
     },
     {
         "label": "Upload Files",
         "desc": "Add to existing",
-        "icon": "upload",
+        "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>',
         "color": "#7C3AED",
         "bg": "bg-purple-50",
         "text_color": "text-purple-600",
@@ -117,7 +75,7 @@ def get_dashboard_data(user,projects):
     {
         "label": "Analytics",
         "desc": "View insights",
-        "icon": "bar-chart-2",
+        "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-no-axes-column-icon lucide-chart-no-axes-column"><path d="M5 21v-6"/><path d="M12 21V3"/><path d="M19 21V9"/></svg>',
         "color": "#22C55E",
         "bg": "bg-green-50",
         "text_color": "text-green-600",
@@ -127,7 +85,7 @@ def get_dashboard_data(user,projects):
     {
         "label": "Notifications",
         "desc": "3 unread",
-        "icon": "bell",
+        "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
         "color": "#F59E0B",
         "bg": "bg-amber-50",
         "text_color": "text-amber-500",
@@ -136,44 +94,6 @@ def get_dashboard_data(user,projects):
     },
      ]
     
-    recent_projects = [
-    {
-        "id": 1,
-        "title": "Brand Identity Kit",
-        "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400",
-        "status": "published",
-        "downloads": 412,
-        "stars": 88,
-        "updated_at": "2h ago",
-    },
-    {
-        "id": 2,
-        "title": "Mobile App UI Kit",
-        "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400",
-        "status": "published",
-        "downloads": 387,
-        "stars": 142,
-        "updated_at": "1d ago",
-    },
-    {
-        "id": 3,
-        "title": "Analytics Dashboard",
-        "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
-        "status": "published",
-        "downloads": 298,
-        "stars": 76,
-        "updated_at": "3d ago",
-    },
-    {
-        "id": 4,
-        "title": "E-commerce Illustrations",
-        "image": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400",
-        "status": "draft",
-        "downloads": 521,
-        "stars": 193,
-        "updated_at": "5d ago",
-    },
-    ]
 
     return { 'banner_stats': banner_stats ,    
             "stats": get_stats(user),
@@ -181,6 +101,7 @@ def get_dashboard_data(user,projects):
             "project_perf": get_project_perf(projects),
             "recent_activity": get_recent_activity(user),
             "quick_actions": quick_actions,
+            "storage_pie": get_project_storage(projects,user),
             "recent_projects": get_recent_projects(projects),}
     
     
@@ -199,7 +120,7 @@ def get_stats(user):
             "label": "Projects",
             "value": projects.count(),
             "sub": "All your projects",
-            "icon": "folder-open",
+            "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open-icon lucide-folder-open"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>',
             "icon_bg": "bg-indigo-100",
             "icon_color": "text-indigo-600",
             "sub_color": "text-indigo-600",
@@ -208,7 +129,7 @@ def get_stats(user):
             "label": "Uploads",
             "value": files.count(),
             "sub": "Total uploaded files",
-            "icon": "upload",
+            "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>',
             "icon_bg": "bg-purple-100",
             "icon_color": "text-purple-600",
             "sub_color": "text-purple-600",
@@ -217,7 +138,7 @@ def get_stats(user):
             "label": "Storage",
             "value": sum(f.file.size for f in files),
             "sub": "Bytes used",
-            "icon": "download",
+            "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>',
             "icon_bg": "bg-green-50",
             "icon_color": "text-green-500",
             "sub_color": "text-green-500",
@@ -226,7 +147,7 @@ def get_stats(user):
             "label": "Followers",
             "value": 0,
             "sub": "Coming soon",
-            "icon": "users",
+            "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-round-icon lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg>',
             "icon_bg": "bg-amber-50",
             "icon_color": "text-amber-500",
             "sub_color": "text-amber-500",
@@ -241,12 +162,51 @@ def get_project_perf(projects):
         {
             "name": p.title,
             "downloads": p.files.count(),
-            "stars": 0 
+            "stars": 0
         }
         for p in projects[:5]
     ]
     
+def get_project_storage(projects, user):
+    image_exts = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'}
+    pdf_exts = {'pdf'}
+    doc_exts = {
+        'doc', 'docx',
+        'xls', 'xlsx',
+        'ppt', 'pptx',
+        'odt', 'ods', 'odp',
+        'rtf', 'txt'
+    }
 
+    files = ProjectFile.objects.filter(
+        project__in=projects,
+        uploaded_by=user
+    )
+
+    images = 0
+    PDFs = 0
+    docs = 0
+    other = 0
+
+    for f in files:
+        ext = f.file.name.rsplit('.', 1)[-1].lower()
+
+        if ext in image_exts:
+            images += 1
+        elif ext in pdf_exts:
+            PDFs += 1
+        elif ext in doc_exts:
+            docs += 1
+        else:
+            other += 1
+
+    return {
+        "images": images,
+        "PDFs": PDFs,
+        "docs": docs,
+        "other": other,
+    }    
+      
 def get_recent_activity(user):
     
     recent_activity = [
