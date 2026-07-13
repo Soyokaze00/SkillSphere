@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  :root{
+    --background:#F7F8FA;
+    --foreground:#111114;
+    --card:#FFFFFF;
+    --border:#E7E7EF;
+    --muted:#F1F1F6;
+    --muted-foreground:#8A8A99;
+    --primary:#4F46E5;
+    --accent:#EEECFC;
+    --secondary:#F1F1F6;
+  }
+  body{ background:var(--background); font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; }
+  .fade-in{ animation: fadeIn .15s ease-out; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+</style>
+
+<!-- Top Nav -->
+<!-- <header class="sticky top-0 z-10 flex items-center justify-between px-8 py-4" style="background:var(--card); border-bottom:1px solid var(--border);">
+  <nav class="flex items-center gap-2 text-sm">
+    <span style="color:var(--muted-foreground);">Home</span>
+    <span style="color:var(--muted-foreground);">/</span>
+    <span class="font-semibold" style="color:var(--foreground);">Search</span>
+  </nav>
+
+  <div class="flex items-center gap-4">
+    <div class="relative hidden sm:block">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input id="topSearchInput" type="text" placeholder="Search anything..."
+        class="rounded-xl pl-9 pr-12 py-2 text-sm outline-none w-64 transition-all"
+        style="background:var(--muted); border:1px solid transparent; color:var(--foreground);">
+      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs px-1.5 py-0.5 rounded"
+        style="color:var(--muted-foreground); background:var(--card); border:1px solid var(--border);">⌘K</span>
+    </div>
+
+    <button class="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:opacity-80" style="background:var(--muted);" title="Toggle dark mode">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+
+    <button class="relative w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:opacity-80" style="background:var(--muted);" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style="background:#EF4444; border:2px solid var(--card);"></span>
+    </button>
+
+    <button class="flex items-center gap-1.5 pl-1 pr-1 py-1 rounded-full transition-colors hover:opacity-90">
+      <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+        style="background:linear-gradient(135deg, #4F46E5, #7C3AED);">AJ</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+  </div>
+</header> -->
+
+<div class="max-w-3xl mx-auto p-8 space-y-6">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-3xl font-extrabold tracking-tight" style="color:var(--foreground); letter-spacing:-0.5px;">Search</h1>
+    <p class="text-sm mt-1" style="color:var(--muted-foreground);">Find projects, creators, and tags</p>
+  </div>
+
+  <!-- Search Input -->
+  <div class="relative">
+    <svg id="searchIcon" class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input id="searchInput" type="text" placeholder="Search projects, creators, tags..."
+      class="w-full rounded-2xl pl-12 pr-12 py-4 outline-none transition-all text-base"
+      style="background:var(--card); border:1px solid var(--border); color:var(--foreground);">
+    <button id="clearBtn" class="hidden absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full items-center justify-center"
+      style="background:var(--muted); color:var(--muted-foreground);">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+
+  <!-- Empty state: discovery -->
+  <div id="discoveryState" class="space-y-6"></div>
+
+  <!-- Results state -->
+  <div id="resultsState" class="hidden space-y-5"></div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// Sample data (replace with real data from Django, e.g. via an
+// API endpoint or template context)
+// ---------------------------------------------------------------
+const SUGGESTIONS = ['Brand Identity Kit', 'UI Components', 'Icon Pack', 'React Dashboard', 'Figma Templates', 'Motion Design'];
+const TRENDING = ['Figma', 'React', 'Branding', 'UI/UX', 'SVG Icons', 'Dark Mode', 'Templates', 'Open Source'];
+let RECENT = ['Dashboard UI', 'Brand Kit', 'Motion pack', 'Icon set'];
+
+const ALL_RESULTS = {
+  projects: [
+    { id: 1, title: 'Brand Identity Kit 2026', category: 'Design', downloads: 412, stars: 88, image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=200&h=120&fit=crop&auto=format', owner: 'Alex Johnson' },
+    { id: 2, title: 'Mobile App UI Kit', category: 'UI/UX', downloads: 387, stars: 142, image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=200&h=120&fit=crop&auto=format', owner: 'Sarah Chen' },
+    { id: 3, title: 'Analytics Dashboard Template', category: 'Templates', downloads: 298, stars: 76, image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=120&fit=crop&auto=format', owner: 'Marcus Rivera' },
+    { id: 4, title: 'Icon Pack Pro — 2000+', category: 'Icons', downloads: 689, stars: 247, image: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=200&h=120&fit=crop&auto=format', owner: 'Daniel Kim' },
+  ],
+  users: [
+    { id: 1, name: 'Alex Johnson', role: 'Brand Designer', projects: 24, followers: 1284, avatar: 'AJ' },
+    { id: 2, name: 'Sarah Chen', role: 'Product Designer', projects: 18, followers: 892, avatar: 'SC' },
+    { id: 3, name: 'Marcus Rivera', role: 'Frontend Developer', projects: 12, followers: 543, avatar: 'MR' },
+  ],
+  tags: [
+    { tag: 'Figma', count: 248 }, { tag: 'React', count: 189 }, { tag: 'Branding', count: 167 },
+    { tag: 'UI/UX', count: 312 }, { tag: 'SVG', count: 98 }, { tag: 'Dark Mode', count: 142 },
+  ],
+};
+
+// ---------------------------------------------------------------
+// State
+// ---------------------------------------------------------------
+let state = {
+  query: '',
+  activeTab: 'all', // all | projects | users | tags
+};
+
+const els = {
+  input: document.getElementById('searchInput'),
+  clearBtn: document.getElementById('clearBtn'),
+  searchIcon: document.getElementById('searchIcon'),
+  discovery: document.getElementById('discoveryState'),
+  results: document.getElementById('resultsState'),
+  topSearchInput: document.getElementById('topSearchInput'),
+};
+
+// ---------------------------------------------------------------
+// Icon helper
+// ---------------------------------------------------------------
+function iconSvg(name, size = 16, color = 'currentColor') {
+  const icons = {
+    clock: `<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>`,
+    trending: `<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>`,
+    hash: `<line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line>`,
+    search: `<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>`,
+    arrowRight: `<line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>`,
+    download: `<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>`,
+    star: `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>`,
+    tag: `<path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2.41 12.4a2 2 0 0 1 0-2.83l7.17-7.17A2 2 0 0 1 11 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-.59 1.41z"></path><circle cx="7" cy="7" r="1"></circle>`,
+  };
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
+}
+
+function filterList(list, query, keyFn) {
+  if (!query) return list;
+  const q = query.toLowerCase();
+  return list.filter(item => keyFn(item).toLowerCase().includes(q));
+}
+
+// ---------------------------------------------------------------
+// Render
+// ---------------------------------------------------------------
+function render() {
+  const hasQuery = state.query.length > 0;
+  els.clearBtn.classList.toggle('hidden', !hasQuery);
+  els.clearBtn.classList.toggle('flex', hasQuery);
+
+  if (!hasQuery) {
+    els.discovery.classList.remove('hidden');
+    els.results.classList.add('hidden');
+    renderDiscovery();
+  } else {
+    els.discovery.classList.add('hidden');
+    els.results.classList.remove('hidden');
+    renderResults();
+  }
+}
+
+function renderDiscovery() {
+  const recentHtml = RECENT.length ? `
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold" style="color:var(--foreground);">Recent Searches</h3>
+        <button id="clearRecentBtn" class="text-xs font-medium" style="color:var(--primary);">Clear all</button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${RECENT.map(r => `
+          <button class="recent-chip flex items-center gap-2 rounded-full px-3.5 py-2 transition-all hover:opacity-80 text-sm"
+            data-query="${r}" style="background:var(--card); border:1px solid var(--border); color:var(--foreground);">
+            ${iconSvg('clock', 13, 'var(--muted-foreground)')}
+            ${r}
+          </button>`).join('')}
+      </div>
+    </div>` : '';
+
+  els.discovery.innerHTML = `
+    ${recentHtml}
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        ${iconSvg('trending', 16, 'var(--primary)')}
+        <h3 class="text-sm font-bold" style="color:var(--foreground);">Trending Tags</h3>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${TRENDING.map(t => `
+          <button class="trending-chip flex items-center gap-1.5 rounded-full px-3.5 py-2 transition-all hover:opacity-80 text-sm font-medium"
+            data-query="${t}" style="background:var(--accent); color:var(--primary);">
+            ${iconSvg('hash', 12)}${t}
+          </button>`).join('')}
+      </div>
+    </div>
+    <div>
+      <h3 class="text-sm font-bold mb-3" style="color:var(--foreground);">Suggested Searches</h3>
+      <div class="space-y-1">
+        ${SUGGESTIONS.map(s => `
+          <button class="suggestion-item w-full flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-gray-100 text-left text-sm"
+            data-query="${s}" style="color:var(--foreground);">
+            ${iconSvg('search', 16, 'var(--muted-foreground)')}
+            <span class="font-medium">${s}</span>
+            <span class="ml-auto">${iconSvg('arrowRight', 14, 'var(--muted-foreground)')}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.recent-chip, .trending-chip, .suggestion-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.query = btn.dataset.query;
+      els.input.value = state.query;
+      render();
+    });
+  });
+  const clearRecentBtn = document.getElementById('clearRecentBtn');
+  if (clearRecentBtn) {
+    clearRecentBtn.addEventListener('click', () => {
+      RECENT = [];
+      render();
+    });
+  }
+}
+
+function renderResults() {
+  const filteredProjects = filterList(ALL_RESULTS.projects, state.query, p => p.title + ' ' + p.category);
+  const filteredUsers = filterList(ALL_RESULTS.users, state.query, u => u.name);
+  const filteredTags = filterList(ALL_RESULTS.tags, state.query, t => t.tag);
+
+  const tabs = [
+    { key: 'all', label: 'All', count: filteredProjects.length + filteredUsers.length + filteredTags.length },
+    { key: 'projects', label: 'Projects', count: filteredProjects.length },
+    { key: 'users', label: 'Users', count: filteredUsers.length },
+    { key: 'tags', label: 'Tags', count: filteredTags.length },
+  ];
+
+  const tabsHtml = `
+    <div class="flex gap-1 p-1 rounded-xl" style="background:var(--secondary);">
+      ${tabs.map(t => `
+        <button class="tab-btn flex-1 py-2 rounded-lg text-xs capitalize transition-all"
+          data-tab="${t.key}"
+          style="background:${state.activeTab === t.key ? 'var(--card)' : 'transparent'};
+                 color:${state.activeTab === t.key ? 'var(--primary)' : 'var(--muted-foreground)'};
+                 font-weight:${state.activeTab === t.key ? 600 : 400};">
+          ${t.label} (${t.count})
+        </button>`).join('')}
+    </div>
+  `;
+
+  const showProjects = (state.activeTab === 'all' || state.activeTab === 'projects') && filteredProjects.length > 0;
+  const showUsers = (state.activeTab === 'all' || state.activeTab === 'users') && filteredUsers.length > 0;
+  const showTags = (state.activeTab === 'all' || state.activeTab === 'tags') && filteredTags.length > 0;
+  const noResults = filteredProjects.length === 0 && filteredUsers.length === 0 && filteredTags.length === 0;
+
+  const projectsHtml = showProjects ? `
+    <div>
+      ${state.activeTab === 'all' ? `<h3 class="text-sm font-bold mb-3" style="color:var(--foreground);">Projects</h3>` : ''}
+      <div class="space-y-3">
+        ${filteredProjects.map(p => `
+          <div class="project-item flex gap-4 rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md"
+            data-nav="project-details"
+            style="background:var(--card); border:1px solid var(--border);">
+            <div class="w-20 h-14 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-bold" style="color:var(--foreground);">${p.title}</h4>
+              <p class="text-xs mt-0.5" style="color:var(--muted-foreground);">by ${p.owner}</p>
+              <div class="flex items-center gap-3 mt-2">
+                <span class="px-2 py-0.5 rounded-lg text-xs font-medium" style="background:var(--accent); color:var(--primary);">${p.category}</span>
+                <span class="flex items-center gap-1 text-xs" style="color:var(--muted-foreground);">${iconSvg('download', 11)}${p.downloads}</span>
+                <span class="flex items-center gap-1 text-xs" style="color:var(--muted-foreground);">${iconSvg('star', 11)}${p.stars}</span>
+              </div>
+            </div>
+            <span class="self-center">${iconSvg('arrowRight', 16, 'var(--muted-foreground)')}</span>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  const usersHtml = showUsers ? `
+    <div>
+      ${state.activeTab === 'all' ? `<h3 class="text-sm font-bold mb-3 mt-2" style="color:var(--foreground);">Creators</h3>` : ''}
+      <div class="space-y-3">
+        ${filteredUsers.map(u => `
+          <div class="user-item flex items-center gap-4 rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md"
+            data-nav="profile"
+            style="background:var(--card); border:1px solid var(--border);">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold text-white"
+              style="background:linear-gradient(135deg, #4F46E5, #7C3AED);">
+              ${u.avatar}
+            </div>
+            <div class="flex-1">
+              <h4 class="text-sm font-bold" style="color:var(--foreground);">${u.name}</h4>
+              <p class="text-xs" style="color:var(--muted-foreground);">${u.role} · ${u.projects} projects · ${u.followers} followers</p>
+            </div>
+            <button class="follow-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all hover:opacity-90"
+              style="background:var(--accent); color:var(--primary);">Follow</button>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  const tagsHtml = showTags ? `
+    <div>
+      ${state.activeTab === 'all' ? `<h3 class="text-sm font-bold mb-3 mt-2" style="color:var(--foreground);">Tags</h3>` : ''}
+      <div class="flex flex-wrap gap-2">
+        ${filteredTags.map(t => `
+          <button class="tag-chip flex items-center gap-2 rounded-xl px-4 py-2 transition-all hover:opacity-80 font-semibold text-sm"
+            data-query="${t.tag}" style="background:var(--accent); color:var(--primary);">
+            ${iconSvg('tag', 13)}
+            ${t.tag}
+            <span class="text-xs opacity-70">(${t.count})</span>
+          </button>`).join('')}
+      </div>
+    </div>` : '';
+
+  const noResultsHtml = noResults ? `
+    <div class="rounded-2xl p-12 text-center" style="background:var(--card); border:1px solid var(--border);">
+      <div class="mx-auto mb-3 opacity-40" style="width:32px;">${iconSvg('search', 32, 'var(--muted-foreground)')}</div>
+      <p class="text-base font-semibold" style="color:var(--foreground);">No results found</p>
+      <p class="text-xs mt-1" style="color:var(--muted-foreground);">Try different keywords or browse categories</p>
+    </div>` : '';
+
+  els.results.innerHTML = `
+    ${tabsHtml}
+    <p class="text-xs" style="color:var(--muted-foreground);">Results for "<strong style="color:var(--foreground);">${state.query}</strong>"</p>
+    ${projectsHtml}
+    ${usersHtml}
+    ${tagsHtml}
+    ${noResultsHtml}
+  `;
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.activeTab = btn.dataset.tab;
+      render();
+    });
+  });
+  document.querySelectorAll('.tag-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.query = btn.dataset.query;
+      els.input.value = state.query;
+      render();
+    });
+  });
+  document.querySelectorAll('.project-item, .user-item').forEach(el => {
+    el.addEventListener('click', () => {
+      // Replace with the real Django URL for this project/profile
+      window.location.href = '/' + el.dataset.nav + '/';
+    });
+  });
+  document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Replace with a real fetch() call to a Django follow endpoint
+      btn.textContent = 'Following';
+    });
+  });
+}
+
+// ---------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------
+els.input.addEventListener('input', (e) => {
+  state.query = e.target.value;
+  render();
+});
+els.input.addEventListener('focus', () => {
+  els.input.style.border = '2px solid var(--primary)';
+  els.input.style.boxShadow = '0 0 0 4px rgba(79,70,229,0.08)';
+  els.searchIcon.setAttribute('stroke', 'var(--primary)');
+});
+els.input.addEventListener('blur', () => {
+  els.input.style.border = '1px solid var(--border)';
+  els.input.style.boxShadow = 'none';
+  els.searchIcon.setAttribute('stroke', 'var(--muted-foreground)');
+});
+els.clearBtn.addEventListener('click', () => {
+  state.query = '';
+  els.input.value = '';
+  els.input.focus();
+  render();
+});
+
+// Top nav search box focuses / mirrors the main search input
+els.topSearchInput.addEventListener('focus', () => {
+  els.input.focus();
+});
+
+// Initial render
+render();
+</script>
+
+{% endblock %}

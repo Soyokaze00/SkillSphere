@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@source "../../../**/*.{html,py,js}";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+    --tw-bg-opacity: 1;
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+@layer base {
+    .dark {
+        color-scheme: dark;
+    }
+}
+
+.dark .bg-white {
+    background-color: #1e293b !important;
+}
+
+.dark .bg-gray-50 {
+    background-color: #0f172a !important;
+}
+
+.dark .text-gray-900 {
+    color: #f1f5f9 !important;
+}
+
+.dark .text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+.dark .border-gray-200 {
+    border-color: #334155 !important;
+}
+
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .bg-indigo-50{
+    background-color: #6366f126 !important;
+}
+
+.dark .text-indigo-600{
+    color: #6366f1 !important;
+}

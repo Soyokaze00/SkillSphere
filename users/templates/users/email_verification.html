@@ -1,58 +1,123 @@
-<h2>Signup Verification</h2>
+{% extends "users/auth_base.html" %}
 
-{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+{% block title %}Email Verification{% endblock %}
 
-<form method="POST" id="verification-form">
+{% block auth_content %}
+
+<h1 class="text-[28px] font-extrabold text-slate-900 tracking-[-0.5px]">
+    Email Verification
+</h1>
+
+<p class="mt-1 text-sm text-slate-500">
+    Enter your email to receive a verification code
+</p>
+
+{% if error %}
+<div class="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="POST" id="verification-form" class="mt-6 space-y-5">
     {% csrf_token %}
-    
-    <div class="field-wrapper">
-        <label for="id_email">Email:</label>
-        <input type="email" name="email" id="id_email" value="{{ request.session.email|default:'' }}" required>
-        <button type="submit" name="send_code" id="send-code-btn">Request Code</button>
-        <span id="timer" style="margin-left: 10px;"></span>
+
+    <!-- Email -->
+    <div>
+        <label class="text-sm font-medium text-slate-700 block mb-1">
+            Email
+        </label>
+
+        <div class="flex gap-2">
+            <input 
+                type="email"
+                name="email"
+                id="id_email"
+                value="{{ request.session.email|default:'' }}"
+                required
+                class="flex-1 rounded-xl px-4 py-3 bg-slate-50 border-[1.5px] border-slate-200 text-sm outline-none focus:border-indigo-600"
+            >
+
+            <button
+                type="submit"
+                name="send_code"
+                id="send-code-btn"
+                class="px-4 rounded-xl bg-slate-900 text-white text-sm font-medium hover:opacity-90"
+            >
+                Request
+            </button>
+        </div>
+
+        <span id="timer" class="text-xs text-slate-500 ml-1"></span>
     </div>
 
-    <div class="field-wrapper">
-        <label for="id_code">Verification Code:</label>
-        <input type="text" name="code" id="id_code" disabled placeholder="Enter code" required>
-        <button type="submit" name="verify_code" id="verify-btn" disabled>Verify & Continue</button>
+    <!-- Code -->
+    <div>
+        <label class="text-sm font-medium text-slate-700 block mb-1">
+            Verification Code
+        </label>
+
+        <div class="flex gap-2">
+            <input
+                type="text"
+                name="code"
+                id="id_code"
+                disabled
+                placeholder="Enter code"
+                required
+                class="flex-1 rounded-xl px-4 py-3 bg-slate-50 border-[1.5px] border-slate-200 text-sm outline-none disabled:bg-slate-100 disabled:text-slate-400"
+            >
+
+            <button
+                type="submit"
+                name="verify_code"
+                id="verify-btn"
+                disabled
+                class="px-4 rounded-xl bg-linear-to-br from-indigo-600 to-violet-950 text-white text-sm font-semibold disabled:opacity-40"
+            >
+                Verify
+            </button>
+        </div>
     </div>
 </form>
 
-<style>
-    .field-wrapper { margin-bottom: 20px; }
-    
-    input:disabled {
-        background-color: #f0f0f0;
-        color: #999;
-        cursor: not-allowed;
-        border: 1px solid #ccc;
-    }
-</style>
+<p class="text-center mt-6 text-[13px] text-slate-500">
+    Already have an account?
+    <a href="{% url 'users:login' %}" class="text-indigo-600 font-semibold">
+        Sign in
+    </a>
+</p>
 
 <script>
-    const emailInput = document.getElementById('id_email');
-    const codeInput = document.getElementById('id_code');
-    const verifyBtn = document.getElementById('verify-btn');
-    const timerDisplay = document.getElementById('timer');
+const emailInput = document.getElementById('id_email');
+const codeInput = document.getElementById('id_code');
+const verifyBtn = document.getElementById('verify-btn');
+const timerDisplay = document.getElementById('timer');
 
-    {% if code_sent %}
-        codeInput.disabled = false;
-        verifyBtn.disabled = false;
-        
-        let timeLeft = {{ remaining_seconds|default:300 }};
-        const countdown = setInterval(() => {
-            timeLeft--;
-            const m = Math.floor(timeLeft / 60);
-            const s = timeLeft % 60;
-            timerDisplay.textContent = `Expires in ${m}:${s.toString().padStart(2, '0')}`;
-            
-            if (timeLeft < 0) {
-                clearInterval(countdown);
-                timerDisplay.textContent = "Code expired";
-                codeInput.disabled = true; 
-                verifyBtn.disabled = true;
-            }
-        }, 1000);
-    {% endif %}
+{% if code_sent %}
+    codeInput.disabled = false;
+    verifyBtn.disabled = false;
+
+    let timeLeft = {{ remaining_seconds|default:300 }};
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+
+        timerDisplay.textContent =
+            `Expires in ${m}:${s.toString().padStart(2,'0')}`;
+
+        if (timeLeft < 0) {
+            clearInterval(countdown);
+            timerDisplay.textContent = "Code expired";
+
+            codeInput.disabled = true;
+            verifyBtn.disabled = true;
+        }
+
+    }, 1000);
+{% endif %}
 </script>
+
+{% endblock %}

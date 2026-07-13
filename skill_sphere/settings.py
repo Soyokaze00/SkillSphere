@@ -52,7 +52,18 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
+    'tailwind',
+    "django.contrib.humanize",
+    'search', 
+
+    'theme',  
+        'lucide', # <-- این خط را اضافه کنید
+
 ]
+
+TAILWIND_APP_NAME = 'theme'
+
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 SITE_ID = 1
 
@@ -74,14 +85,17 @@ LOGIN_URL = "/users/login/"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # "DIRS": [],
         "APP_DIRS": True,
+         "DIRS": [BASE_DIR / "templates"], 
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'notifications.context_processors.notifications',
+                "skill_sphere.context_processors.sidebar_menu",
             ],
         },
     },
@@ -190,3 +204,6 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+# خذف کن
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
