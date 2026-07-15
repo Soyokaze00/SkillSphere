@@ -29,7 +29,7 @@ def home(request):
 
 
     print("Dashboard:", time.perf_counter() - start)
-
+     
 
     return render(request, "dashboard/home.html", get_dashboard_data(request.user , projects))
 

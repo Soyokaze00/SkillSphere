@@ -15,8 +15,10 @@
     <!-- Breadcrumb -->
     <div class="flex items-center gap-1.5 flex-1  text-gray-500 text-[16px]">
       <span>Home</span>
-      <span>/</span>
-      <span class="text-gray-900 font-semibold">Dashboard</span>
+    {% if page_title %}
+        <span>/</span>
+        <span class="text-gray-900 font-semibold">{{ page_title }}</span>
+    {% endif %}
     </div>
 
     <!-- Search -->

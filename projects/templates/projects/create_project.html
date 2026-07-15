@@ -1,26 +1,7 @@
 {% extends "base.html" %} 
 {% load static %} 
 {% block content %}
-<h1>Create Project</h1>
 
-<form method="POST" enctype="multipart/form-data" class="mx-100">
-    {% csrf_token %}
-
-    <h3>Project Details</h3>
-    {{ project_form.as_p }}
-
-    <h3 class="bg-amber-300">Upload Initial File (Optional)</h3>
-    {{ file_form.as_p }}
-
-    <button type="submit">
-        Create Project
-    </button>
-</form>
-
-<a href="{% url 'projects:project-list' %}"
->
-    Back to Projects
-</a>
 <form method="POST" enctype="multipart/form-data" id="projectForm">
   {% csrf_token %}
    

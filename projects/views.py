@@ -58,7 +58,7 @@ def project_list(request):
     return render(
         request,
         "projects/project_list.html",
-        {"projects": projects}
+        {"projects": projects ,  "page_title": "Projects",}
     )
 
 
@@ -100,7 +100,9 @@ def project_detail(request, project_id):
         "file_form": file_form,
         "total_size": total_size,
         "last_file":last_file,
-        "project_count":project_count
+        "project_count":project_count,
+        "page_title": project.title,
+
 
     })
 

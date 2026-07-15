@@ -102,7 +102,10 @@ def get_dashboard_data(user,projects):
             "recent_activity": get_recent_activity(user),
             "quick_actions": quick_actions,
             "storage_pie": get_project_storage(projects,user),
-            "recent_projects": get_recent_projects(projects),}
+            "recent_projects": get_recent_projects(projects),
+            "page_title": "Dashboard",
+
+            }
     
     
 
