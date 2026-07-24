@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "notifications",
     "dashboard",
     "feedback",
-    "activity_logs",
+    "activity_logs.apps.ActivityLogsConfig",
     "django.contrib.sites",
     "allauth",
     "allauth.account",
