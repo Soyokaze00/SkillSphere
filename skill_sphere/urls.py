@@ -22,18 +22,33 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("", include("dashboard.urls")),
+
     path("admin/", admin.site.urls),
+
     path("users/", include("users.urls")),
+
     path("projects/", include("projects.urls")),
+
     path("accounts/", include("allauth.urls")),
+
     path(
         "notifications/",
-        include("notifications.urls")
+        include("notifications.urls"),
     ),
-    path('search/', include('search.urls')),
+
+    path(
+        "search/",
+        include("search.urls"),
+    ),
+
     path(
         "feedback/",
         include("feedback.urls"),
+    ),
+
+    path(
+        "activity/",
+        include("activity_logs.urls"),
     ),
 ]
 

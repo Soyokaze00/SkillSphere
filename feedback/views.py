@@ -1,12 +1,12 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from .forms import FeedbackForm
 from .models import Feedback
 from .services import create_feedback
-
 
 def serialize_feedback(feedback):
     return {
@@ -117,28 +117,35 @@ def feedback_delete(request, feedback_id):
             "message": "Feedback deleted successfully.",
         }
     )
+@login_required
 def feedback_index(request):
-    return JsonResponse(
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+
+        if form.is_valid():
+            create_feedback(
+                request=request,
+                form=form,
+            )
+
+            messages.success(
+                request,
+                "Feedback submitted successfully.",
+            )
+
+            return redirect("feedback:index")
+    else:
+        form = FeedbackForm()
+
+    feedbacks = Feedback.objects.filter(
+        user=request.user
+    )
+
+    return render(
+        request,
+        "feedback/index.html",
         {
-            "success": True,
-            "message": "Feedback backend is running.",
-            "endpoints": {
-                "create": {
-                    "method": "POST",
-                    "url": "/feedback/create/",
-                },
-                "my_feedbacks": {
-                    "method": "GET",
-                    "url": "/feedback/mine/",
-                },
-                "detail": {
-                    "method": "GET",
-                    "url": "/feedback/<id>/",
-                },
-                "delete": {
-                    "method": "POST",
-                    "url": "/feedback/<id>/delete/",
-                },
-            },
-        }
+            "form": form,
+            "feedbacks": feedbacks,
+        },
     )

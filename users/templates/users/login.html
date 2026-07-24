@@ -7,7 +7,6 @@
 </head>
 
 {% block auth_content %}
-<!-- LOGIN VIEW -->
 <div id="loginView">
     <h1 class="text-[28px] font-extrabold text-slate-900 tracking-[-0.5px]">
         Welcome back
@@ -16,10 +15,27 @@
         Sign in to your SkillSphere account
     </p>
 
-    <!-- Error Messages from Django -->
     {% if error %}
     <div class="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
         {{ error }}
+    </div>
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+        <ul class="list-disc list-inside">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li>{{ field|title }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="mt-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-600 text-sm">
+        {{ success }}
     </div>
     {% endif %}
 
@@ -27,7 +43,6 @@
         <a href="/accounts/github/login/" class="w-full grid mt-8">
             <button type="button"
                 class="flex items-center justify-center gap-2 rounded-xl py-2.5 border-[1.5px] border-slate-200 bg-slate-50 text-[13px] font-medium text-slate-900 transition hover:opacity-80 active:scale-95">
-                <!-- GitHub Icon SVG -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="lucide lucide-github">
@@ -45,8 +60,7 @@
         <div class="flex-1 h-px bg-slate-200"></div>
     </div>
 
-    <!-- Django Form -->
-    <form id="loginForm" class="space-y-4" method="POST">
+    <form id="loginForm" class="space-y-4" method="POST" action="{% url 'users:login' %}">
         {% csrf_token %}
 
         <div class="relative">
@@ -54,6 +68,7 @@
                 <i data-lucide="mail" class="w-4 h-4"></i>
             </div>
             <input required type="text" name="username" placeholder="Username or Email"
+                value="{{ request.POST.username|default:'' }}"
                 class="w-full rounded-xl pl-10 pr-4 py-3 bg-slate-50 border-[1.5px] border-slate-200 text-slate-900 text-sm outline-none transition focus:border-indigo-600" />
         </div>
 
@@ -96,12 +111,14 @@
     const loginEyeIcon = document.getElementById("loginEyeIcon");
     const toggleBtn = document.getElementById("toggleLoginPassword");
 
-    toggleBtn.addEventListener("click", () => {
-        const isPass = loginPassword.type === "password";
-        loginPassword.type = isPass ? "text" : "password";
-        loginEyeIcon.setAttribute("data-lucide", isPass ? "eye-off" : "eye");
-        lucide.createIcons();
-    });
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            const isPass = loginPassword.type === "password";
+            loginPassword.type = isPass ? "text" : "password";
+            loginEyeIcon.setAttribute("data-lucide", isPass ? "eye-off" : "eye");
+            lucide.createIcons();
+        });
+    }
 
     lucide.createIcons();
 </script>
