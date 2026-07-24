@@ -31,6 +31,10 @@ urlpatterns = [
         include("notifications.urls")
     ),
     path('search/', include('search.urls')),
+    path(
+        "feedback/",
+        include("feedback.urls"),
+    ),
 ]
 
 

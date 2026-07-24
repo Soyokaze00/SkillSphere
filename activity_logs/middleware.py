@@ -48,6 +48,9 @@ class ActivityLogMiddleware:
         if user is None or not user.is_authenticated:
             return False
 
+        if getattr(request, "_activity_logged", False):
+            return False
+
         if request.method not in self.TRACKED_METHODS:
             return False
 
