@@ -39,10 +39,8 @@ Desktop.ini
 
 # -----------------------
 # Django Migrations
-# (keep __init__.py)
+# Migration files must be committed
 # -----------------------
-**/migrations/*
-!**/migrations/__init__.py
 
 # -----------------------
 # Tailwind / Node

@@ -39,13 +39,14 @@
   {% include "includes/navbar.html" %} 
   {% include "notifications/notification_drawer.html" %}
 
-  <main
-    :style="notificationOpen
-            ? 'margin-left:220px; margin-right:320px'
-            : 'margin-left:220px; margin-right:2px'"
+<main
+    :style="{
+        marginLeft: '256px',
+        marginRight: notificationOpen ? '320px' : '0px'
+    }"
     class="transition-all duration-300 pt-16 min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden"
-  >
-    <div class="p-6 max-w-350">
+>
+    <div class="w-full p-6">
     {% block content %} {% endblock %}
     </div>
     {% block extra_js %} {% endblock %}

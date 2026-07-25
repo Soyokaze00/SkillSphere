@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            Activity History
+        </h1>
+
+        <p class="mt-1 text-gray-500 dark:text-gray-400">
+            View your recent account activities.
+        </p>
+    </div>
+
+    <div class="overflow-hidden rounded-xl bg-white shadow dark:bg-gray-800">
+
+        {% for log in logs %}
+            <div class="border-b border-gray-200 p-5 last:border-b-0 dark:border-gray-700">
+
+                <div class="flex items-start justify-between gap-4">
+
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            {{ log.get_action_display }}
+                        </p>
+
+                        {% if log.description %}
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                                {{ log.description }}
+                            </p>
+                        {% endif %}
+
+                        <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+                            {% if log.method %}
+                                <span>{{ log.method }}</span>
+                            {% endif %}
+
+                            {% if log.path %}
+                                <span>{{ log.path }}</span>
+                            {% endif %}
+
+                            {% if log.status_code %}
+                                <span>Status: {{ log.status_code }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <time class="shrink-0 text-sm text-gray-500">
+                        {{ log.created_at|date:"M d, Y H:i" }}
+                    </time>
+
+                </div>
+            </div>
+
+        {% empty %}
+            <div class="p-8 text-center">
+                <p class="text-gray-500 dark:text-gray-400">
+                    No activity has been recorded yet.
+                </p>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-between">
+
+            <div>
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="rounded-lg border px-4 py-2 text-sm dark:border-gray-700 dark:text-white"
+                    >
+                        Previous
+                    </a>
+                {% endif %}
+            </div>
+
+            <span class="text-sm text-gray-500">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            <div>
+                {% if page_obj.has_next %}
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="rounded-lg border px-4 py-2 text-sm dark:border-gray-700 dark:text-white"
+                    >
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
