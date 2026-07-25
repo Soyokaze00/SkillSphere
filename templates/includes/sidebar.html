@@ -87,23 +87,25 @@
     style="border-color: var(--sidebar-border)"
   >
     <div
-      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 cursor-pointer"
+      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer overflow-hidden"
     >
       <div
-        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
         style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
       >
-        AJ
+        {{ user.username|slice:":2"|upper }}
       </div>
 
-      <div class="flex-1">
-        <div class="text-sm font-semibold">{{ user.username }}</div>
-        <div class="text-xs text-gray-500">Pro Plan</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-semibold text-gray-500 truncate">{{ user.username }}</div>
+        <div class="text-xs text-gray-500 truncate">
+          Member since {{ user.date_joined|date:"M Y" }}
+        </div>
       </div>
 
       <!-- settings -->
       <svg
-        class="w-4 h-4 text-gray-500"
+        class="w-4 h-4 text-gray-500 shrink-0"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

@@ -32,6 +32,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+DATA_UPLOAD_MAX_NUMBER_FILES = 5000
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,7 +60,7 @@ INSTALLED_APPS = [
     'search', 
 
     'theme',  
-        'lucide', # <-- این خط را اضافه کنید
+        'lucide', 
 
 ]
 
