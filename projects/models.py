@@ -6,8 +6,6 @@ from django.utils import timezone
 import secrets
 
 
-# Create your models here.
-
 
 def generate_invitation_token():
     return secrets.token_urlsafe(32)
@@ -29,7 +27,6 @@ class Project(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-
     description = models.TextField()
 
     owner = models.ForeignKey(
@@ -51,7 +48,6 @@ class Project(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
     updated_at = models.DateTimeField(auto_now=True)
 
     tags = models.CharField(
@@ -95,22 +91,18 @@ class Project(models.Model):
         return self.likes.filter(user=user).exists()
 
 
-    
 class ProjectMember(models.Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
         related_name="memberships"
     )
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
+    joined_at = models.DateTimeField(auto_now_add=True)
 
-    joined_at = models.DateTimeField(
-        auto_now_add=True
-    )
     class Meta:
         unique_together = ("project", "user")
 
@@ -209,17 +201,18 @@ class ProjectLike(models.Model):
 
 class ProjectFile(models.Model):
     project = models.ForeignKey(
-        Project, 
-        on_delete=models.CASCADE, 
+        Project,
+        on_delete=models.CASCADE,
         related_name="files"
     )
     file = models.FileField(upload_to="project_files/%Y/%m/%d/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name="uploaded_project_files"
     )
+    relative_path = models.CharField(max_length=500, blank=True)
 
     relative_path = models.CharField(max_length=500, blank=True)
 
@@ -236,7 +229,6 @@ class ProjectFile(models.Model):
 
     def __str__(self):
         return f"{self.project.title} - {self.file.name}"
-
 
 
 class Comment(models.Model):

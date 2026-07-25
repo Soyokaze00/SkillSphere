@@ -628,8 +628,9 @@
           </div>
         </div>
         <button
-          class="w-full mt-4 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 bg-indigo-50 text-indigo-600"
-        >
+           href="{% url 'users:profile' project.owner.username %}"
+            class="block text-center w-full mt-4 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 bg-indigo-50 text-indigo-600"
+          >
           View Profile
         </button>
         </div>
