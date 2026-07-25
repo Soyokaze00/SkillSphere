@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "notifications",
     "dashboard",
     "feedback",
-    "activity_logs",
+    "activity_logs.apps.ActivityLogsConfig",
     "django.contrib.sites",
     "allauth",
     "allauth.account",
@@ -63,7 +63,7 @@ INSTALLED_APPS = [
 
 TAILWIND_APP_NAME = 'theme'
 
-NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+NPM_BIN_PATH = r"/usr/local/bin/npm"
 
 SITE_ID = 1
 
@@ -73,6 +73,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "activity_logs.middleware.ActivityLogMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
