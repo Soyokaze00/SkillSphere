@@ -1,5 +1,3 @@
-import secrets
-
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -212,7 +210,6 @@ class ProjectFile(models.Model):
         on_delete=models.CASCADE,
         related_name="uploaded_project_files"
     )
-    relative_path = models.CharField(max_length=500, blank=True)
 
     relative_path = models.CharField(max_length=500, blank=True)
 
