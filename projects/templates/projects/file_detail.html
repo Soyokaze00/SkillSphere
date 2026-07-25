@@ -107,7 +107,7 @@
                     <object data="{{ project_file.file.url }}" type="application/pdf" width="100%" height="750px" class="rounded-lg overflow-hidden">
                         <div class="py-16 px-8 text-center bg-slate-50/80">
                             <div class="text-5xl text-slate-300 mb-4"><i class="fas fa-file-pdf"></i></div>
-                            <p class="text-slate-600 text-sm mb-5">مرورگر شما قابلیت نمایش PDF را ندارد.</p>
+                            <p class="text-slate-600 text-sm mb-5">Your browser is incapable of showing pdf.</p>
                             <a href="{{ project_file.file.url }}" download 
                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all">
                                 <i class="fas fa-download"></i>
@@ -152,7 +152,7 @@
         <div class="flex items-center gap-4">
             <span>
                 <i class="far fa-clock mr-1.5 text-slate-400"></i>
-                آخرین بازدید: {{ project_file.uploaded_at|date:"H:i" }}
+                last sean: {{ project_file.uploaded_at|date:"H:i" }}
             </span>
             <span>
                 <i class="far fa-user mr-1.5 text-slate-400"></i>
