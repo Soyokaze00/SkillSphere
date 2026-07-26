@@ -1,12 +1,16 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import EmailVerification, CustomUser
+from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.http import require_POST
+from .models import EmailVerification, CustomUser, Follow
 from .utils import generate_code, send_verification_email
 from .forms import EmailRequestForm, CodeVerificationForm, SignupForm, ProfileEditForm
 from django.utils import timezone
 from datetime import timedelta
 from projects.models import Project
+from django.db.models import Q
+from notifications.utils import create_notification
 
 
 
@@ -180,16 +184,67 @@ def profile_view(request, username):
     profile_user = get_object_or_404(CustomUser, username=username)
     is_own_profile = request.user == profile_user
 
-    projects = Project.objects.filter(owner=profile_user)
+    projects = Project.objects.filter(
+        Q(owner=profile_user) | Q(memberships__user=profile_user)
+    ).distinct()
+
     if not is_own_profile:
         projects = projects.filter(visibility=Project.PUBLIC)
+        
     projects = projects.order_by("-created_at")
+
+    is_following = (
+        request.user.is_authenticated
+        and not is_own_profile
+        and Follow.objects.filter(follower=request.user, following=profile_user).exists()
+    )
 
     return render(request, "users/profile.html", {
         "profile_user": profile_user,
         "projects": projects,
         "project_count": projects.count(),
         "is_own_profile": is_own_profile,
+        "is_following": is_following,
+        "follower_count": profile_user.followers.count(),
+        "following_count": profile_user.following.count(),
+    })
+
+
+@login_required
+@require_POST
+def toggle_follow(request, username):
+    """
+    Toggle the current user following `username`. Returns JSON so the
+    profile page (and the project detail sidebar) can flip the button
+    state without a full page reload -- same pattern as the like/save
+    toggles elsewhere in the app.
+    """
+    target = get_object_or_404(CustomUser, username=username)
+
+    if target == request.user:
+        return HttpResponseForbidden("You can't follow yourself.")
+
+    follow, created = Follow.objects.get_or_create(
+        follower=request.user,
+        following=target,
+    )
+
+    if not created:
+        follow.delete()
+        following = False
+    else:
+        following = True
+        create_notification(
+            user=target,
+            title="New follower",
+            message=f"{request.user.username} started following you.",
+            notification_type="follow",
+            link=f"/users/profile/{target.username}/",
+        )
+
+    return JsonResponse({
+        "following": following,
+        "follower_count": target.followers.count(),
     })
 
 

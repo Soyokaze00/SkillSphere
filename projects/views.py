@@ -19,6 +19,8 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from users.models import Follow
+from .services import get_similar_projects
 
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB per file
@@ -223,13 +225,17 @@ def project_detail(request, project_id):
 
         return redirect('projects:project-detail', project_id=project.id)
 
-    # count a view once per session, not on every refresh
     viewed = request.session.setdefault('viewed_projects', [])
     if project.id not in viewed:
         project.views_count += 1
         project.save(update_fields=['views_count'])
         viewed.append(project.id)
         request.session.modified = True
+
+    is_following_owner = (
+        request.user != project.owner
+        and Follow.objects.filter(follower=request.user, following=project.owner).exists()
+    )
 
     return render(request, "projects/project_detail.html", {
         "project": project,
@@ -242,6 +248,9 @@ def project_detail(request, project_id):
         "comments": project.comments.select_related("user").all(),
         "members": project.memberships.select_related("user").all(),
         "pending_invitations": project.invitations.filter(status=ProjectInvitation.PENDING),
+        "is_following_owner": is_following_owner,
+        "owner_follower_count": project.owner.followers.count(),
+        "related_projects": get_similar_projects(project, limit=4),
         "file_tree_json": json.dumps(_serialize_tree(_build_file_tree(project.files.all()))),
     })
 
