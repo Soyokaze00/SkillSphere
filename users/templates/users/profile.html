@@ -8,7 +8,13 @@
     {% if profile_user.profile_image %}
     <img
       src="{{ profile_user.profile_image.url }}"
-      class="w-20 h-20 rounded-2xl object-cover shrink-0"
+      class="w-20 h-20 rounded-full object-cover shrink-0"
+      alt="{{ profile_user.username }}"
+    />
+    {% elif profile_user.avatar_seed %}
+    <img
+      src="https://api.dicebear.com/9.x/identicon/svg?seed={{ profile_user.avatar_seed }}"
+      class="w-20 h-20 rounded-full shrink-0 bg-gray-100"
       alt="{{ profile_user.username }}"
     />
     {% else %}
@@ -32,7 +38,7 @@
           <span class="text-xs text-gray-500 ml-1">Projects</span>
         </div>
         <div>
-          <span class="text-base font-bold text-gray-900">{{ profile_user.followers.count }}</span>
+          <span id="followerCount" class="text-base font-bold text-gray-900">{{ profile_user.followers.count }}</span>
           <span class="text-xs text-gray-500 ml-1">Followers</span>
         </div>
         <div>
@@ -43,12 +49,21 @@
     </div>
 
     {% if is_own_profile %}
-    
     <a href="{% url 'users:edit-profile' %}"
-      class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all whitespace-nowrap"
+    class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all whitespace-nowrap"
     >
-      Edit Profile
+    Edit Profile
     </a>
+    {% else %}
+    <button
+    id="followBtn"
+    type="button"
+    data-follow-url="{% url 'users:toggle-follow' profile_user.username %}"
+    data-following="{% if is_following %}true{% else %}false{% endif %}"
+    class="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 whitespace-nowrap {% if is_following %}bg-gray-100 text-gray-700{% else %}bg-indigo-600 text-white{% endif %}"
+    >
+    <span id="followLabel">{% if is_following %}Following{% else %}+ Follow{% endif %}</span>
+    </button>
     {% endif %}
   </div>
 
@@ -61,7 +76,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {% for project in projects %}
       
-        href="{% url 'projects:project-detail' project.id %}"
+      <a href="{% url 'projects:project-detail' project.id %}"
         class="rounded-2xl overflow-hidden border border-gray-200 bg-white hover:shadow-lg transition-all"
       >
         <div class="h-32 bg-linear-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-4xl">
@@ -80,6 +95,11 @@
             <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
               {{ project.get_status_display }}
             </span>
+            {% if project.owner == profile_user %}
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">Owner</span>
+            {% else %}
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Collaborator</span>
+            {% endif %}
           </div>
         </div>
       </a>
