@@ -1,13 +1,3 @@
-// Shared logic for "Upload Folder" buttons across the app.
-//
-// webkitdirectory hands us EVERY file in the picked folder, including
-// stuff nobody wants to upload: node_modules, venv, .git, __pycache__,
-// build output, IDE junk, etc. This filters those out before the files
-// ever get merged into the upload input, using:
-//   1. a default list of well-known heavy/junk directory + file names
-//   2. the folder's own .gitignore, if it has one, parsed and applied too
-//
-// Exposes a single global: filterFolderFiles(fileList) -> Promise<{kept, skipped, skippedBytes}>
 
 const DEFAULT_IGNORE_DIR_NAMES = [
   "node_modules", ".git", "__pycache__", ".pytest_cache",

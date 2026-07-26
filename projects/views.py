@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from users.models import Follow
 from .services import get_similar_projects
+from django.core.paginator import Paginator
 
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB per file
@@ -105,8 +106,9 @@ def create_project(request):
             create_notification(
                user=project.owner,
                title="New project created",
-               message=f"The project '{project.title}' has been created.", notification_type="project",
-               link=f"/projects/{project.id}/"
+               message=f"The project '{project.title}' has been created.", 
+               notification_type="project",
+               link=f"/projects/{project.id}/",
              )
             
             file_errors = _save_uploaded_files(request, project)
@@ -136,7 +138,7 @@ def project_list(request):
     return render(
         request,
         "projects/project_list.html",
-        {"projects": projects ,  "page_title": "Projects",}
+        {"projects": projects}
     )
 
 
@@ -242,11 +244,17 @@ def project_detail(request, project_id):
         "file_form": file_form,
         "invite_form": InviteMemberForm(),
         "total_size": total_size,
-        "last_file":last_file,
-        "project_count":project_count
-
+        "views_count": project.views_count,
+        "project_count": project_count,
+        "is_liked": project.is_liked_by(request.user),
+        "comments": project.comments.select_related("user").all(),
+        "members": project.memberships.select_related("user").all(),
+        "pending_invitations": project.invitations.filter(status=ProjectInvitation.PENDING),
+        "is_following_owner": is_following_owner,
+        "owner_follower_count": project.owner.followers.count(),
+        "related_projects": get_similar_projects(project, limit=4),
+        "file_tree_json": json.dumps(_serialize_tree(_build_file_tree(project.files.all()))),
     })
-
 
 
 def file_detail(request, file_id):
@@ -319,7 +327,16 @@ def toggle_like(request, project_id):
         liked = False
     else:
         liked = True
-
+        
+    if liked and project.owner != request.user: 
+        create_notification(
+                       user=project.owner,
+                       title="New Like",
+                       message=f"{request.user.username} liked your project '{project.title}'.",  # 👈 بگو کی لایک کرد
+                       notification_type="like",
+                       link=f"/projects/{project.id}/",
+        )
+        
     return JsonResponse({
         "liked": liked,
         "like_count": project.like_count,
@@ -611,3 +628,25 @@ def delete_project(request, project_id):
 
     messages.success(request, f'"{project_title}" was permanently deleted.')
     return redirect('projects:project-list')
+
+
+
+
+@login_required
+def explore_projects(request):
+    projects = (
+        Project.objects
+        .filter(visibility=Project.PUBLIC)
+        .exclude(owner=request.user)
+        .exclude(memberships__user=request.user)
+        .select_related("owner")
+        .order_by("-created_at")
+    )
+
+    paginator = Paginator(projects, 20)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "projects/explore.html", {
+        "page_obj": page_obj,
+        "page_title": "Explore",
+    })

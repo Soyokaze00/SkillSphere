@@ -49,4 +49,5 @@ SIDEBAR_MENU = [
         </svg>
         """,
     },
+
 ]

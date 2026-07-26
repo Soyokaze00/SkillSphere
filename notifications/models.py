@@ -43,11 +43,12 @@ class Notification(models.Model):
     ("invite", "Invite"),
     ("member", "Member"),
     ("follow", "Follow"),
+    ("like", "Like"),
     ("system", "System"),
     ]
 
     type = models.CharField(
-       max_length=20,
+      max_length=20,
       choices=TYPE_CHOICES,
       default="system"
      )

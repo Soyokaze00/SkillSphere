@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new ApexCharts(perfEl, {
       series: [
         { name: "Downloads", data: projectData.map((x) => x.downloads) },
-        { name: "Stars", data: projectData.map((x) => x.stars) },
+        { name: "Likes", data: projectData.map((x) => x.likes) },
       ],
       chart: {
         type: "bar",

@@ -1,177 +1,228 @@
-{% extends "base.html" %} 
-{% block content %}
- {% load humanize%} 
+{% extends "base.html" %}
+{% block content %} 
+{% load humanize%} 
+{% load static%}
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillSphere | {{ project_file.filename }}</title>
-    
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSphere | {{ project_file.filename }}</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <style>
-        /* فقط برای فونت و پرایزم - بقیه همه تلوینده */
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        /* Prism line-numbers */
-        .line-numbers .line-numbers-rows {
-            border-right: 1px solid #30363d !important;
-        }
-    </style>
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* فقط برای فونت و پرایزم - بقیه همه تلوینده */
+    * {
+      font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+    }
+    /* Prism line-numbers */
+    .line-numbers .line-numbers-rows {
+      border-right: 1px solid #30363d !important;
+    }
+  </style>
 </head>
 <!-- <body class="bg-slate-50 min-h-screen"> -->
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-    
-    <!-- ===== BREADCRUMB ===== -->
-    <nav class="flex items-center text-sm mb-6" aria-label="Breadcrumb">
-        <a href="{% url 'projects:project-detail' project_file.project.id %}" 
-           class="text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-2 font-medium">
-            <i class="fas fa-folder-open text-indigo-500 text-xs"></i>
-            {{ project_file.project.title }}
-        </a>
-        <span class="text-slate-300 mx-2">/</span>
-        <span class="text-slate-800 font-semibold flex items-center gap-2">
-            <i class="fas fa-file text-indigo-500 text-sm"></i>
+  <!-- ===== BREADCRUMB ===== -->
+  <nav class="flex items-center text-sm mb-6" aria-label="Breadcrumb">
+    <a
+      href="{% url 'projects:project-detail' project_file.project.id %}"
+      class="text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-2 font-medium dark:text-gray-200"
+    >
+      <i class="fas fa-folder-open text-indigo-500 text-xs"></i>
+      {{ project_file.project.title }}
+    </a>
+    <span class="text-slate-300 mx-2 dark:text-gray-200">/</span>
+    <span
+      class="text-slate-800 font-semibold flex items-center gap-2 dark:text-gray-200"
+    >
+      <i class="fas fa-file text-indigo-500 text-sm"></i>
+      {{ project_file.filename }}
+    </span>
+  </nav>
+
+  <!-- ===== FILE CARD ===== -->
+  <div
+    class="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_rgba(0,0,0,0.04)] border border-slate-100 hover:shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)] transition-all overflow-hidden"
+  >
+    <!-- Header -->
+    <div
+      class="bg-gradient-to-br from-slate-50 to-slate-100/70 px-5 sm:px-7 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/60"
+    >
+      <div class="flex items-center gap-3 min-w-0">
+        <div
+          class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0"
+        >
+          <i class="fas fa-file-lines text-lg"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm font-bold text-slate-800 truncate">
             {{ project_file.filename }}
-        </span>
-    </nav>
-
-    <!-- ===== FILE CARD ===== -->
-    <div class="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_rgba(0,0,0,0.04)] border border-slate-100 hover:shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)] transition-all overflow-hidden">
-        
-        <!-- Header -->
-        <div class="bg-gradient-to-br from-slate-50 to-slate-100/70 px-5 sm:px-7 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/60">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
-                    <i class="fas fa-file-lines text-lg"></i>
-                </div>
-                <div class="min-w-0">
-                    <h1 class="text-sm font-bold text-slate-800 truncate">
-                        {{ project_file.filename }}
-                    </h1>
-                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span class="bg-slate-200 text-slate-600 text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
-                            {{ project_file.filename|slice:"-3:"|upper }}
-                        </span>
-                        <span class="text-xs text-slate-500">
-                            <i class="far fa-user-circle mr-1"></i>
-                            {{ project_file.uploaded_by.username }}
-                        </span>
-                        <span class="text-xs text-slate-400">
-                            <i class="far fa-calendar-alt mr-1"></i>
-                            {{ project_file.uploaded_at|date:"M d, Y H:i" }}
-                        </span>
-                        <span class="bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-3 py-0.5 rounded-full border border-indigo-100">
-                            <i class="fas fa-code text-[10px]"></i>
-                            {{ project_file.file.size|filesizeformat }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <a href="{{ project_file.file.url }}" download 
-                   class="bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-md transition-all inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold">
-                    <i class="fas fa-download text-indigo-500"></i>
-                    Download
-                </a>
-                <button class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all flex items-center justify-center">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-            </div>
+          </h1>
+          <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+            <span
+              class="bg-slate-200 text-slate-600 text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide"
+            >
+              {{ project_file.filename|slice:"-3:"|upper }}
+            </span>
+            <span class="text-xs text-slate-500">
+              <i class="far fa-user-circle mr-1"></i>
+              {{ project_file.uploaded_by.username }}
+            </span>
+            <span class="text-xs text-slate-400">
+              <i class="far fa-calendar-alt mr-1"></i>
+              {{ project_file.uploaded_at|date:"M d, Y H:i" }}
+            </span>
+            <span
+              class="bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-3 py-0.5 rounded-full border border-indigo-100"
+            >
+              <i class="fas fa-code text-[10px]"></i>
+              {{ project_file.file.size|filesizeformat }}
+            </span>
+          </div>
         </div>
+      </div>
 
-        <!-- Content -->
-        <div>
-            {% if is_image %}
-                <div class="bg-slate-50/80 p-8 sm:p-12 text-center">
-                    <img src="{{ project_file.file.url }}" alt="{{ project_file.filename }}" 
-                         class="max-w-full max-h-[600px] rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-slate-200 mx-auto" 
-                         loading="lazy">
-                    <div class="mt-4 text-sm text-slate-500">
-                        <i class="fas fa-image mr-2 text-indigo-400"></i>
-                        Image Preview
-                    </div>
-                </div>
-                
-            {% elif is_pdf %}
-                <div class="bg-slate-50/80 p-2">
-                    <object data="{{ project_file.file.url }}" type="application/pdf" width="100%" height="750px" class="rounded-lg overflow-hidden">
-                        <div class="py-16 px-8 text-center bg-slate-50/80">
-                            <div class="text-5xl text-slate-300 mb-4"><i class="fas fa-file-pdf"></i></div>
-                            <p class="text-slate-600 text-sm mb-5">Your browser is incapable of showing pdf.</p>
-                            <a href="{{ project_file.file.url }}" download 
-                               class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all">
-                                <i class="fas fa-download"></i>
-                                download PDF
-                            </a>
-                        </div>
-                    </object>
-                </div>
-                
-            {% elif is_previewable_text %}
-                <div class="bg-[#0d1117] rounded-b-2xl overflow-hidden">
-                    <pre class="line-numbers language-{{ extension }} !m-0 !p-6 text-sm leading-relaxed"><code>{{ file_content }}</code></pre>
-                </div>
-                
-
-                {% elif is_pdf %}
-    <div class="bg-slate-50/80 p-2">
-        <iframe 
-            src="{{ project_file.file.url }}" 
-            width="100%" 
-            height="750px"
-            class="rounded-lg border">
-        </iframe>
-    </div>            {% else %}
-                <div class="py-16 px-8 text-center bg-slate-50/80 rounded-b-2xl">
-                    <div class="text-5xl text-slate-300 mb-4"><i class="fas fa-file-alt"></i></div>
-                    <h3 class="text-slate-700 font-semibold text-base mb-2">پیش‌نمایش در دسترس نیست</h3>
-                    <p class="text-slate-500 text-sm mb-5">این نوع فایل قابل نمایش در مرورگر نمی‌باشد.</p>
-                    <a href="{{ project_file.file.url }}" download 
-                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all">
-                        <i class="fas fa-download"></i>
-                        دانلود فایل
-                    </a>
-                </div>
-
-            {% endif %}
-        </div>
+      <div class="flex items-center gap-2">
+        <a
+          href="{{ project_file.file.url }}"
+          download
+          class="bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-md transition-all inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold dark:text-gray-200"
+        >
+          <i class="fas fa-download text-indigo-500"></i>
+          Download
+        </a>
+        <button
+          class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-all flex items-center justify-center"
+        >
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- ===== FOOTER INFO ===== -->
-    <div class="mt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-        <div class="flex items-center gap-4">
-            <span>
-                <i class="far fa-clock mr-1.5 text-slate-400"></i>
-                last sean: {{ project_file.uploaded_at|date:"H:i" }}
-            </span>
-            <span>
-                <i class="far fa-user mr-1.5 text-slate-400"></i>
-                {{ project_file.uploaded_by.username }}
-            </span>
+    <!-- Content -->
+    <div>
+      {% if is_image %}
+      <div class="bg-slate-50/80 p-8 sm:p-12 text-center">
+        <img
+          src="{{ project_file.file.url }}"
+          alt="{{ project_file.filename }}"
+          class="max-w-full max-h-[600px] rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-slate-200 mx-auto"
+          loading="lazy"
+        />
+        <div class="mt-4 text-sm text-slate-500">
+          <i class="fas fa-image mr-2 text-indigo-400"></i>
+          Image Preview
         </div>
-        <div>
-            <a href="{% url 'projects:project-detail' project_file.project.id %}" 
-               class="text-indigo-600 hover:text-indigo-800 transition-colors font-medium inline-flex items-center gap-1.5">
-                <i class="fas fa-arrow-left"></i>
-            go to back
-            </a>
+      </div>
+
+      {% elif is_pdf %}
+      <div class="border rounded-xl p-4 bg-gray-50 m-5 border-gray-200">
+        <div
+          id="pdfPreviewWrapper"
+          class="relative min-h-[300px] flex items-center justify-center"
+        >
+          <!-- اسپینر -->
+          <div
+            id="pdfPreviewLoader"
+            class="absolute inset-0 flex flex-col items-center justify-center gap-3"
+          >
+            <div
+              class="w-10 h-10 rounded-full border-4 border-gray-200 border-t-indigo-600 animate-spin"
+            ></div>
+            <span class="text-xs text-gray-400"
+             >Loading preview...</span>
+          </div>
+
+          <canvas
+            id="pdfPreviewCanvas"
+            data-pdf-url="{{ project_file.file.url }}"
+            style="display: block; width: 100%"
+            class="border rounded-lg shadow-sm border-gray-200 opacity-0 transition-opacity duration-300"
+          ></canvas>
         </div>
+        <p class="text-xs text-gray-400 mt-2 text-center">First page preview</p>
+      </div>
+
+      {% elif is_previewable_text %}
+      <div class="bg-[#0d1117] rounded-b-2xl overflow-hidden">
+        <pre
+          class="line-numbers language-{{ extension }} !m-0 !p-6 text-sm leading-relaxed"
+        ><code>{{ file_content }}</code></pre>
+      </div>
+
+      {% else %}
+      <div class="py-16 px-8 text-center bg-slate-50/80 rounded-b-2xl">
+        <div class="text-5xl text-slate-300 mb-4">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h3 class="text-slate-700 font-semibold text-base mb-2">
+          پیش‌نمایش در دسترس نیست
+        </h3>
+        <p class="text-slate-500 text-sm mb-5">
+          این نوع فایل قابل نمایش در مرورگر نمی‌باشد.
+        </p>
+        <a
+          href="{{ project_file.file.url }}"
+          download
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all"
+        >
+          <i class="fas fa-download"></i>
+          دانلود فایل
+        </a>
+      </div>
+
+      {% endif %}
     </div>
+  </div>
+
+  <!-- ===== FOOTER INFO ===== -->
+  <div
+    class="mt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500"
+  >
+    <div class="flex items-center gap-4">
+      <span>
+        <i class="far fa-clock mr-1.5 text-slate-400"></i>
+        last sean: {{ project_file.uploaded_at|date:"H:i" }}
+      </span>
+      <span>
+        <i class="far fa-user mr-1.5 text-slate-400"></i>
+        {{ project_file.uploaded_by.username }}
+      </span>
+    </div>
+    <div>
+      <a
+        href="{% url 'projects:project-detail' project_file.project.id %}"
+        class="text-indigo-600 hover:text-indigo-800 transition-colors font-medium inline-flex items-center gap-1.5"
+      >
+        <i class="fas fa-arrow-left"></i>
+        go to back
+      </a>
+    </div>
+  </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-
+<script src="{% static 'projects/js/file_detail.js' %}"></script>
 
 {% endblock %}

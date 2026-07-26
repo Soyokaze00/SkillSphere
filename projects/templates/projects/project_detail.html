@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %} 
+{% load static %}
+ {% block content %}
  {% load humanize%} {% load file_tags %}
 
 <div class="max-w-6xl mx-auto p-6 space-y-6">
@@ -150,14 +152,14 @@
                 <button
                   type="button"
                   id="shareGmailBtn"
-                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
                 >
                   📧 Share via Gmail
                 </button>
                 <button
                   type="button"
                   id="shareCopyBtn"
-                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
                 >
                   🔗 Copy Link
                 </button>
