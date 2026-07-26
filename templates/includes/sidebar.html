@@ -61,8 +61,8 @@
 
   {% for item in sidebar_items %}
 
-  <a
-    href="{{ item.url }}"
+  
+  <a href="{{ item.url }}"
     class="flex items-center gap-3 w-full rounded-3xl p-3  transition
     {% if url_name == item.url_name %}
       bg-indigo-50 text-indigo-500 font-bold
@@ -78,6 +78,21 @@
 
   {% endfor %}
 
+  
+  <a href="{% url 'users:profile' request.user.username %}"
+    class="flex items-center gap-3 w-full rounded-3xl p-3 transition
+    {% if url_name == 'profile' %}
+      bg-indigo-50 text-indigo-500 font-bold
+    {% else %}
+      text-gray-500 hover:bg-gray-100
+    {% endif %}"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+    <span>Profile</span>
+  </a>
+
 </nav>
 
 {% endwith %}
@@ -86,14 +101,21 @@
     class="px-3 pb-4 border-t pt-3"
     style="border-color: var(--sidebar-border)"
   >
-    <div
+    
+    <a href="{% url 'users:profile' request.user.username %}"
       class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer overflow-hidden"
     >
       <div
-        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden"
         style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
       >
+        {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" class="w-full h-full object-cover" alt="" />
+        {% elif user.avatar_seed %}
+        <img src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.avatar_seed }}" class="w-full h-full" alt="" />
+        {% else %}
         {{ user.username|slice:":2"|upper }}
+        {% endif %}
       </div>
 
       <div class="flex-1 min-w-0">
@@ -115,7 +137,7 @@
           d="M12 1v2m0 18v2m9-11h2M1 12H3m15.364-6.364l1.414-1.414M4.222 19.778l1.414-1.414"
         />
       </svg>
-    </div>
+    </a>
   </div>
   
 </aside>

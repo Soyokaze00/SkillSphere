@@ -104,6 +104,17 @@
           <p class="text-red-500 text-xs mt-1">{{ file_form.file.errors }}</p>
           {% endif %}
         </div>
+        <!-- PUBLISH BUTTON -->
+        <div class="flex justify-center">
+          <button
+            type="submit"
+            id="publishBtn"
+            class="w-52 py-3 rounded-xl bg-gray-300 text-gray-600 font-semibold transition"
+            disabled
+          >
+            Publish
+          </button>
+        </div>
       </div>
 
       <!-- RIGHT COLUMN -->
@@ -169,19 +180,6 @@
         </div>
       </div>
     </div>
-
-    <!-- PUBLISH BUTTON -->
-    <div class="flex justify-center">
-      <button
-        type="submit"
-        id="publishBtn"
-        class="w-52 py-3 rounded-xl bg-gray-300 text-gray-600 font-semibold transition"
-        disabled
-      >
-        Publish
-      </button>
-    </div>
-  </div>
 </form>
 <script src="{% static 'projects/js/folder_upload_filter.js' %}"></script>
 <script src="{% static 'projects/js/create_project.js' %}"></script>
