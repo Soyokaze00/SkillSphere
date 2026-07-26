@@ -80,6 +80,65 @@
       </button>
     </div>
   </form>
+  <!-- ===== DANGER ZONE ===== -->
+  <div class="mt-6 bg-white border-2 border-red-200 rounded-2xl p-6">
+    <h2 class="text-base font-bold text-red-600">Danger Zone</h2>
+    <p class="text-sm text-gray-500 mt-1">
+      Permanently delete your account. This cannot be undone.
+    </p>
+    <button
+      type="button"
+      id="openDeleteModalBtn"
+      class="mt-4 px-4 py-2.5 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition"
+    >
+      Delete Account
+    </button>
+  </div>
+
+  <!-- ===== DELETE CONFIRMATION MODAL ===== -->
+  <div
+    id="deleteModal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  >
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full">
+      <h3 class="text-lg font-bold text-gray-900">Delete your account?</h3>
+      <p class="text-sm text-gray-600 mt-2">
+        This will <strong>permanently delete</strong> your account
+        <strong>and every project you own</strong> — files, comments, likes,
+        everything. There is no way to undo this.
+      </p>
+
+      <label class="block text-sm font-semibold text-gray-700 mt-4">
+        Type your username (<span class="font-mono">{{ request.user.username }}</span>) to confirm:
+      </label>
+      <input
+        type="text"
+        id="deleteConfirmInput"
+        data-username="{{ request.user.username }}"
+        autocomplete="off"
+        class="w-full mt-2 px-3 py-2 rounded-xl border border-gray-300 bg-gray-50 text-sm outline-none focus:ring-2 focus:ring-red-400"
+      />
+
+      <form method="POST" action="{% url 'users:delete-account' %}" class="mt-5 flex gap-3">
+        {% csrf_token %}
+        <button
+          type="button"
+          id="closeDeleteModalBtn"
+          class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          id="confirmDeleteBtn"
+          disabled
+          class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-red-300 text-white cursor-not-allowed transition"
+        >
+          Permanently Delete
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script src="{% static 'users/js/edit_profile.js' %}"></script>

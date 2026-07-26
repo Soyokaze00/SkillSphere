@@ -155,6 +155,31 @@
           <path stroke-width="2" d="M6 9l6 6 6-6" />
         </svg>
       </a>
+      <!-- sign out -->
+      <form method="POST" action="{% url 'users:logout' %}">
+        {% csrf_token %}
+        <button
+          type="submit"
+          title="Sign out"
+          class="w-9 h-9 rounded-xl flex items-center justify-center transition hover:scale-105 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5" />
+            <path d="M21 12H9" />
+          </svg>
+        </button>
+      </form>
     </div>
   </header>
   

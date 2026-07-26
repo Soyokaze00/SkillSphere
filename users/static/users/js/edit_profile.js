@@ -65,4 +65,49 @@ document.addEventListener('DOMContentLoaded', function() {
       renderAvatarGrid(Array.from({ length: 8 }, randomSeed));
     });
   }
+
+  // ===== Delete account modal =====
+  const openBtn = document.getElementById('openDeleteModalBtn');
+  const closeBtn = document.getElementById('closeDeleteModalBtn');
+  const modal = document.getElementById('deleteModal');
+  const confirmInput = document.getElementById('deleteConfirmInput');
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  const expectedUsername = confirmInput ? confirmInput.dataset.username : '';
+
+  function setConfirmEnabled(enabled) {
+    confirmBtn.disabled = !enabled;
+    if (enabled) {
+      confirmBtn.classList.remove('bg-red-300', 'cursor-not-allowed');
+      confirmBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+    } else {
+      confirmBtn.classList.add('bg-red-300', 'cursor-not-allowed');
+      confirmBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+    }
+  }
+
+  if (openBtn && modal) {
+    openBtn.addEventListener('click', () => {
+      confirmInput.value = '';
+      setConfirmEnabled(false);
+      modal.classList.remove('hidden');
+    });
+  }
+
+  if (closeBtn && modal) {
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.add('hidden'); // click on backdrop
+    });
+  }
+
+  if (confirmInput) {
+    confirmInput.addEventListener('input', () => {
+      setConfirmEnabled(confirmInput.value === expectedUsername);
+    });
+  }
 });

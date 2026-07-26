@@ -11,7 +11,7 @@ from datetime import timedelta
 from projects.models import Project
 from django.db.models import Q
 from notifications.utils import create_notification
-
+from django.urls import reverse
 
 
 def email_verification_view(request):
@@ -178,6 +178,16 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("users:login")
+
+
+
+@login_required
+@require_POST
+def delete_account_view(request):
+    user = request.user
+    logout(request) 
+    user.delete()  
+    return redirect(f"{reverse('users:login')}?account_deleted=1")
 
 
 def profile_view(request, username):

@@ -8,6 +8,7 @@ from .views import (
     profile_view,
     edit_profile_view,
     toggle_follow,
+    delete_account_view,
 )
 
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
     path("profile/edit/", edit_profile_view, name="edit-profile"),
+    path("profile/delete/", delete_account_view, name="delete-account"),
     path("profile/<str:username>/", profile_view, name="profile"),
     path("profile/<str:username>/toggle-follow/", toggle_follow, name="toggle-follow"),
 ]
