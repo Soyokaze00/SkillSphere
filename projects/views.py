@@ -153,17 +153,6 @@ def project_detail(request, project_id):
         if not _user_can_access(project, request.user):
             return HttpResponseForbidden("You don't have access to this project.")
 
-    file_form = ProjectFileForm()
-
-    if request.method == "POST" and "file_upload" in request.POST:
-        if request.FILES.getlist('file'):
-            file_errors = _save_uploaded_files(request, project)
-            for err in file_errors:
-                messages.warning(request, err)
-        else:
-            messages.warning(request, "No files were selected for upload.")
-        return redirect('projects:project-detail', project_id=project.id)
-
     if request.method == "POST" and "add_comment" in request.POST:
         text = request.POST.get("text", "").strip()
         if text:
@@ -197,7 +186,7 @@ def project_detail(request, project_id):
                 )
 
                 accept_url = request.build_absolute_uri(
-                    reverse("projects:accept-invite", args=[invitation.token])
+                    reverse("projects:invite-landing", args=[invitation.token])
                 )
                 greeting = f"Hi {matched_user.username}," if matched_user else "Hi there,"
 
@@ -241,7 +230,6 @@ def project_detail(request, project_id):
 
     return render(request, "projects/project_detail.html", {
         "project": project,
-        "file_form": file_form,
         "invite_form": InviteMemberForm(),
         "total_size": total_size,
         "views_count": project.views_count,
@@ -367,14 +355,7 @@ def remove_member(request, project_id, user_id):
 
 
 @login_required
-def accept_invite(request, token):
-    """
-    Landing page for the link sent in the invite email. Only completes
-    the join if the logged-in user's email matches the address the
-    invite was sent to -- someone can't accept an invite meant for a
-    different inbox just by guessing/forwarding the link while logged
-    into another account.
-    """
+def invite_landing(request, token):
     invitation = get_object_or_404(ProjectInvitation, token=token)
     project = invitation.project
 
@@ -382,37 +363,49 @@ def accept_invite(request, token):
         messages.info(request, "This invite has already been used or is no longer valid.")
         return redirect('projects:project-detail', project_id=project.id)
 
-    if not request.user.email or request.user.email.lower() != invitation.email.lower():
-        messages.error(
-            request,
-            f"This invite was sent to {invitation.email}. Log in with that account to accept it."
-        )
-        return redirect('projects:project-list')
-
-    ProjectMember.objects.get_or_create(project=project, user=request.user)
-    invitation.mark_accepted()
-
-    create_notification(
-        user=project.owner,
-        title="Invite accepted",
-        message=f"{request.user.username} accepted your invite to '{project.title}'.",
-        notification_type="project",
-        link=f"/projects/{project.id}/",
+    email_mismatch = (
+        not request.user.email
+        or request.user.email.lower() != invitation.email.lower()
     )
 
-    messages.success(request, f"You've joined \"{project.title}\" as a collaborator.")
-    return redirect('projects:project-detail', project_id=project.id)
+    if request.method == "POST":
+        if email_mismatch:
+            messages.error(
+                request,
+                f"This invite was sent to {invitation.email}. Log in with that account to respond."
+            )
+            return redirect('projects:project-list')
 
+        if "accept" in request.POST:
+            ProjectMember.objects.get_or_create(project=project, user=request.user)
+            invitation.mark_accepted()
+            create_notification(
+                user=project.owner,
+                title="Invite accepted",
+                message=f"{request.user.username} accepted your invite to '{project.title}'.",
+                notification_type="project",
+                link=f"/projects/{project.id}/",
+            )
+            messages.success(request, f"You've joined \"{project.title}\" as a collaborator.")
+            return redirect('projects:project-detail', project_id=project.id)
 
-@login_required
-def decline_invite(request, token):
-    invitation = get_object_or_404(ProjectInvitation, token=token)
+        elif "decline" in request.POST:
+            invitation.mark_declined()
+            create_notification(
+                user=project.owner,
+                title="Invite declined",
+                message=f"{invitation.email} declined your invite to '{project.title}'.",
+                notification_type="project",
+                link=f"/projects/{project.id}/",
+            )
+            messages.info(request, f"You declined the invite to \"{project.title}\".")
+            return redirect('projects:project-list')
 
-    if invitation.status == ProjectInvitation.PENDING:
-        invitation.mark_declined()
-        messages.info(request, "Invite declined.")
-
-    return redirect('projects:project-list')
+    return render(request, "projects/invite_landing.html", {
+        "invitation": invitation,
+        "project": project,
+        "email_mismatch": email_mismatch,
+    })
 
 
 @login_required
@@ -585,6 +578,17 @@ def edit_project(request, project_id):
     if project.owner != request.user:
         return HttpResponseForbidden("Only the project owner can edit this project.")
 
+    file_form = ProjectFileForm()
+
+    if request.method == "POST" and "file_upload" in request.POST:
+        if request.FILES.getlist('file'):
+            file_errors = _save_uploaded_files(request, project)
+            for err in file_errors:
+                messages.warning(request, err)
+        else:
+            messages.warning(request, "No files were selected for upload.")
+        return redirect('projects:project-edit', project_id=project.id)
+
     if request.method == "POST":
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
@@ -596,6 +600,7 @@ def edit_project(request, project_id):
 
     return render(request, "projects/edit_project.html", {
         "project_form": project_form,
+        "file_form": file_form,
         "project": project,
         "tags_json": json.dumps(project.tag_list),
     })
