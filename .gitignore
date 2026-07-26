@@ -48,10 +48,11 @@ Desktop.ini
 theme/node_modules/
 theme/static/css/dist/
 
-# اگر از static_src استفاده می‌کنی:
+
 theme/static_src/node_modules/
 
 # -----------------------
 # Logs
 # -----------------------
-*.log
+*.lognode_modules/
+node_modules/

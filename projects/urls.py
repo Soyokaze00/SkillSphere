@@ -3,7 +3,16 @@ from .views import (
     create_project,
     project_list,
     project_detail,
-    file_detail
+    file_detail,
+    toggle_like,
+    download_all_files,
+    edit_project,
+    delete_project,
+    share_project_email,
+    remove_member,
+    accept_invite,
+    decline_invite,
+    cancel_invite,
 )
 
 app_name = "projects"
@@ -12,5 +21,14 @@ urlpatterns = [
     path("", project_list, name="project-list"),
     path("create-project/", create_project, name="create-project"),
     path("<int:project_id>/", project_detail, name='project-detail'),
+    path("<int:project_id>/like/", toggle_like, name='toggle-like'),
+    path("<int:project_id>/download-all/", download_all_files, name='download-all'),
     path("file/<int:file_id>/", file_detail, name='file-detail'),
+    path('<int:project_id>/edit/', edit_project, name='project-edit'),
+    path('<int:project_id>/delete/', delete_project, name='delete-project'),
+    path("<int:project_id>/share-email/", share_project_email, name='share-email'),
+    path("<int:project_id>/remove-member/<int:user_id>/", remove_member, name='remove-member'),
+    path("<int:project_id>/invite/<int:invitation_id>/cancel/", cancel_invite, name='cancel-invite'),
+    path("invite/<str:token>/accept/", accept_invite, name='accept-invite'),
+    path("invite/<str:token>/decline/", decline_invite, name='decline-invite'),
 ]

@@ -59,11 +59,7 @@ document.getElementById('sort').addEventListener('change', function() {
             aVal = a.dataset.title || '';
             bVal = b.dataset.title || '';
             return aVal.localeCompare(bVal);
-        } else if (sortBy === '-deadline') {
-            const aDeadline = a.querySelector('[data-deadline]')?.dataset.deadline || '';
-            const bDeadline = b.querySelector('[data-deadline]')?.dataset.deadline || '';
-            return bDeadline.localeCompare(aDeadline);
-        }
+        } 
         return 0;
     });
 

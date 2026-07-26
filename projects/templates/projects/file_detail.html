@@ -107,7 +107,7 @@
                     <object data="{{ project_file.file.url }}" type="application/pdf" width="100%" height="750px" class="rounded-lg overflow-hidden">
                         <div class="py-16 px-8 text-center bg-slate-50/80">
                             <div class="text-5xl text-slate-300 mb-4"><i class="fas fa-file-pdf"></i></div>
-                            <p class="text-slate-600 text-sm mb-5">مرورگر شما قابلیت نمایش PDF را ندارد.</p>
+                            <p class="text-slate-600 text-sm mb-5">Your browser is incapable of showing pdf.</p>
                             <a href="{{ project_file.file.url }}" download 
                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all">
                                 <i class="fas fa-download"></i>
@@ -149,24 +149,23 @@
 
     <!-- ===== FOOTER INFO ===== -->
     <div class="mt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-          <div>
-            <a href="{% url 'projects:project-detail' project_file.project.id %}" 
-               class="text-indigo-600 hover:text-indigo-800 transition-colors font-medium inline-flex items-center gap-1.5">
-                <i class="fas fa-arrow-left"></i>
-            go to back
-            </a>
-        </div>
         <div class="flex items-center gap-4">
             <span>
                 <i class="far fa-clock mr-1.5 text-slate-400"></i>
-                last seen : {{ project_file.uploaded_at|date:"H:i" }}
+                last sean: {{ project_file.uploaded_at|date:"H:i" }}
             </span>
             <span>
                 <i class="far fa-user mr-1.5 text-slate-400"></i>
                 {{ project_file.uploaded_by.username }}
             </span>
         </div>
-      
+        <div>
+            <a href="{% url 'projects:project-detail' project_file.project.id %}" 
+               class="text-indigo-600 hover:text-indigo-800 transition-colors font-medium inline-flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i>
+            go to back
+            </a>
+        </div>
     </div>
 </div>
 

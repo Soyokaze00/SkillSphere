@@ -1,132 +1,17 @@
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import EmailVerification, CustomUser
+from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.http import require_POST
+from .models import EmailVerification, CustomUser, Follow
 from .utils import generate_code, send_verification_email
-from .forms import EmailRequestForm, CodeVerificationForm, SignupForm
+from .forms import EmailRequestForm, CodeVerificationForm, SignupForm, ProfileEditForm
 from django.utils import timezone
 from datetime import timedelta
-
-
-# def request_code(request):
-#     form = EmailRequestForm(request.POST or None)
-
-#     if request.method == "POST" and form.is_valid():
-#         email = form.cleaned_data["email"]
-
-#         if CustomUser.objects.filter(email=email).exists():
-#             return render(
-#                 request,
-#                 "users/request_code.html",
-#                 {
-#                     "form": form,
-#                     "error": "An account with this email already exists."
-#                 }
-#             )
-
-#         code = generate_code()
-
-#         EmailVerification.objects.update_or_create(
-#             email=email,
-#             defaults={
-#                 "code": code, 
-#                 "is_verified": False,
-#                 "created_at": timezone.now(),
-#                 }
-#         )
-#         print("POST DATA:", request.POST)
-#         print("FORM VALID:", form.is_valid())
-#         print("FORM ERRORS:", form.errors)
-
-#         send_verification_email(email, code)
-
-#         request.session["email"] = email
-
-#         return redirect("users:verify-code")
-
-#     return render(request, "users/request_code.html", {"form": form})
-
-
-
-# def verify_code(request):
-#     email = request.session.get("email")
-
-#     if not email:
-#         return redirect("users:request-code")
-
-#     verification = EmailVerification.objects.filter(
-#         email=email
-#     ).first()
-
-#     if not verification:
-#         return redirect("users:request-code")
-
-#     expiration_time = verification.created_at + timedelta(minutes=5)
-
-#     print("EMAIL:", verification.email)
-#     print("CREATED:", verification.created_at)
-#     print("NOW:", timezone.now())
-#     print("EXPIRES:", expiration_time)
-
-#     remaining_seconds = max(
-#         0,
-#         int((expiration_time - timezone.now()).total_seconds())
-#     )
-
-#     print("REMAINING:", remaining_seconds)
-
-#     remaining_seconds = max(
-#         0,
-#         int((expiration_time - timezone.now()).total_seconds())
-#     )
-
-#     form = CodeVerificationForm(request.POST or None)
-
-#     if request.method == "POST" and form.is_valid():
-#         code = form.cleaned_data["code"]
-
-#         record = EmailVerification.objects.filter(
-#             email=email,
-#             code=code,
-#             is_verified=False
-#         ).first()
-
-#         if not record:
-#             return render(
-#                 request,
-#                 "users/verify_code.html",
-#                 {
-#                     "form": form,
-#                     "remaining_seconds": remaining_seconds,
-#                     "error": "Invalid code"
-#                 }
-#             )
-
-#         if timezone.now() > expiration_time:
-#             return render(
-#                 request,
-#                 "users/verify_code.html",
-#                 {
-#                     "form": form,
-#                     "remaining_seconds": 0,
-#                     "error": "Code expired. Request a new one."
-#                 }
-#             )
-
-#         record.is_verified = True
-#         record.save()
-
-#         return redirect("users:signup")
-
-#     return render(
-#         request,
-#         "users/verify_code.html",
-#         {
-#             "form": form,
-#             "remaining_seconds": remaining_seconds,
-#         }
-#     )
-
+from projects.models import Project
+from django.db.models import Q
+from notifications.utils import create_notification
+from django.urls import reverse
 
 
 def email_verification_view(request):
@@ -224,7 +109,6 @@ def resend_code(request):
     return redirect("users:verify-code")
 
 
-
 def complete_signup(request):
     email = request.session.get("email")
 
@@ -267,7 +151,6 @@ def complete_signup(request):
     return render(request, "users/signup.html", {"form": form})
 
 
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -291,10 +174,98 @@ def login_view(request):
     return render(request, "users/login.html")
 
 
-
 @login_required
 def logout_view(request):
     logout(request)
     return redirect("users:login")
 
 
+
+@login_required
+@require_POST
+def delete_account_view(request):
+    user = request.user
+    logout(request) 
+    user.delete()  
+    return redirect(f"{reverse('users:login')}?account_deleted=1")
+
+
+def profile_view(request, username):
+    profile_user = get_object_or_404(CustomUser, username=username)
+    is_own_profile = request.user == profile_user
+
+    projects = Project.objects.filter(
+        Q(owner=profile_user) | Q(memberships__user=profile_user)
+    ).distinct()
+
+    if not is_own_profile:
+        projects = projects.filter(visibility=Project.PUBLIC)
+        
+    projects = projects.order_by("-created_at")
+
+    is_following = (
+        request.user.is_authenticated
+        and not is_own_profile
+        and Follow.objects.filter(follower=request.user, following=profile_user).exists()
+    )
+
+    return render(request, "users/profile.html", {
+        "profile_user": profile_user,
+        "projects": projects,
+        "project_count": projects.count(),
+        "is_own_profile": is_own_profile,
+        "is_following": is_following,
+        "follower_count": profile_user.followers.count(),
+        "following_count": profile_user.following.count(),
+    })
+
+
+@login_required
+@require_POST
+def toggle_follow(request, username):
+    """
+    Toggle the current user following `username`. Returns JSON so the
+    profile page (and the project detail sidebar) can flip the button
+    state without a full page reload -- same pattern as the like/save
+    toggles elsewhere in the app.
+    """
+    target = get_object_or_404(CustomUser, username=username)
+
+    if target == request.user:
+        return HttpResponseForbidden("You can't follow yourself.")
+
+    follow, created = Follow.objects.get_or_create(
+        follower=request.user,
+        following=target,
+    )
+
+    if not created:
+        follow.delete()
+        following = False
+    else:
+        following = True
+        create_notification(
+            user=target,
+            title="New follower",
+            message=f"{request.user.username} started following you.",
+            notification_type="follow",
+            link=f"/users/profile/{target.username}/",
+        )
+
+    return JsonResponse({
+        "following": following,
+        "follower_count": target.followers.count(),
+    })
+
+
+@login_required
+def edit_profile_view(request):
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("users:profile", username=request.user.username)
+    else:
+        form = ProfileEditForm(instance=request.user)
+
+    return render(request, "users/edit_profile.html", {"form": form})

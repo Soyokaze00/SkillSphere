@@ -63,7 +63,6 @@
       >
         <option value="-created_at">Most Recent</option>
         <option value="title">Alphabetical</option>
-        <option value="-deadline">Latest Deadline</option>
       </select>
 
       <button
@@ -212,28 +211,21 @@
           {{ project.description|truncatechars:100 }}
         </p>
 
-        <!-- TAGS (if you have tags field, otherwise show deadline) -->
+        <!-- TAGS -->
         <div class="flex flex-wrap gap-1.5 mt-3">
-          {% if project.deadline %}
+          {% if project.tag_list %}
+          {% for tag in project.tag_list|slice:":3" %}
           <span
-            class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs"
+            class="px-2 py-0.5 rounded-lg text-xs"
             style="
               background: var(--accent);
               color: var(--primary);
               font-weight: 500;
             "
           >
-            <svg
-              class="w-2.25 h-2.25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="12" cy="12" r="10" stroke-width="2" />
-              <path stroke-width="2" d="M12 6v6l4 2" />
-            </svg>
-            {{ project.deadline|date:"M d, Y" }}
+            #{{ tag }}
           </span>
+          {% endfor %}
           {% endif %}
 
           <span
@@ -256,7 +248,7 @@
               />
               <circle cx="12" cy="7" r="4" stroke-width="2" />
             </svg>
-            {{ project.memberships.count }} members
+            {{ project.member_count }} members
           </span>
         </div>
 
