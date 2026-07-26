@@ -35,17 +35,9 @@
   <!-- HEADER -->
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold">Projects</h1>
+      <h1 class="text-2xl font-bold">Explore </h1>
       <p class="text-sm text-gray-500">Browse projects</p>
     </div>
-    <a href="{% url 'projects:create-project' %}">
-      <button
-        class="px-4 py-2 rounded-xl text-white font-semibold"
-        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
-      >
-        New Project
-      </button>
-    </a>
   </div>
 
   <!-- SEARCH -->
@@ -112,7 +104,7 @@
     id="projectContainer"
     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
   >
-    {% for project in projects %}
+   {% for project in page_obj  %}
     <div
       class="project-card rounded-2xl overflow-hidden cursor-pointer transition-all border border-gray-300 hover:shadow-xl group dark:border-gray-700 bg-white"
       style="
@@ -311,28 +303,11 @@
         </svg>
       </div>
 
-      <h3 class="text-lg font-bold mb-1 text-gray-900">No projects yet</h3>
+      <h3 class="text-lg font-bold mb-1 text-gray-900">No public projects yet</h3>
 
-      <p class="text-sm max-w-md text-gray-500 leading-[1.6]">
-        You haven't created any projects yet. Start building your first project
-        and it will appear here.
-      </p>
-
-      <a
-        href="{% url 'projects:create-project' %}"
-        class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-semibold transition-all hover:opacity-90"
-        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
-      >
-        <svg
-          class="w-4 h-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path stroke-width="2" d="M12 5v14M5 12h14" />
-        </svg>
-        Create Project
-      </a>
+<p class="text-sm max-w-md text-gray-500 leading-[1.6]">
+  No one has shared a public project yet. Be the first — publish yours and it'll show up here for others to discover.
+</p>
     </div>
     {% endfor %}
   </div>

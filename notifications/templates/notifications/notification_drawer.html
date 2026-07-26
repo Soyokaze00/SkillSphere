@@ -1,47 +1,92 @@
+{% load notification_extras %}
+
 <div
-
-    x-show="notificationOpen"
-
-    x-transition
-
-    class="fixed  top-16 right-0 w-87.5 h-[calc(100vh-64px)] bg-white shadow-lg border-l border-l-gray-300 overflow-y-auto z-50"
-
+  x-show="notificationOpen"
+  x-transition
+  class="fixed top-16 right-0 w-87.5 h-[calc(100vh-64px)] bg-white shadow-lg border-l border-l-gray-300 overflow-y-auto z-50"
 >
-
-    <div class="p-4 border-b border-b-gray-300">
-
-        <h3 class="font-bold">
-            Notifications
-        </h3>
-
+  <div class="flex justify-between items-center px-2 py-1 border-b border-b-gray-300">
+    <div class="p-4 ">
+      <h3 class="font-bold">Notifications</h3>
+      <div>
+        <p class="text-[11px] text-gray-500 font-medium">
+          {{ unread_count }} Unread
+        </p>
+      </div>
     </div>
+    <a
+      href="{% url 'notifications:mark_all_as_read' %}"
+      class="rounded-3xl bg-indigo-50 px-2 py-1 gap-2 flex items-center justify-between text-[12px] text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-check-check-icon lucide-check-check"
+      >
+        <path d="M18 6 7 17l-5-5" />
+        <path d="m22 10-7.5 7.5L13 16" />
+      </svg>
+      <p>Mark all read</p>
+    </a>
+    <button @click="toggleNotification()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
 
-    <div class="p-4">
+  <div class="p-4">
+    <div class="space-y-2">
+      {% for n in notifications %} {% with style=n.type|notification_style %}
 
-        {% for notification in notifications %}
-
-            <div class="border-b border-b-gray-300 py-3">
-
-                <h5 class="font-semibold">
-
-                    {{ notification.title }}
-
-                </h5>
-
-                <p class="text-sm text-gray-500">
-
-                    {{ notification.message }}
-
-                </p>
-
+      <div
+        class="rounded-2xl px-2 py-3 transition-colors hover:bg-white {% if n.is_read %} bg-white {% else %} {{ style.color }} {% endif %} {{ style.border }} border"
+      >
+        <div class="flex items-start gap-4">
+          <div class="shrink-0 mt-0.5">
+            <div
+              class="w-10 h-10 rounded-full {{ style.badge }} flex items-center justify-center"
+            >
+              {{ style.icon|safe }}
             </div>
+          </div>
 
-        {% empty %}
-
-            <p>اعلانی وجود ندارد.</p>
-
-        {% endfor %}
-
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <a
+                    href="{{ n.link|default:'#' }}"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 truncate"
+                  >
+                    {{ n.title }}
+                  </a>
+                  <span
+                    class="flex-shrink-0 px-2 py-0.5 {{ style.badge }} dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-[10px] font-medium"
+                  >
+                    new
+                  </span>
+                </div>
+                <p
+                  class="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed"
+                >
+                  {{ n.message }}
+                </p>
+                <div
+                  class="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400"
+                >
+                <span>{{ n.created_at|timesince_precise }} ago</span>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endwith %} {% endfor %}
     </div>
-
+  </div>
 </div>

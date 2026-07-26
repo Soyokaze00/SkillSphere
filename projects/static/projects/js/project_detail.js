@@ -54,12 +54,12 @@ function switchTab(tab) {
 
     function buildFolderRow(name, depth) {
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer select-none';
+      row.className = 'flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 group cursor-pointer select-none';
       row.style.paddingLeft = (depth * 20 + 8) + 'px';
       row.innerHTML =
         '<span class="chevron text-gray-400 text-xs w-3 inline-block">▶</span>' +
         '<span>📁</span>' +
-        '<span class="font-semibold text-gray-800">' + name + '</span>';
+        '<span class="font-semibold text-gray-800 dark:text-white dark:group-hover:text-gray-800">' + name + '</span>';
       return row;
     }
 
@@ -119,7 +119,6 @@ function switchTab(tab) {
     container.appendChild(renderNode(tree, 0));
   }
 
-  renderFileTree();
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -127,9 +126,11 @@ document.addEventListener('DOMContentLoaded', function() {
   var wrapper = document.querySelector('.file-input-wrapper');
   var input = wrapper ? wrapper.querySelector('input[type="file"]') : null;
 
-  console.log('Clicked label, triggering file input click');
-  console.log('wrapper found?', wrapper);
-  console.log('input found?', input);
+  // console.log('Clicked label, triggering file input click');
+  // console.log('wrapper found?', wrapper);
+  // console.log('input found?', input);
+ 
+  renderFileTree();
 
   function renderFileNameLabel() {
     var nameText = document.querySelector('.file-name-text');

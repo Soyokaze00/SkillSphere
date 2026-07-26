@@ -64,6 +64,7 @@ def notification_center(request):
             "current_status": current_status,
             "current_type": current_type,
             "page_obj": page_obj,
+            "page_title": "Notification",
 
         }
     )

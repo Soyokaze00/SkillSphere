@@ -133,7 +133,7 @@ def feedback_index(request):
                 "Feedback submitted successfully.",
             )
 
-            return redirect("feedback:index")
+            return redirect("feedback:feedback")
     else:
         form = FeedbackForm()
 
@@ -143,9 +143,11 @@ def feedback_index(request):
 
     return render(
         request,
-        "feedback/index.html",
+        "feedback/feedback.html",
         {
             "form": form,
             "feedbacks": feedbacks,
         },
     )
+    
+    

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
     create_project,
+    explore_projects,
     project_list,
     project_detail,
     file_detail,
@@ -31,4 +32,6 @@ urlpatterns = [
     path("<int:project_id>/invite/<int:invitation_id>/cancel/", cancel_invite, name='cancel-invite'),
     path("invite/<str:token>/accept/", accept_invite, name='accept-invite'),
     path("invite/<str:token>/decline/", decline_invite, name='decline-invite'),
+    path("explore/", explore_projects, name="explore"), 
+
 ]

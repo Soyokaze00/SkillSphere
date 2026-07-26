@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from users.models import Follow
 from .services import get_similar_projects
+from django.core.paginator import Paginator
 
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB per file
@@ -105,8 +106,9 @@ def create_project(request):
             create_notification(
                user=project.owner,
                title="New project created",
-               message=f"The project '{project.title}' has been created.", notification_type="project",
-               link=f"/projects/{project.id}/"
+               message=f"The project '{project.title}' has been created.", 
+               notification_type="project",
+               link=f"/projects/{project.id}/",
              )
             
             file_errors = _save_uploaded_files(request, project)
@@ -325,7 +327,16 @@ def toggle_like(request, project_id):
         liked = False
     else:
         liked = True
-
+        
+    if liked and project.owner != request.user: 
+        create_notification(
+                       user=project.owner,
+                       title="New Like",
+                       message=f"{request.user.username} liked your project '{project.title}'.",  # 👈 بگو کی لایک کرد
+                       notification_type="like",
+                       link=f"/projects/{project.id}/",
+        )
+        
     return JsonResponse({
         "liked": liked,
         "like_count": project.like_count,
@@ -617,3 +628,25 @@ def delete_project(request, project_id):
 
     messages.success(request, f'"{project_title}" was permanently deleted.')
     return redirect('projects:project-list')
+
+
+
+
+@login_required
+def explore_projects(request):
+    projects = (
+        Project.objects
+        .filter(visibility=Project.PUBLIC)
+        .exclude(owner=request.user)
+        .exclude(memberships__user=request.user)
+        .select_related("owner")
+        .order_by("-created_at")
+    )
+
+    paginator = Paginator(projects, 20)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "projects/explore.html", {
+        "page_obj": page_obj,
+        "page_title": "Explore",
+    })

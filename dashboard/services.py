@@ -102,10 +102,21 @@ def get_dashboard_data(user,projects):
             "recent_activity": get_recent_activity(user),
             "quick_actions": quick_actions,
             "storage_pie": get_project_storage(projects,user),
-            "recent_projects": get_recent_projects(projects),}
+            "recent_projects": get_recent_projects(projects),
+            "page_title": "Dashboard",
+           "explore_projects": get_explore_projects(user),
+
+
+            }
     
     
 
+def format_bytes(size):
+    for unit in ["B", "KB", "MB", "GB"]:
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} TB"
 
 def get_stats(user):
 
@@ -136,7 +147,7 @@ def get_stats(user):
         },
         {
             "label": "Storage",
-            "value": sum(f.file.size for f in files),
+            "value": format_bytes(sum(f.file.size for f in files)),
             "sub": "Bytes used",
             "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>',
             "icon_bg": "bg-green-50",
@@ -145,7 +156,7 @@ def get_stats(user):
         },
         {
             "label": "Followers",
-            "value": 0,
+            "value": user.followers.count(),
             "sub": "Coming soon",
             "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-round-icon lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg>',
             "icon_bg": "bg-amber-50",
@@ -161,8 +172,8 @@ def get_project_perf(projects):
     return [
         {
             "name": p.title,
-            "downloads": p.files.count(),
-            "stars": 0
+            "downloads": p.download_count,
+            "likes": p.like_count
         }
         for p in projects[:5]
     ]
@@ -277,7 +288,7 @@ def get_weekly_activity(user):
     )
 
     data = []
-
+    
     for i in range(7):
         day = start_date + timedelta(days=i)
 
@@ -291,3 +302,17 @@ def get_weekly_activity(user):
         })
 
     return data
+
+
+
+
+
+def get_explore_projects(user, limit=8):
+    """Public projects from other users, newest/most-popular first."""
+    return (
+        Project.objects
+        .filter(visibility=Project.PUBLIC)
+        .exclude(owner=user)
+        .select_related("owner")
+        .order_by("-created_at")[:limit]
+    )

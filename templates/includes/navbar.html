@@ -7,21 +7,21 @@
   <header
     id="navbar"
     class="fixed top-0 right-0 h-16 flex border-b border-b-gray-200 items-center px-6 gap-4 z-30 transition-all duration-300 bg-white dark:border-b-gray-700"
-    style="
-      left: 256px;
-      box-shadow: 0 1px 12px rgba(15, 23, 42, 0.04);
-    "
+    style="left: 256px; box-shadow: 0 1px 12px rgba(15, 23, 42, 0.04)"
   >
     <!-- Breadcrumb -->
-    <div class="flex items-center gap-1.5 flex-1  text-gray-500 text-[16px]">
+    <div class="flex items-center gap-1.5 flex-1 text-gray-500 text-[16px]">
       <span>Home</span>
+      {% if page_title %}
       <span>/</span>
-      <span class="text-gray-900 font-semibold">Dashboard</span>
+      <span class="text-gray-900 font-semibold">{{ page_title }}</span>
+      {% endif %}
     </div>
 
     <!-- Search -->
-    <a href="{% url 'search:search' %}"
-      class="flex items-center gap-2 rounded-xl px-3 py-2 transition hover:opacity-80 bg-gray-100 text-gray-500 text-sm min-w-[200px] border border-gray-200"
+    <a
+      href="{% url 'search:search' %}"
+      class="flex items-center gap-2 rounded-xl px-3 py-2 transition hover:opacity-80 bg-gray-100 text-gray-500 text-sm min-w-[200px] border border-gray-200 hover:bg-indigo-100 hover:text-indigo-600"
     >
       <!-- search icon -->
       <svg
@@ -58,46 +58,53 @@
     <!-- Actions -->
     <div class="flex items-center gap-2">
       <!-- Dark toggle -->
-      <button id="themeToggle" 
-        class="w-9 h-9 rounded-xl flex items-center justify-center transition hover:scale-105 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-    <!-- Sun icon (visible in dark mode) -->
-    <svg id="sunIcon" 
-         class="w-4 h-4 hidden dark:block" 
-         xmlns="http://www.w3.org/2000/svg" 
-         width="20" height="20" 
-         viewBox="0 0 24 24" 
-         fill="none" 
-         stroke="currentColor" 
-         stroke-width="2" 
-         stroke-linecap="round" 
-         stroke-linejoin="round">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M12 2v2"/>
-        <path d="M12 20v2"/>
-        <path d="m4.93 4.93 1.41 1.41"/>
-        <path d="m17.66 17.66 1.41 1.41"/>
-        <path d="M2 12h2"/>
-        <path d="M20 12h2"/>
-        <path d="m6.34 17.66-1.41 1.41"/>
-        <path d="m19.07 4.93-1.41 1.41"/>
-    </svg>
+      <button
+      
+        id="themeToggle"
+        class="w-9 h-9 rounded-xl flex items-center justify-center transition hover:scale-105 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-600"
+      >
+        <!-- Sun icon (visible in dark mode) -->
+        <svg
+          id="sunIcon"
+          class="w-4 h-4 hidden dark:block"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2" />
+          <path d="M12 20v2" />
+          <path d="m4.93 4.93 1.41 1.41" />
+          <path d="m17.66 17.66 1.41 1.41" />
+          <path d="M2 12h2" />
+          <path d="M20 12h2" />
+          <path d="m6.34 17.66-1.41 1.41" />
+          <path d="m19.07 4.93-1.41 1.41" />
+        </svg>
 
-    <!-- Moon icon (visible in light mode) -->
-    <svg id="moonIcon" 
-         class="w-4 h-4 block dark:hidden" 
-         viewBox="0 0 24 24" 
-         fill="none" 
-         stroke="currentColor">
-        <path stroke-width="2" d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" />
-    </svg>
-</button>
-
-
+        <!-- Moon icon (visible in light mode) -->
+        <svg
+          id="moonIcon"
+          class="w-4 h-4 block dark:hidden"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path stroke-width="2" d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" />
+        </svg>
+      </button>
 
       <!-- notifications -->
       <button
         @click="toggleNotification()"
-        class="relative w-9 h-9 rounded-xl flex items-center justify-center bg-gray-200 text-gray-600"
+        :class="notificationOpen ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-600'"
+        class="relative w-9 h-9 rounded-xl flex items-center justify-center hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -116,33 +123,42 @@
             d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
           />
         </svg>
-        {% if unread_count  %}
+        {% if unread_count %}
         <span
-          class="absolute -top-1 -right-1 w-4 h-4 text-white text-[11px] rounded-full bg-red-500"
+          class="absolute -top-1 -right-1 w-4 h-4 text-white text-[11px] rounded-full bg-red-500 flex items-center justify-center"
         >
-        {{ unread_count }}
-      </span>
-       {% endif %}
+          {{ unread_count }}
+        </span>
+        {% endif %}
       </button>
 
       <!-- avatar -->
-      
-      <a href="{% url 'users:profile' request.user.username %}"
+
+      <a
+        href="{% url 'users:profile' request.user.username %}"
         class="flex items-center gap-2 rounded-xl px-2 py-1.5 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 max-w-[180px]"
       >
         <div
           class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 bg-linear-to-br from-indigo-600 to-purple-600 text-white text-[11px] font-bold overflow-hidden"
         >
           {% if user.profile_image %}
-          <img src="{{ user.profile_image.url }}" class="w-full h-full object-cover" alt="" />
+          <img
+            src="{{ user.profile_image.url }}"
+            class="w-full h-full object-cover"
+            alt=""
+          />
           {% elif user.avatar_seed %}
-          <img src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.avatar_seed }}" class="w-full h-full" alt="" />
-          {% else %}
-          {{ user.username|slice:":2"|upper }}
-          {% endif %}
+          <img
+            src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.avatar_seed }}"
+            class="w-full h-full"
+            alt=""
+          />
+          {% else %} {{ user.username|slice:":2"|upper }} {% endif %}
         </div>
 
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+        <span
+          class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate"
+        >
           {{ user.username }}
         </span>
 
@@ -182,5 +198,4 @@
       </form>
     </div>
   </header>
-  
 </html>

@@ -59,9 +59,7 @@
 
 <nav class="flex-1 overflow-y-auto px-3 space-y-1 text-sm">
 
-  {% for item in sidebar_items %}
-
-  
+  {% for item in sidebar_items %}  
   <a href="{{ item.url }}"
     class="flex items-center gap-3 w-full rounded-3xl p-3  transition
     {% if url_name == item.url_name %}

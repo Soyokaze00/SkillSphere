@@ -9,7 +9,7 @@ urlpatterns = [
     path(
         "",
         views.feedback_index,
-        name="index",
+        name="feedback",
     ),
     path(
         "create/",
