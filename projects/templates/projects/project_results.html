@@ -1,0 +1,68 @@
+<div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  {% for project in page_obj %}
+    {% include "projects/project_card.html" with project=project %}
+  {% empty %}
+    <div
+      class="col-span-full flex flex-col items-center justify-center text-center py-20 px-6 rounded-2xl"
+      style="background: var(--card); border: 1px solid var(--border)"
+    >
+      <div
+        class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+      >
+        <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-width="2" d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8z" />
+          <path stroke-width="2" d="M3.3 7l8.7 5 8.7-5" />
+          <path stroke-width="2" d="M12 22V12" />
+        </svg>
+      </div>
+
+      {% if query %}
+      <h3 class="text-lg font-bold mb-1 text-gray-900">No projects match "{{ query }}"</h3>
+      <p class="text-sm max-w-md text-gray-500 leading-[1.6]">
+        Try a different search term, or check tags and descriptions for typos.
+      </p>
+      {% else %}
+      <h3 class="text-lg font-bold mb-1 text-gray-900">No projects yet</h3>
+      <p class="text-sm max-w-md text-gray-500 leading-[1.6]">
+        You haven't created any projects yet. Start building your first project
+        and it will appear here.
+      </p>
+      
+       <a href="{% url 'projects:create-project' %}"
+        class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-semibold transition-all hover:opacity-90"
+        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-width="2" d="M12 5v14M5 12h14" />
+        </svg>
+        Create Project
+      </a>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center gap-2 mt-6">
+  {% if page_obj.has_previous %}
+  
+   <a href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}"
+    class="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
+    >Previous</a
+  >
+  {% endif %}
+
+  <span class="px-4 py-2 text-sm">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  </span>
+
+  {% if page_obj.has_next %}
+  
+   <a href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}"
+    class="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
+    >Next</a
+  >
+  {% endif %}
+</div>
+{% endif %}

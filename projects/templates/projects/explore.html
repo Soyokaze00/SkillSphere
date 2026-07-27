@@ -3,34 +3,6 @@
 {% block content %}
 {% with show_loader=True %}
 
-<!-- <h1>My Projects</h1>
-
-<a href="{% url 'projects:create-project' %}"> Create New Project </a>
-
-<hr />
-
-{% for project in projects %}
-
-<h3>
-  <a href="{% url 'projects:project-detail' project.id %}">
-    {{ project.title }}
-  </a>
-</h3>
-
-<p>Status: {{ project.get_status_display }}</p>
-
-<p>Visibility: {{ project.get_visibility_display }}</p>
-
-<p>Created: {{ project.created_at }}</p>
-
-<hr />
-
-{% empty %}
-
-<p>No projects yet.</p>
-
-{% endfor %} -->
-
 <div class="max-w-6xl mx-auto p-6 space-y-6">
   <!-- HEADER -->
   <div class="flex items-center justify-between">
@@ -104,180 +76,8 @@
     id="projectContainer"
     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
   >
-   {% for project in page_obj  %}
-    <div
-      class="project-card rounded-2xl overflow-hidden cursor-pointer transition-all border border-gray-300 hover:shadow-xl group dark:border-gray-700 bg-white"
-      style="
-        box-shadow: 0 1px 8px rgba(15, 23, 42, 0.04);
-      "
-      data-status="{{ project.status|lower }}"
-      data-title="{{ project.title|lower }}"
-    >
-      <!-- IMAGE / PLACEHOLDER -->
-      <div
-        class="h-44 overflow-hidden relative bg-linear-to-br from-indigo-100 to-purple-100"
-      >
-      {% with url=project.files.first.file.url|lower %}
-    {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
-        <img
-         loading="lazy"
-          src="{{ project.files.first.file.url }}"
-          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          alt="{{ project.title }}"
-          decoding="async"
-
-        />
-    {% else %}
-        <div class="w-full h-full flex items-center justify-center text-6xl">
-            📄
-        </div>
-    {% endif %}
-{% endwith %}
-       
-        <!-- HOVER OVERLAY -->
-        <a href="{% url 'projects:project-detail' project.id %}">
-          <div
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-            style="background: rgba(79, 70, 229, 0.3)"
-          >
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span
-                class="flex items-center gap-2 rounded-xl px-4 py-2"
-                style="
-                  background: #fff;
-                  color: #4f46e5;
-                  font-weight: 600;
-                  font-size: 13px;
-                "
-              >
-                <svg
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-width="2"
-                    d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
-                  />
-                  <circle cx="12" cy="12" r="3" stroke-width="2" />
-                </svg>
-                View Project
-              </span>
-            </div>
-          </div>
-        </a>
-
-        <!-- VISIBILITY BADGE -->
-        <div class="absolute top-3 left-3">
-          <span
-            class="
-            {% if project.visibility == 'PUBLIC' %} bg-black text-white {% elif project.visibility == 'PRIVATE' %} bg-white text-black {% endif %}
-            px-2 py-1 rounded-lg text-xs"
-            style="
-              font-weight: 500;
-              backdrop-filter: blur(8px);
-            "
-          >
-            {{ project.get_visibility_display }}
-          </span>
-        </div>
-
-        <!-- STATUS BADGE -->
-        <div class="absolute top-3 right-3">
-          <span
-            class="px-2 py-0.5 rounded-full text-xs font-semibold {% if project.status|lower == 'open' %}bg-yellow-100 text-yellow-800 {% elif project.status|lower == 'in_progress' %}bg-blue-100 text-blue-800 {% elif project.status|lower == 'completed' %}bg-green-100 text-green-800 {% elif project.status|lower == 'active' %}bg-red-100 text-red-800 {% endif %}"
-          >
-            {{ project.get_status_display }}
-          </span>
-        </div>
-      </div>
-
-      <!-- CONTENT -->
-      <div class="p-4">
-        <h3 class="truncate text-[15px] font-bold text-gray-900">
-          {{ project.title }}
-        </h3>
-
-        <p class="mt-1 text-[12px] text-gray-500 line-clamp-2 leading-[1.6]">
-          {{ project.description|truncatechars:100 }}
-        </p>
-
-        <!-- TAGS -->
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          {% if project.tag_list %}
-          {% for tag in project.tag_list|slice:":3" %}
-          <div
-            class="flex items-center gap-1 justify-center font-bold  text-indigo-600 text-xs bg-indigo-100 rounded-2xl px-3 py-1"
-        
-          > 
-          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag-icon lucide-tag"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>  
-          <div>
-             {{ tag }}
-          </div>
-          </div>
-          {% endfor %}
-          {% endif %}
-
-          <span
-            class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs"
-            style="
-              background: var(--accent);
-              color: var(--primary);
-              font-weight: 500;
-            "
-          >
-            <svg
-              class="w-2.25 h-2.25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                stroke-width="2"
-                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-              />
-              <circle cx="12" cy="7" r="4" stroke-width="2" />
-            </svg>
-            {{ project.member_count }} members
-          </span>
-        </div>
-
-        <!-- FOOTER -->
-        <div
-          class="flex items-center justify-between mt-4 pt-3 border-t border-[#0f172a14] dark:border-t-gray-700"
-        >
-          <!-- OWNER -->
-          <div class="flex items-center gap-2">
-            <div
-              class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
-              style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
-            >
-              {{ project.owner.username|first|upper }}
-            </div>
-            <span class="text-[12px] text-gray-500">
-              {{ project.owner.username }}
-            </span>
-          </div>
-
-          <!-- STATS (created_at) -->
-          <div class="flex items-center gap-3 text-[11px] text-gray-500">
-            <span class="flex items-center gap-1">
-              <svg
-                class="w-2.5 h-2.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <circle cx="12" cy="12" r="10" stroke-width="2" />
-                <path stroke-width="2" d="M12 6v6l4 2" />
-              </svg>
-              {{ project.created_at|date:"M d" }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% for project in page_obj %}
+      {% include "projects/project_card.html" with project=project %}
     {% empty %}
     <!-- EMPTY STATE -->
     <div
@@ -305,31 +105,31 @@
 
       <h3 class="text-lg font-bold mb-1 text-gray-900">No public projects yet</h3>
 
-<p class="text-sm max-w-md text-gray-500 leading-[1.6]">
-  No one has shared a public project yet. Be the first — publish yours and it'll show up here for others to discover.
-</p>
+      <p class="text-sm max-w-md text-gray-500 leading-[1.6]">
+        No one has shared a public project yet. Be the first — publish yours and it'll show up here for others to discover.
+      </p>
     </div>
     {% endfor %}
   </div>
 
-  <!-- PAGINATION (optional) -->
-  {% if projects.has_other_pages %}
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
   <div class="flex justify-center gap-2 mt-6">
-    {% if projects.has_previous %}
+    {% if page_obj.has_previous %}
     <a
-      href="?page={{ projects.previous_page_number }}"
+      href="?page={{ page_obj.previous_page_number }}"
       class="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
       >Previous</a
     >
     {% endif %}
 
     <span class="px-4 py-2 text-sm">
-      Page {{ projects.number }} of {{ projects.paginator.num_pages }}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
 
-    {% if projects.has_next %}
+    {% if page_obj.has_next %}
     <a
-      href="?page={{ projects.next_page_number }}"
+      href="?page={{ page_obj.next_page_number }}"
       class="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
       >Next</a
     >

@@ -126,10 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var wrapper = document.querySelector('.file-input-wrapper');
   var input = wrapper ? wrapper.querySelector('input[type="file"]') : null;
 
-  // console.log('Clicked label, triggering file input click');
-  // console.log('wrapper found?', wrapper);
-  // console.log('input found?', input);
- 
   renderFileTree();
 
   function renderFileNameLabel() {
@@ -144,8 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    // Keep the parallel path list in sync so the backend can tell which
-    // files came from a folder (Django strips '/' from the real filename).
     var filePaths = document.getElementById('filePaths');
     if (filePaths && input) {
       filePaths.value = JSON.stringify([...input.files].map(function(f) { return f.name; }));
@@ -154,12 +148,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (label && input) {
     label.addEventListener('click', function() {
-      console.log('Clicked label, triggering file input click');
       input.click();
     });
 
     input.addEventListener('change', function() {
-      console.log('فایل انتخاب شد:', input.files);
       renderFileNameLabel();
     });
   }
@@ -186,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
       input.files = dt.files;
 
       renderFileNameLabel();
-      folderInput.value = ''; // allow re-picking the same folder later
+      folderInput.value = ''; 
     });
   }
 
@@ -376,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
 
-      // don't let the click-outside handler close the menu while typing
       emailInput.addEventListener('click', function(e) { e.stopPropagation(); });
     }
   }

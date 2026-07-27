@@ -130,15 +130,31 @@ def create_project(request):
 @login_required
 def project_list(request):
     projects = Project.objects.filter(
-        Q(owner=request.user)
-        |
-        Q(memberships__user=request.user)
+        Q(owner=request.user) | Q(memberships__user=request.user)
     ).distinct()
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        projects = projects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__icontains=query)
+        )
+
+    projects = projects.order_by('-created_at')
+
+    paginator = Paginator(projects, 6)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {"page_obj": page_obj, "query": query}
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, "projects/project_results.html", context)
 
     return render(
         request,
-        "projects/project_list.html",
-        {"projects": projects}
+        "projects/project_list.html", 
+        context
     )
 
 
@@ -633,8 +649,6 @@ def delete_project(request, project_id):
 
     messages.success(request, f'"{project_title}" was permanently deleted.')
     return redirect('projects:project-list')
-
-
 
 
 @login_required

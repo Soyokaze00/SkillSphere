@@ -106,7 +106,6 @@ def get_similar_projects(project, limit=4):
     return list(candidates.order_by("-created_at")[:limit])
 
 
-
 def get_trending_projects(limit=10, days=7):
     """
     Trending = most liked recently, weighted a bit by views so a brand

@@ -5,6 +5,7 @@ function randomSeed() {
 function renderAvatarGrid(seeds) {
   const grid = document.getElementById('avatarGrid');
   const hiddenInput = document.querySelector('input[name="avatar_seed"]');
+  const clearPhotoFlag = document.getElementById('clearPhotoFlag');
   if (!grid || !hiddenInput) return;
 
   grid.innerHTML = '';
@@ -43,6 +44,7 @@ function renderAvatarGrid(seeds) {
     wrapper.addEventListener('click', () => {
       hiddenInput.value = seed;
       highlight(wrapper);
+      if (clearPhotoFlag) clearPhotoFlag.value = '1';
     });
 
     grid.appendChild(wrapper);
@@ -52,6 +54,8 @@ function renderAvatarGrid(seeds) {
 document.addEventListener('DOMContentLoaded', function() {
   const hiddenInput = document.querySelector('input[name="avatar_seed"]');
   const existingSeed = hiddenInput ? hiddenInput.value : '';
+  const clearPhotoFlag = document.getElementById('clearPhotoFlag');
+  const photoInput = document.querySelector('input[name="profile_image"]');
 
   const seeds = existingSeed
     ? [existingSeed, randomSeed(), randomSeed(), randomSeed(), randomSeed(), randomSeed(), randomSeed(), randomSeed()]
@@ -63,6 +67,14 @@ document.addEventListener('DOMContentLoaded', function() {
   if (shuffleBtn) {
     shuffleBtn.addEventListener('click', () => {
       renderAvatarGrid(Array.from({ length: 8 }, randomSeed));
+    });
+  }
+
+  if (photoInput) {
+    photoInput.addEventListener('change', () => {
+      if (photoInput.files && photoInput.files.length > 0 && clearPhotoFlag) {
+        clearPhotoFlag.value = '';
+      }
     });
   }
 

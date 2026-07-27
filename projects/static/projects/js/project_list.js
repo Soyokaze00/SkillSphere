@@ -29,18 +29,44 @@ document.querySelectorAll('.category-btn').forEach(btn => {
     });
 });
 
-document.getElementById('search').addEventListener('input', function() {
-    const query = this.value.toLowerCase().trim();
-    const cards = document.querySelectorAll('.project-card');
+const searchInput = document.getElementById('search');
+if (searchInput && searchInput.dataset.serverSearch) {
+  const resultsWrapper = document.getElementById('resultsWrapper');
+  let debounceTimer = null;
+  let latestRequestId = 0;
 
-    cards.forEach(card => {
-        const title = card.dataset.title || '';
-        if (title.includes(query)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+  function runSearch() {
+    const query = searchInput.value.trim();
+    const requestId = ++latestRequestId;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('q', query);
+    url.searchParams.delete('page');
+
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(res => res.text())
+      .then(html => {
+        if (requestId !== latestRequestId) return;
+        resultsWrapper.innerHTML = html;
+        history.replaceState(null, '', url);
+      })
+      .catch(err => console.error('Search failed', err));
+  }
+
+  searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(runSearch, 350);
+  });
+}
+
+document.addEventListener('click', function(e) {
+    const card = e.target.closest('.project-card');
+    if (!card) return;
+    if (e.target.closest('a')) return;
+    const link = card.querySelector('a[href*="project-detail"]');
+    if (link) {
+        window.location.href = link.href;
+    }
 });
 
 document.getElementById('sort').addEventListener('change', function() {
@@ -66,18 +92,5 @@ document.getElementById('sort').addEventListener('change', function() {
     cards.forEach(card => container.appendChild(card));
 });
 
-function onProjectClick(projectId) {
-    window.location.href = `/projects/${projectId}/`;
-}
-
-document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        if (e.target.closest('a')) return;
-        const link = this.querySelector('a[href*="project-detail"]');
-        if (link) {
-            window.location.href = link.href;
-        }
-    });
-});
 
 console.timeEnd("pl-js");

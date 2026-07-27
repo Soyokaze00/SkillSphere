@@ -269,3 +269,23 @@ def edit_profile_view(request):
         form = ProfileEditForm(instance=request.user)
 
     return render(request, "users/edit_profile.html", {"form": form})
+
+
+@login_required
+def edit_profile_view(request):
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+
+            if request.POST.get("clear_photo") == "1" and "profile_image" not in request.FILES:
+                if user.profile_image:
+                    user.profile_image.delete(save=False)
+                user.profile_image = None
+
+            user.save()
+            return redirect("users:profile", username=request.user.username)
+    else:
+        form = ProfileEditForm(instance=request.user)
+
+    return render(request, "users/edit_profile.html", {"form": form})

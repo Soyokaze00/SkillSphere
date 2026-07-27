@@ -172,7 +172,6 @@ function renderFileList() {
 }
 
 fileInput.onchange = renderFileList;
-folderBtn.onclick = () => folderInput.click();
 document.getElementById("browseFilesBtn").onclick = () => fileInput.click();
 folderBtn.onclick = () => folderInput.click();
 
