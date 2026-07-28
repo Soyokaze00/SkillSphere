@@ -1,4 +1,4 @@
-<div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+<div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 ">
   {% for project in page_obj %}
     {% include "projects/project_card.html" with project=project %}
   {% empty %}

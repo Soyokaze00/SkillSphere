@@ -78,21 +78,21 @@
   <!-- Header -->
   <div>
     <h1
-      class="text-2xl font-extrabold tracking-tight"
-      style="color: var(--foreground); letter-spacing: -0.5px"
+      class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white"
+      style="letter-spacing: -0.5px"
     >
       Search
     </h1>
-    <p class="text-sm mt-1" style="color: var(--muted-foreground)">
+    <p class="text-sm mt-1 text-gray-500 dark:text-gray-400">
       Find projects, creators, and tags
     </p>
   </div>
 
   <!-- Search Input -->
   <div
-    class="group focus-within:border-indigo-600 focus-within:outline-4 focus-within:outline-[#efe8ff] relative bg-white rounded-2xl border border-gray-200 flex items-center justify-start gap-3 px-5"
+    class="group focus-within:border-indigo-600 focus-within:outline-4 focus-within:outline-[#efe8ff] dark:focus-within:outline-indigo-900/30 relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-start gap-3 px-5"
   >
-    <div class="text-gray-500 group-focus-within:text-indigo-600">
+    <div class="text-gray-500 dark:text-gray-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -116,22 +116,16 @@
         value="{{ query }}"
         type="text"
         placeholder="Search projects, creators, tags..."
-        class=" w-full rounded-2xl py-4 outline-none transition-all text-base"
-        style="
-          background: var(--card);
-          border: 1px solid var(--border);
-          color: var(--foreground);
-        "
+        class="w-full rounded-2xl py-4 outline-none transition-all text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
       />
       
       <div id="suggestions"
-     class="absolute w-full bg-white rounded-xl shadow-lg mt-2 hidden z-50">
+     class="absolute w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-2 hidden z-50 border border-gray-200 dark:border-gray-700">
 </div>
       <button
         type="submit"
         id="clearBtn"
-        class=" hidden absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full items-center justify-center"
-        style="background: var(--muted); color: var(--muted-foreground)"
+        class="hidden absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
       >
         <svg
           width="12"
@@ -155,37 +149,37 @@
   {% if projects %}
   <div class="space-y-3 mt-6">
     <!-- Filters -->
-  <div class="bg-white border border-gray-200 rounded-4xl px-4 py-2 mb-6 ">
+  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-4xl px-4 py-2 mb-6">
     <div class="flex justify-between items-center gap-3">
        
       <div class="flex flex-wrap items-center gap-3">
 
     <a href="?q={{ query }}&type=all&status={{ current_status }}"
-       class="px-5 py-1.5 rounded-3xl text-xs font-medium
+       class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors
        {% if current_type == 'all' %}
-            bg-indigo-600 text-white
+            bg-indigo-600 dark:bg-indigo-500 text-white
        {% else %}
-            bg-gray-100 text-gray-700 hover:bg-gray-200
+            bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
        {% endif %}">
         All ({{ total_count }})
     </a>
 
     <a href="?q={{ query }}&type=projects&status={{ current_status }}"
-       class="px-5 py-1.5 rounded-3xl text-xs font-medium
+       class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors
        {% if current_type == 'projects' %}
-            bg-indigo-600 text-white
+            bg-indigo-600 dark:bg-indigo-500 text-white
        {% else %}
-            bg-gray-100 text-gray-700 hover:bg-gray-200
+            bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
        {% endif %}">
         Projects ({{ projects_count }})
     </a>
 
     <a href="?q={{ query }}&type=users&status={{ current_status }}"
-       class="px-5 py-1.5 rounded-3xl text-xs font-medium
+       class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors
        {% if current_type == 'users' %}
-            bg-indigo-600 text-white
+            bg-indigo-600 dark:bg-indigo-500 text-white
        {% else %}
-            bg-gray-100 text-gray-700 hover:bg-gray-200
+            bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600
        {% endif %}">
         Users ({{ users_count }})
     </a>
@@ -193,25 +187,25 @@
 </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <span class="text-sm font-medium text-gray-700 ml-2">Status:</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">Status:</span>
 
         <a
           href="?status=all"
-          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'all' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}"
+          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'all' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
         >
           All({{ total_results }})
         </a>
 
         <a
           href="?status=unread"
-          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'unread' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}"
+          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'unread' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
         >
           Unread
         </a>
 
         <a
           href="?status=read"
-          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'read' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}"
+          class="px-5 py-1.5 rounded-3xl text-xs font-medium transition-colors {% if current_status == 'read' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
         >
           Read
         </a>
@@ -222,40 +216,35 @@
     {% for project in projects %}
     <a
       href="{% url 'projects:project-detail' project.id %}"
-      class="block rounded-2xl border border-gray-200 bg-white p-5 transition hover:shadow-md"
+      class="block rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 transition hover:shadow-md"
     >
       <div class="flex justify-between items-center">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             {{ project.title }}
           </h3>
 
-          <p class="mt-2 text-sm text-gray-600">
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {{ project.description|truncatechars:120 }}
           </p>
 
           <div class="mt-4 flex gap-2">
             <span
-              class="rounded-full bg-indigo-100 px-3 py-1 text-xs text-indigo-700"
+              class="rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 text-xs text-indigo-700 dark:text-indigo-400"
             >
               {{ project.status }}
             </span>
 
             <span
-              class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700"
+              class="rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs text-gray-700 dark:text-gray-300"
             >
               {{ project.visibility }}
             </span>
           </div>
         </div>
 
-        <div class="text-right text-sm text-gray-500">
-          <!-- <p>{{ project.owner.username }}</p>
-
-                <p class="mt-1">
-                    {{ project.created_at|date:"Y/m/d" }}
-                </p> -->
-          <div class="text-gray-400">
+        <div class="text-right text-sm text-gray-500 dark:text-gray-400">
+          <div class="text-gray-400 dark:text-gray-600">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="19"
@@ -279,28 +268,28 @@
   </div>
   {% endif %} 
 {% if query and projects_count == 0 and users_count == 0 %}
-<div class="mt-8 rounded-2xl border border-gray-200 bg-white p-12 text-center">
+<div class="mt-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
 
-    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
         🔍
     </div>
 
-    <h2 class="text-xl font-semibold text-gray-900">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
         No results found
     </h2>
 
-    <p class="mt-2 text-gray-500">
+    <p class="mt-2 text-gray-500 dark:text-gray-400">
         We couldn't find anything matching
-        <span class="font-semibold">"{{ query }}"</span>.
+        <span class="font-semibold text-gray-700 dark:text-gray-300">"{{ query }}"</span>.
     </p>
 
-    <p class="mt-1 text-sm text-gray-400">
+    <p class="mt-1 text-sm text-gray-400 dark:text-gray-500">
         Try different keywords, check the spelling, or search for a broader term.
     </p>
 
     <div class="mt-6">
         <a href="{% url 'search:search' %}"
-           class="inline-flex items-center rounded-xl bg-indigo-600 px-5 py-2.5 text-white hover:bg-indigo-700 transition">
+           class="inline-flex items-center rounded-xl bg-indigo-600 dark:bg-indigo-500 px-5 py-2.5 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition">
             Clear search
         </a>
     </div>
@@ -311,10 +300,10 @@
 
   <div class="mb-6">
     <div class="flex items-center justify-between">
-      <h3 class="font-semibold mb-3">Recent Searches</h3>
+      <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Recent Searches</h3>
       <a
         href="{% url 'search:clear_search_history' %}"
-        class="text-blue-700 text-sm font-bold"
+        class="text-blue-700 dark:text-blue-400 text-sm font-bold hover:opacity-80"
       >
         Clear All
       </a>
@@ -325,9 +314,9 @@
 
       <a
         href="?q={{ item.query }}"
-        class="px-2 py-1 rounded-full border border-gray-200 bg-white hover:bg-gray-200 flex items-center justify-center gap-2"
+        class="px-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300"
       >
-        <div class="text-gray-400">
+        <div class="text-gray-400 dark:text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -354,7 +343,7 @@
   {% endif %}
 
 
-  <h3 class="font-semibold mb-4">
+  <h3 class="font-semibold text-gray-900 dark:text-white mb-4">
     Suggested Searches
 </h3>
 
@@ -363,14 +352,14 @@
 {% for item in suggested_searches %}
 
 <a href="?q={{ item }}"
-   class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 transition text-gray-500">
-     <div class=" flex items-center gap-3">
+   class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition text-gray-500 dark:text-gray-400">
+     <div class="flex items-center gap-3">
       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
      <div class="flex items-center gap-3">
-        <span class="text-gray-900">{{ item }}</span>
+        <span class="text-gray-900 dark:text-white">{{ item }}</span>
     </div>
     </div>
-         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right text-gray-400 dark:text-gray-600"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 
 
 </a>

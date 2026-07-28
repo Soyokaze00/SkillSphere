@@ -217,6 +217,7 @@ def profile_view(request, username):
         "is_following": is_following,
         "follower_count": profile_user.followers.count(),
         "following_count": profile_user.following.count(),
+        "page_title":"Profile"
     })
 
 
@@ -268,7 +269,7 @@ def edit_profile_view(request):
     else:
         form = ProfileEditForm(instance=request.user)
 
-    return render(request, "users/edit_profile.html", {"form": form})
+    return render(request, "users/edit_profile.html", {"form": form , "page_title":"Edit Profile"})
 
 
 @login_required
@@ -288,4 +289,4 @@ def edit_profile_view(request):
     else:
         form = ProfileEditForm(instance=request.user)
 
-    return render(request, "users/edit_profile.html", {"form": form})
+    return render(request, "users/edit_profile.html", {"form": form , "page_title":"Edit Profile"})

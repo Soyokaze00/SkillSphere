@@ -146,7 +146,7 @@ def project_list(request):
     paginator = Paginator(projects, 6)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    context = {"page_obj": page_obj, "query": query}
+    context = {"page_obj": page_obj, "query": query , "page_title":"My Projects"}
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, "projects/project_results.html", context)
@@ -173,6 +173,14 @@ def project_detail(request, project_id):
         text = request.POST.get("text", "").strip()
         if text:
             Comment.objects.create(project=project, user=request.user, text=text)
+            if project.owner != request.user:
+                    create_notification(
+                           user=project.owner,
+                           title="New comment",
+                           message=f"{request.user.username} commented on your project {project.title}",
+                           notification_type="comment",
+                           link=f"/projects/{project.id}/",
+                 )
         return redirect('projects:project-detail', project_id=project.id)
 
     if request.method == "POST" and "invite_member" in request.POST:
@@ -258,6 +266,7 @@ def project_detail(request, project_id):
         "owner_follower_count": project.owner.followers.count(),
         "related_projects": get_similar_projects(project, limit=4),
         "file_tree_json": json.dumps(_serialize_tree(_build_file_tree(project.files.all()))),
+        "page_title": project.title,
     })
 
 
@@ -305,6 +314,8 @@ def file_detail(request, file_id):
         'is_pdf': file_extension == 'pdf',
         'is_previewable_text': is_text,
         'file_content': file_content,
+        "page_title": f"File: {project_file.filename}",
+        
     }
     return render(request, 'projects/file_detail.html', context)
 
@@ -399,7 +410,7 @@ def invite_landing(request, token):
                 user=project.owner,
                 title="Invite accepted",
                 message=f"{request.user.username} accepted your invite to '{project.title}'.",
-                notification_type="project",
+                notification_type="invite",
                 link=f"/projects/{project.id}/",
             )
             messages.success(request, f"You've joined \"{project.title}\" as a collaborator.")
@@ -411,8 +422,9 @@ def invite_landing(request, token):
                 user=project.owner,
                 title="Invite declined",
                 message=f"{invitation.email} declined your invite to '{project.title}'.",
-                notification_type="project",
+                notification_type="invite",
                 link=f"/projects/{project.id}/",
+
             )
             messages.info(request, f"You declined the invite to \"{project.title}\".")
             return redirect('projects:project-list')
@@ -619,6 +631,7 @@ def edit_project(request, project_id):
         "file_form": file_form,
         "project": project,
         "tags_json": json.dumps(project.tag_list),
+        "page_title": f"Edit {project.title}",
     })
 
 

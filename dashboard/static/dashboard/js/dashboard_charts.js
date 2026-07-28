@@ -3,70 +3,20 @@ document.addEventListener("DOMContentLoaded", function () {
     lucide.createIcons();
   }
 
-
-  const lineEl = document.getElementById("lineChart");
-  if (lineEl) {
-    new Chart(lineEl, {
-      type: "line",
-      data: {
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        datasets: [
-          {
-            label: "Downloads",
-            data: [18, 24, 31, 42, 38, 29, 35],
-            borderColor: "#4F46E5",
-            tension: 0.4,
-          },
-          {
-            label: "Views",
-            data: [45, 62, 58, 87, 94, 71, 83],
-            borderColor: "#7C3AED",
-            tension: 0.4,
-          },
-        ],
-      },
-    });
+  // Check if dark mode is active
+  function isDarkMode() {
+    return document.documentElement.classList.contains("dark");
   }
 
-  // const pieEl = document.getElementById("pieChart");
-  // if (pieEl) {
-  //   new Chart(pieEl, {
-  //     type: "doughnut",
-  //     data: {
-  //       labels: ["Images", "Videos", "Docs", "Other"],
-  //       datasets: [
-  //         {
-  //           data: [38, 22, 18, 22],
-  //           backgroundColor: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-  //         },
-  //       ],
-  //     },
-  //   });
-  // }
-
-  // const barEl = document.getElementById("barChart");
-  // if (barEl) {
-  //   new Chart(barEl, {
-  //     type: "bar",
-  //     data: {
-  //       labels: ["Brand", "UI Lib", "Dashboard", "Icon Pack", "Fonts"],
-  //       datasets: [
-  //         {
-  //           label: "Downloads",
-  //           data: [412, 387, 298, 521, 164],
-  //           backgroundColor: "#4F46E5",
-  //         },
-  //         {
-  //           label: "Stars",
-  //           data: [88, 142, 76, 193, 41],
-  //           backgroundColor: "#7C3AED",
-  //         },
-  //       ],
-  //     },
-
-  //   });
-  // }
-
+  // Get chart colors based on theme
+  function getChartColors() {
+    const dark = isDarkMode();
+    return {
+      textColor: dark ? "#E5E7EB" : "#6B7280",
+      gridColor: dark ? "#374151" : "#E5E7EB",
+      axisColor: dark ? "#4B5563" : "#D1D5DB",
+    };
+  }
 
   const weeklyEl = document.getElementById("weekly-data");
   const projectEl = document.getElementById("project-data");
@@ -86,23 +36,173 @@ document.addEventListener("DOMContentLoaded", function () {
     uploads: weeklyData.map((i) => i.uploads),
   };
 
+  // Store chart instances for later updates
+  let activityChartInstance = null;
+  let storageChartInstance = null;
+  let performanceChartInstance = null;
+
+  // Function to update chart colors
+  function updateChartColors() {
+    const colors = getChartColors();
+    const isDark = isDarkMode();
+
+    // Update activity chart
+    if (storageChartInstance &&
+        typeof storageChartInstance.updateOptions === "function") {
+      activityChartInstance.updateOptions({
+        xaxis: {
+          labels: { style: { colors: colors.textColor } },
+          axisBorder: { color: colors.gridColor },
+          axisTicks: { color: colors.gridColor },
+        },
+        yaxis: {
+          labels: { style: { colors: colors.textColor } },
+        },
+        grid: {
+          borderColor: colors.gridColor,
+          strokeDashArray: 4,
+        },
+        tooltip: {
+          theme: isDark ? "dark" : "light",
+        },
+      });
+    }
+
+    // Update storage chart
+if (
+  activityChartInstance &&
+  typeof activityChartInstance.updateOptions === "function"
+) {
+  activityChartInstance.updateOptions({
+        plotOptions: {
+          pie: {
+            donut: {
+              labels: {
+                value: {
+                  color: isDark ? "#E5E7EB" : "#374151",
+                },
+                total: {
+                  color: isDark ? "#E5E7EB" : "#374151",
+                },
+              },
+            },
+          },
+        },
+        tooltip: {
+          theme: isDark ? "dark" : "light",
+        },
+      });
+    }
+
+    // Update performance chart
+    if (performanceChartInstance) {
+      performanceChartInstance.updateOptions({
+        xaxis: {
+          labels: { style: { colors: colors.textColor } },
+          axisBorder: { color: colors.gridColor },
+          axisTicks: { color: colors.gridColor },
+        },
+        yaxis: {
+          labels: { style: { colors: colors.textColor } },
+        },
+        grid: {
+          borderColor: colors.gridColor,
+          strokeDashArray: 4,
+        },
+        legend: {
+          labels: { colors: colors.textColor },
+        },
+        tooltip: {
+          theme: isDark ? "dark" : "light",
+        },
+      });
+    }
+
+    // Update storage legend
+    updateStorageLegend();
+  }
+
+  // Function to update storage legend
+  function updateStorageLegend() {
+    const images = storageData.images;
+    const PDFs = storageData.PDFs;
+    const docs = storageData.docs;
+    const other = storageData.other;
+    const total = images + PDFs + docs + other;
+    const isDark = isDarkMode();
+
+    const items = [
+      { label: "Images", value: images, color: "#4F46E5" },
+      { label: "PDFs", value: PDFs, color: "#7C3AED" },
+      { label: "Docs", value: docs, color: "#22C55E" },
+      { label: "Other", value: other, color: "#F59E0B" },
+    ];
+
+    const legend = document.getElementById("storageLegend");
+    if (!legend) return;
+
+    legend.innerHTML = items
+      .map((item) => {
+        const percent = total ? ((item.value / total) * 100).toFixed(1) : 0;
+        return `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span
+              class="w-3 h-3 rounded-full"
+              style="background:${item.color}">
+            </span>
+            <span class="${isDark ? "text-gray-300" : "text-gray-600"}">${item.label}</span>
+          </div>
+          <span class="font-medium ${isDark ? "text-gray-300" : "text-slate-600"}">
+            ${percent}%
+          </span>
+        </div>
+      `;
+      })
+      .join("");
+  }
+
   const activityEl = document.querySelector("#activityChart");
 
   if (activityEl && window.ApexCharts) {
-    const chart = new ApexCharts(activityEl, {
+    const colors = getChartColors();
+    activityChartInstance = new ApexCharts(activityEl, {
       series: [{ name: "Downloads", data: chartData.downloads }],
-      chart: { type: "area", height: 220, toolbar: { show: false } },
+      chart: {
+        type: "area",
+        height: 220,
+        toolbar: { show: false },
+        background: "transparent",
+      },
       stroke: { curve: "smooth", width: 3 },
       dataLabels: { enabled: false },
       fill: { type: "gradient", gradient: { opacityFrom: 0.3, opacityTo: 0 } },
       colors: ["#4F46E5"],
-      xaxis: { categories },
+      xaxis: {
+        categories,
+        labels: { style: { colors: colors.textColor } },
+        axisBorder: { color: colors.gridColor },
+        axisTicks: { color: colors.gridColor },
+      },
+      yaxis: {
+        labels: { style: { colors: colors.textColor } },
+      },
+      grid: {
+        borderColor: colors.gridColor,
+        strokeDashArray: 4,
+      },
+      tooltip: {
+        theme: isDarkMode() ? "dark" : "light",
+      },
     });
 
-    chart.render();
+    activityChartInstance.render();
 
     window.changeChart = function (type, el) {
-      chart.updateSeries([{ name: type, data: chartData[type] }]);
+      if (!activityChartInstance) return;
+      activityChartInstance.updateSeries([
+        { name: type, data: chartData[type] },
+      ]);
 
       document.querySelectorAll(".chart-btn").forEach((btn) => {
         btn.classList.remove(
@@ -110,8 +210,10 @@ document.addEventListener("DOMContentLoaded", function () {
           "text-indigo-600",
           "font-semibold",
           "shadow-sm",
+          "dark:bg-gray-800",
+          "dark:text-indigo-400",
         );
-        btn.classList.add("text-slate-500");
+        btn.classList.add("text-slate-500", "dark:text-gray-400");
       });
 
       if (el) {
@@ -120,8 +222,10 @@ document.addEventListener("DOMContentLoaded", function () {
           "text-indigo-600",
           "font-semibold",
           "shadow-sm",
+          "dark:bg-gray-800",
+          "dark:text-indigo-400",
         );
-        el.classList.remove("text-slate-500");
+        el.classList.remove("text-slate-500", "dark:text-gray-400");
       }
     };
   }
@@ -133,45 +237,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const storageEl = document.querySelector("#storageChart");
   if (storageEl && window.ApexCharts) {
-    new ApexCharts(storageEl, {
-      series: [images, PDFs, docs, other],
-      chart: { type: "donut", height: 220 },
-      labels: ["Images", "PDFs", "Docs", "Other"],
-      colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-      legend: {
-        show: false,
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            size: "65%",
-            labels: {
-              show: true,
-
-              total: {
-                show: true,
-                label: "Total Files",
-                formatter: function (w) {
-                  const total = w.globals.seriesTotals.reduce(
-                    (a, b) => a + b,
-                    0,
-                  );
-                  return total;
-                },
-              },
+    const colors = getChartColors();
+    const isDark = isDarkMode();
+storageChartInstance = new ApexCharts(storageEl, {
+  series: [images, PDFs, docs, other],
+  chart: {
+    type: "donut",
+    height: 220,
+    background: "transparent",
+  },
+  labels: ["Images", "PDFs", "Docs", "Other"],
+  colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
+  legend: {
+    show: false,
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  plotOptions: {
+    pie: {
+      donut: {
+        size: "65%",
+        labels: {
+          show: true,
+          value: {
+            color: isDark ? "#E5E7EB" : "#374151",
+          },
+          total: {
+            show: true,
+            label: "Total Files",
+            color: isDark ? "#E5E7EB" : "#374151",
+            formatter: function (w) {
+              return w.globals.seriesTotals.reduce(
+                (a, b) => a + b,
+                0
+              );
             },
           },
         },
       },
-    }).render();
+    },
+  },
+  tooltip: {
+    theme: isDark ? "dark" : "light",
+  },
+});
+
+
+storageChartInstance.render();
+
+    // Update legend initially
+    updateStorageLegend();
   }
 
   const perfEl = document.querySelector("#performanceChart");
   if (perfEl && window.ApexCharts) {
-    new ApexCharts(perfEl, {
+    const colors = getChartColors();
+    performanceChartInstance = new ApexCharts(perfEl, {
       series: [
         { name: "Downloads", data: projectData.map((x) => x.downloads) },
         { name: "Likes", data: projectData.map((x) => x.likes) },
@@ -181,6 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
         height: 250,
         width: "100%",
         toolbar: { show: false },
+        background: "transparent",
       },
       plotOptions: {
         bar: {
@@ -188,46 +311,60 @@ document.addEventListener("DOMContentLoaded", function () {
           borderRadius: 4,
         },
       },
-
       colors: ["#4F46E5", "#7C3AED"],
       dataLabels: { enabled: false },
-      colors: ["#4F46E5", "#7C3AED"],
-      xaxis: { categories: projectData.map((x) => x.name) },
-      dataLabels: { enabled: false },
-      grid: { borderColor: "#e5e7eb", strokeDashArray: 4 },
+      xaxis: {
+        categories: projectData.map((x) => x.name),
+        labels: { style: { colors: colors.textColor } },
+        axisBorder: { color: colors.gridColor },
+        axisTicks: { color: colors.gridColor },
+      },
+      yaxis: {
+        min: 0,
+        max: 10,
+        tickAmount: 10,
+        forceNiceScale: false,
+        labels: {
+          style: {
+            colors: colors.textColor,
+          },
+          formatter: function (value) {
+            return Math.round(value);
+          },
+        },
+      },
+      grid: {
+        borderColor: colors.gridColor,
+        strokeDashArray: 4,
+      },
+      legend: {
+        labels: {
+          colors: colors.textColor,
+        },
+      },
+      tooltip: {
+        theme: isDarkMode() ? "dark" : "light",
+      },
     }).render();
   }
 
-  const total = images + PDFs + docs + other;
+  // Watch for theme changes without reloading
+  let themeChangeTimeout = null;
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.attributeName === "class") {
+        // Clear previous timeout
+        if (themeChangeTimeout) {
+          clearTimeout(themeChangeTimeout);
+        }
+        // Update colors after a small delay
+        themeChangeTimeout = setTimeout(function () {
+          updateChartColors();
+          themeChangeTimeout = null;
+        }, 100);
+      }
+    });
+  });
 
-  const items = [
-    { label: "Images", value: images, color: "#4F46E5" },
-    { label: "PDFs", value: PDFs, color: "#7C3AED" },
-    { label: "Docs", value: docs, color: "#22C55E" },
-    { label: "Other", value: other, color: "#F59E0B" },
-  ];
-
-  const legend = document.getElementById("storageLegend");
-
-  legend.innerHTML = items
-    .map((item) => {
-      const percent = total ? ((item.value / total) * 100).toFixed(1) : 0;
-
-      return `
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span
-            class="w-3 h-3 rounded-full"
-            style="background:${item.color}">
-          </span>
-          <span>${item.label}</span>
-        </div>
-
-        <span class="font-medium text-slate-600">
-          ${percent}%
-        </span>
-      </div>
-    `;
-    })
-    .join("");
+  observer.observe(document.documentElement, { attributes: true });
 });

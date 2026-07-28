@@ -31,6 +31,8 @@ def notification_center(request):
     ).order_by("-created_at")
 
     unread_count = notifications.filter(is_read=False).count()
+    read_count = notifications.filter(is_read=True).count()
+
     total_notifications = Notification.objects.filter(user=request.user).count()
    
 
@@ -53,7 +55,9 @@ def notification_center(request):
     paginator = Paginator(notifications, 10) 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-
+    unread_notifications = request.user.notifications.filter(
+        is_read=False
+    )
     return render(
         request,
         "notifications/notification_center.html",
@@ -65,6 +69,8 @@ def notification_center(request):
             "current_type": current_type,
             "page_obj": page_obj,
             "page_title": "Notification",
+            "read_count":read_count,
+            "unread_notifications":unread_notifications
 
         }
     )
