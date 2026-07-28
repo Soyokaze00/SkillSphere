@@ -15,6 +15,7 @@ from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
 
 def get_dashboard_data(user,projects):
     total_projects = projects.count()
@@ -388,8 +389,9 @@ def get_weekly_activity(user):
     return data
 
 
-def get_explore_projects(user, limit=8):
-    """Public projects from other users, newest/most-popular first."""
+
+def get_explore_projects(user, limit=4):
+    """Public projects from other users, sorted by most likes first."""
     return (
         Project.objects
         .filter(visibility=Project.PUBLIC)
@@ -397,11 +399,13 @@ def get_explore_projects(user, limit=8):
         .exclude(memberships__user=user)
         .select_related("owner")
         .prefetch_related(
-           Prefetch(
-            "files",
-            queryset=ProjectFile.objects.order_by("uploaded_at"),
-            to_attr="preview_files"
-       )
-     )
-    .order_by("-created_at")
+            Prefetch(
+                "files",
+                queryset=ProjectFile.objects.order_by("uploaded_at"),
+                to_attr="preview_files"
+            )
+        )
+        .annotate(likes_count=Count("likes"))  
+        .order_by("-likes_count", "-created_at")
+        [:limit]
     )
