@@ -1,99 +1,160 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="space-y-6">
 
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-            Activity History
-        </h1>
+{{ activity_data|json_script:"activity-data" }}
 
-        <p class="mt-1 text-gray-500 dark:text-gray-400">
-            View your recent account activities.
-        </p>
-    </div>
+<div x-data="activityPage()" x-init="init()" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
-    <div class="overflow-hidden rounded-xl bg-white shadow dark:bg-gray-800">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Activity History</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Your recent account activity</p>
+  </div>
 
-        {% for log in logs %}
-            <div class="border-b border-gray-200 p-5 last:border-b-0 dark:border-gray-700">
-
-                <div class="flex items-start justify-between gap-4">
-
-                    <div>
-                        <p class="font-semibold text-gray-900 dark:text-white">
-                            {{ log.get_action_display }}
-                        </p>
-
-                        {% if log.description %}
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                {{ log.description }}
-                            </p>
-                        {% endif %}
-
-                        <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
-                            {% if log.method %}
-                                <span>{{ log.method }}</span>
-                            {% endif %}
-
-                            {% if log.path %}
-                                <span>{{ log.path }}</span>
-                            {% endif %}
-
-                            {% if log.status_code %}
-                                <span>Status: {{ log.status_code }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <time class="shrink-0 text-sm text-gray-500">
-                        {{ log.created_at|date:"M d, Y H:i" }}
-                    </time>
-
-                </div>
-            </div>
-
-        {% empty %}
-            <div class="p-8 text-center">
-                <p class="text-gray-500 dark:text-gray-400">
-                    No activity has been recorded yet.
-                </p>
-            </div>
-        {% endfor %}
-
-    </div>
-
-    {% if page_obj.has_other_pages %}
-        <div class="flex items-center justify-between">
-
-            <div>
-                {% if page_obj.has_previous %}
-                    <a
-                        href="?page={{ page_obj.previous_page_number }}"
-                        class="rounded-lg border px-4 py-2 text-sm dark:border-gray-700 dark:text-white"
-                    >
-                        Previous
-                    </a>
-                {% endif %}
-            </div>
-
-            <span class="text-sm text-gray-500">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-
-            <div>
-                {% if page_obj.has_next %}
-                    <a
-                        href="?page={{ page_obj.next_page_number }}"
-                        class="rounded-lg border px-4 py-2 text-sm dark:border-gray-700 dark:text-white"
-                    >
-                        Next
-                    </a>
-                {% endif %}
-            </div>
-
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <template x-for="s in summary" :key="s.label">
+      <div class="bg-white rounded-2xl p-5 border border-gray-200">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" :style="{ background: s.bg }">
+          <span x-html="s.icon" :style="{ color: s.color }"></span>
         </div>
-    {% endif %}
+        <div class="text-2xl font-extrabold text-gray-900 mt-3 tracking-tight" x-text="s.value"></div>
+        <div class="text-xs text-gray-500 mt-0.5" x-text="s.label"></div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Weekly Chart -->
+  <div class="bg-white rounded-2xl p-5 border border-gray-200 h-full">
+    <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+      <div>
+        <h3 class="text-[15px] font-bold text-gray-900">Weekly Activity Breakdown</h3>
+        <p class="text-xs text-gray-500 mt-1" x-text="weekRange"></p>
+      </div>
+      <div class="flex gap-1 p-1 rounded-xl bg-gray-100">
+        <template x-for="k in chartKeys" :key="k.key">
+          <button
+            @click="setActiveChart(k.key)"
+            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            :class="activeChartKey === k.key ? 'bg-white shadow-sm' : 'text-gray-500'"
+            :style="activeChartKey === k.key ? { color: k.color } : {}"
+            x-text="k.label"
+          ></button>
+        </template>
+      </div>
+    </div>
+    <div class="h-full">
+    <div id="activityChart"></div>
+    </div>
+  </div>
+
+  <!-- Activity Log -->
+  <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+    <div class="flex items-center gap-3 p-4 border-b border-gray-200 flex-wrap">
+      <h3 class="text-[15px] font-bold text-gray-900 flex-1">Activity Log</h3>
+
+      <div class="flex gap-1 p-1 rounded-xl bg-gray-100">
+        <template x-for="v in ['timeline', 'table']" :key="v">
+          <button
+            @click="view = v"
+            class="px-3 py-1.5 rounded-lg text-xs capitalize font-medium transition-all"
+            :class="view === v ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'"
+            x-text="v"
+          ></button>
+        </template>
+      </div>
+
+      <div class="flex gap-1 rounded-xl p-1 bg-gray-100">
+        <template x-for="f in ['All', 'Login', 'Project', 'Social', 'File', 'Account']" :key="f">
+          <button
+            @click="typeFilter = f"
+            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            :class="typeFilter === f ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'"
+            x-text="f"
+          ></button>
+        </template>
+      </div>
+    </div>
+
+    <!-- Timeline view -->
+    <div x-show="view === 'timeline'" class="p-5 space-y-3">
+      <template x-for="(log, i) in filtered()" :key="log.id">
+        <div class="flex gap-4">
+          <div class="flex flex-col items-center">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 :style="{ background: typeConfig[log.type].bg, color: typeConfig[log.type].color }">
+              <span x-html="typeConfig[log.type].icon"></span>
+            </div>
+            <div class="w-px flex-1 mt-2 bg-gray-200" style="min-height: 16px" x-show="i < filtered().length - 1"></div>
+          </div>
+          <div class="flex-1 pb-3">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span class="px-2 py-0.5 rounded-lg text-xs mr-2 font-semibold"
+                      :style="{ background: typeConfig[log.type].bg, color: typeConfig[log.type].color }"
+                      x-text="typeConfig[log.type].label"></span>
+                <span class="text-[13px] text-gray-900" x-text="log.desc"></span>
+              </div>
+              <span class="text-[11px] text-gray-400 flex-shrink-0" x-text="log.time"></span>
+            </div>
+            <div class="flex items-center gap-4 mt-1.5 flex-wrap">
+              <span x-show="log.ip !== '—'" class="flex items-center gap-1 text-[11px] text-gray-400">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                <span x-text="log.ip"></span>
+              </span>
+              <span class="flex items-center gap-1 text-[11px] text-gray-400">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span x-text="log.date"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <p x-show="filtered().length === 0" class="text-sm text-gray-500 text-center py-6">
+        No activity recorded yet.
+      </p>
+    </div>
+
+    <!-- Table view -->
+    <table x-show="view === 'table'" class="w-full">
+      <thead>
+        <tr class="border-b border-gray-200">
+          <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Type</th>
+          <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Description</th>
+          <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">IP Address</th>
+          <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="log in filtered()" :key="log.id">
+          <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3">
+              <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg w-fit text-xs font-semibold"
+                    :style="{ background: typeConfig[log.type].bg, color: typeConfig[log.type].color }">
+                <span x-html="typeConfig[log.type].icon"></span>
+                <span x-text="typeConfig[log.type].label"></span>
+              </span>
+            </td>
+            <td class="px-4 py-3"><span class="text-[13px] text-gray-900 line-clamp-1" x-text="log.desc"></span></td>
+            <td class="px-4 py-3"><span class="text-xs text-gray-400 font-mono" x-text="log.ip"></span></td>
+            <td class="px-4 py-3"><span class="text-xs text-gray-400" x-text="log.date"></span></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
 
 </div>
+
+
+<style>
+  .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+</style>
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="{% static 'activity_logs/js/apexcharts.min.js' %}" defer></script>
+<script src="{% static 'activity_logs/js/activity.js' %}"></script>
 {% endblock %}

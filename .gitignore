@@ -54,4 +54,5 @@ theme/static_src/node_modules/
 # -----------------------
 # Logs
 # -----------------------
-*.log
+*.log.DS_Store
+.DS_Store

@@ -3,61 +3,54 @@ from django.db import models
 
 
 class Feedback(models.Model):
-    class Category(models.TextChoices):
-        SUGGESTION = "SUGGESTION", "Suggestion"
-        BUG_REPORT = "BUG_REPORT", "Bug Report"
-        COMPLAINT = "COMPLAINT", "Complaint"
-        OTHER = "OTHER", "Other"
+    TYPE_SUGGESTION = "suggestion"
+    TYPE_BUG = "bug"
+    TYPE_FEATURE = "feature"
+    TYPE_PRAISE = "praise"
 
-    class Status(models.TextChoices):
-        PENDING = "PENDING", "Pending"
-        REVIEWING = "REVIEWING", "Reviewing"
-        RESOLVED = "RESOLVED", "Resolved"
-        REJECTED = "REJECTED", "Rejected"
+    TYPE_CHOICES = [
+        (TYPE_SUGGESTION, "💡 Suggestion"),
+        (TYPE_BUG, "🐛 Bug Report"),
+        (TYPE_FEATURE, "✨ Feature Request"),
+        (TYPE_PRAISE, "🎉 Praise"),
+    ]
 
+    STATUS_OPEN = "open"
+    STATUS_IN_REVIEW = "in_review"
+    STATUS_PLANNED = "planned"
+    STATUS_RESOLVED = "resolved"
+
+    STATUS_CHOICES = [
+        (STATUS_OPEN, "Open"),
+        (STATUS_IN_REVIEW, "In Review"),
+        (STATUS_PLANNED, "Planned"),
+        (STATUS_RESOLVED, "Resolved"),
+    ]
+
+    REACTION_CHOICES = [
+        ("", "No Reaction"),
+        ("👍", "👍 Agree"),
+        ("❤️", "❤️ Great"),
+        ("👀", "👀 We'll Review"),
+        ("🎉", "🎉 Done"),
+    ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="feedbacks",
     )
-
-    subject = models.CharField(
-        max_length=200,
-    )
-
-    category = models.CharField(
-        max_length=20,
-        choices=Category.choices,
-        default=Category.OTHER,
-    )
-
-    message = models.TextField()
-
-    status = models.CharField(
-        max_length=20,
-        choices=Status.choices,
-        default=Status.PENDING,
-    )
-
-    admin_response = models.TextField(
-        blank=True,
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-    )
-
-    updated_at = models.DateTimeField(
-        auto_now=True,
-    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_SUGGESTION)
+    subject = models.CharField(max_length=255)
+    message = models.TextField(max_length=2000)
+    rating = models.PositiveSmallIntegerField(default=0)  # 0 to 5
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN)
+    admin_reaction = models.CharField(max_length=10, choices=REACTION_CHOICES, blank=True, default="")
+    admin_response = models.TextField(max_length=1000, blank=True, default="")
+    admin_responded_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
-        indexes = [
-            models.Index(fields=["user", "-created_at"]),
-            models.Index(fields=["status"]),
-            models.Index(fields=["category"]),
-        ]
 
     def __str__(self):
-        return f"{self.subject} - {self.user.username}"
+        return f"{self.subject} ({self.get_type_display()})"

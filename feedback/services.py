@@ -30,8 +30,6 @@ def create_feedback(
         status_code=201,
     )
 
-    # Tell the generic middleware that this action already has
-    # a specific activity log.
     request._activity_logged = True
 
     return feedback

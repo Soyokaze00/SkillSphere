@@ -10,6 +10,6 @@ urlpatterns = [
     path(
         "",
         views.activity_list,
-        name="list",
+        name="activity",
     ),
 ]
