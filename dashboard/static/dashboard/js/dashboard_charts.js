@@ -41,14 +41,16 @@ document.addEventListener("DOMContentLoaded", function () {
   let storageChartInstance = null;
   let performanceChartInstance = null;
 
-  // Function to update chart colors
   function updateChartColors() {
     const colors = getChartColors();
     const isDark = isDarkMode();
 
     // Update activity chart
-    if (storageChartInstance &&
-        typeof storageChartInstance.updateOptions === "function") {
+    // Update activity chart
+    if (
+      activityChartInstance &&
+      typeof activityChartInstance.updateOptions === "function"
+    ) {
       activityChartInstance.updateOptions({
         xaxis: {
           labels: { style: { colors: colors.textColor } },
@@ -56,7 +58,17 @@ document.addEventListener("DOMContentLoaded", function () {
           axisTicks: { color: colors.gridColor },
         },
         yaxis: {
-          labels: { style: { colors: colors.textColor } },
+          title: {
+            text: "Downloads",
+            style: { color: colors.textColor },
+          },
+          labels: {
+            style: { colors: colors.textColor },
+            formatter: (val) => Math.round(val),
+          },
+          forceNiceScale: false,
+          decimalsInFloat: 0,
+          tickAmount: 4,
         },
         grid: {
           borderColor: colors.gridColor,
@@ -69,11 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Update storage chart
-if (
-  activityChartInstance &&
-  typeof activityChartInstance.updateOptions === "function"
-) {
-  activityChartInstance.updateOptions({
+    if (
+      storageChartInstance &&
+      typeof storageChartInstance.updateOptions === "function"
+    ) {
+      storageChartInstance.updateOptions({
         plotOptions: {
           pie: {
             donut: {
@@ -103,7 +115,15 @@ if (
           axisTicks: { color: colors.gridColor },
         },
         yaxis: {
-          labels: { style: { colors: colors.textColor } },
+          min: 0,
+          max: 10,
+          tickAmount: 10,
+          forceNiceScale: false,
+          decimalsInFloat: 0,
+          labels: {
+            style: { colors: colors.textColor },
+            formatter: (val) => Math.round(val),
+          },
         },
         grid: {
           borderColor: colors.gridColor,
@@ -185,7 +205,17 @@ if (
         axisTicks: { color: colors.gridColor },
       },
       yaxis: {
-        labels: { style: { colors: colors.textColor } },
+        title: {
+          text: "Downloads",
+          style: { color: colors.textColor },
+        },
+        labels: {
+          style: { colors: colors.textColor },
+          formatter: (val) => Math.round(val),
+        },
+        forceNiceScale: false,
+        decimalsInFloat: 0,
+        tickAmount: 4,
       },
       grid: {
         borderColor: colors.gridColor,
@@ -239,64 +269,66 @@ if (
   if (storageEl && window.ApexCharts) {
     const colors = getChartColors();
     const isDark = isDarkMode();
-storageChartInstance = new ApexCharts(storageEl, {
-  series: [images, PDFs, docs, other],
-  chart: {
-    type: "donut",
-    height: 220,
-    background: "transparent",
-  },
-  labels: ["Images", "PDFs", "Docs", "Other"],
-  colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
-  legend: {
-    show: false,
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  plotOptions: {
-    pie: {
-      donut: {
-        size: "65%",
-        labels: {
-          show: true,
-          value: {
-            color: isDark ? "#E5E7EB" : "#374151",
-          },
-          total: {
-            show: true,
-            label: "Total Files",
-            color: isDark ? "#E5E7EB" : "#374151",
-            formatter: function (w) {
-              return w.globals.seriesTotals.reduce(
-                (a, b) => a + b,
-                0
-              );
+    storageChartInstance = new ApexCharts(storageEl, {
+      series: [images, PDFs, docs, other],
+      chart: {
+        type: "donut",
+        height: 220,
+        background: "transparent",
+      },
+      labels: ["Images", "PDFs", "Docs", "Other"],
+      colors: ["#4F46E5", "#7C3AED", "#22C55E", "#F59E0B"],
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: "65%",
+            labels: {
+              show: true,
+              value: {
+                color: isDark ? "#E5E7EB" : "#374151",
+              },
+              total: {
+                show: true,
+                label: "Total Files",
+                color: isDark ? "#E5E7EB" : "#374151",
+                formatter: function (w) {
+                  return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                },
+              },
             },
           },
         },
       },
-    },
-  },
-  tooltip: {
-    theme: isDark ? "dark" : "light",
-  },
-});
+      tooltip: {
+        theme: isDark ? "dark" : "light",
+      },
+    });
 
+    storageChartInstance.render();
 
-storageChartInstance.render();
-
-    // Update legend initially
     updateStorageLegend();
   }
 
   const perfEl = document.querySelector("#performanceChart");
   if (perfEl && window.ApexCharts) {
     const colors = getChartColors();
+
+    const downloadsArr = projectData.map((x) => x.downloads);
+    const likesArr = projectData.map((x) => x.likes);
+    const maxValue = Math.max(...downloadsArr, ...likesArr, 0);
+
+    const yMax = Math.ceil((maxValue * 1.1) / 5) * 5 || 5;
+
     performanceChartInstance = new ApexCharts(perfEl, {
       series: [
-        { name: "Downloads", data: projectData.map((x) => x.downloads) },
-        { name: "Likes", data: projectData.map((x) => x.likes) },
+        { name: "Downloads", data: downloadsArr },
+        { name: "Likes", data: likesArr },
       ],
       chart: {
         type: "bar",
@@ -315,22 +347,27 @@ storageChartInstance.render();
       dataLabels: { enabled: false },
       xaxis: {
         categories: projectData.map((x) => x.name),
+        // title: {
+        //   text: "Projects",
+        //   style: { color: colors.textColor },
+        // },
         labels: { style: { colors: colors.textColor } },
         axisBorder: { color: colors.gridColor },
         axisTicks: { color: colors.gridColor },
       },
       yaxis: {
         min: 0,
-        max: 10,
-        tickAmount: 10,
+        max: yMax,
+        tickAmount: 5,
         forceNiceScale: false,
+        decimalsInFloat: 0,
+        title: {
+          text: "Number",
+          style: { color: colors.textColor },
+        },
         labels: {
-          style: {
-            colors: colors.textColor,
-          },
-          formatter: function (value) {
-            return Math.round(value);
-          },
+          style: { colors: colors.textColor },
+          formatter: (value) => Math.round(value),
         },
       },
       grid: {
@@ -338,16 +375,13 @@ storageChartInstance.render();
         strokeDashArray: 4,
       },
       legend: {
-        labels: {
-          colors: colors.textColor,
-        },
+        labels: { colors: colors.textColor },
       },
       tooltip: {
         theme: isDarkMode() ? "dark" : "light",
       },
     }).render();
   }
-
   // Watch for theme changes without reloading
   let themeChangeTimeout = null;
   const observer = new MutationObserver(function (mutations) {

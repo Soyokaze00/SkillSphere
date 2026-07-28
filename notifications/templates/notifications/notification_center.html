@@ -152,90 +152,95 @@
     </div>
   </div>
 
-  <!-- Filters (با قابلیت اسکرول افقی در گوشی برای جلوگیری از بهم‌ریختگی) -->
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl sm:rounded-3xl p-3 sm:px-4 sm:py-2 mb-6">
-    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
-       
-      <!-- Type Filter -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
-        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">Type:</span>
+ <!-- Filters Container -->
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl sm:rounded-3xl p-3 sm:p-4 mb-6 shadow-sm">
+  <div class="flex flex-col gap-3 lg:gap-4">
+    
+    <!-- Type Filter -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none [ms-overflow-style:none] [scrollbar-width:none]">
+      <span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 shrink-0 min-w-[50px]">Type:</span>
 
-        <a
-          href="?type=all&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'all' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          All
-        </a>
+      <a
+        href="?type=all&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'all' or not current_type %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        All
+      </a>
 
-        <a
-          href="?type=project&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'project' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Project
-        </a>
+      <a
+        href="?type=project&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'project' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Project
+      </a>
 
-        <a
-          href="?type=comment&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'comment' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Comment
-        </a>
+      <a
+        href="?type=comment&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'comment' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Comment
+      </a>
 
-        <a
-          href="?type=feedback&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'feedback' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Feedback
-        </a>
+      <a
+        href="?type=feedback&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'feedback' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Feedback
+      </a>
 
-        <a
-          href="?type=invite&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'invite' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Invite
-        </a>
+      <a
+        href="?type=invite&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'invite' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Invite
+      </a>
 
-        <a
-          href="?type=like&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'like' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Like
-        </a>
-        <a
-          href="?type=follow&status={{ current_status }}"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_type == 'follow' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Follow
-        </a>
-      </div>
+      <a
+        href="?type=like&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'like' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Like
+      </a>
 
-      <!-- Status Filter -->
-      <div class="flex items-center gap-2 overflow-x-auto pt-2 lg:pt-0 border-t border-gray-100 dark:border-gray-700/50 lg:border-t-0 shrink-0">
-        <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">Status:</span>
-
-        <a
-          href="?status=all"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_status == 'all' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          All
-        </a>
-
-        <a
-          href="?status=unread"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_status == 'unread' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Unread
-        </a>
-
-        <a
-          href="?status=read"
-          class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors shrink-0 {% if current_status == 'read' %}bg-indigo-600 dark:bg-indigo-500 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
-        >
-          Read
-        </a>
-      </div>
+      <a
+        href="?type=follow&status={{ current_status }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_type == 'follow' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Follow
+      </a>
     </div>
+
+    <!-- Divider for Mobile -->
+    <div class="border-t border-gray-100 dark:border-gray-700/60 my-0.5"></div>
+
+    <!-- Status Filter -->
+    <div class="flex items-center gap-2 overflow-x-auto scrollbar-none [ms-overflow-style:none] [scrollbar-width:none]">
+      <span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 shrink-0 min-w-[50px]">Status:</span>
+
+      <a
+        href="?status=all&type={{ current_type }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_status == 'all' or not current_status %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        All
+      </a>
+
+      <a
+        href="?status=unread&type={{ current_type }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_status == 'unread' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Unread
+      </a>
+
+      <a
+        href="?status=read&type={{ current_type }}"
+        class="whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 {% if current_status == 'read' %}bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm{% else %}bg-gray-100 dark:bg-gray-700/70 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}"
+      >
+        Read
+      </a>
+    </div>
+
   </div>
+</div>
 
   <!-- Notifications List -->
   <div class="space-y-2.5">

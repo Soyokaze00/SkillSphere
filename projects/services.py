@@ -1,5 +1,8 @@
 from users.models import Follow
 from django.db.models import Q
+from django.db.models import Count, Prefetch
+from .models import Project, ProjectFile
+
 
 def _can_access(project, user):
     """Same access rule as projects._user_can_access, duplicated here to
@@ -133,4 +136,53 @@ def get_trending_projects(limit=10, days=7):
         Project.objects.filter(visibility=Project.PUBLIC)
         .annotate(total_likes=Count("likes"))
         .order_by("-total_likes", "-views_count")[:limit]
+    )
+    
+    
+
+# Explore
+def get_user_top_projects(user, limit=4):
+    """1. User's top public projects ordered by most likes"""
+    return (
+        Project.objects
+        .filter(owner=user, visibility=Project.PUBLIC)
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count", "-created_at")
+        [:limit]
+    )
+
+
+def get_followed_users_most_liked_projects(user, limit=4):
+    """
+    2. Public projects from followed users that have been liked by the current user
+    """
+    followed_users = user.following.values_list('id', flat=True)
+
+    return (
+        Project.objects
+        .filter(owner_id__in=followed_users, visibility=Project.PUBLIC)
+        .filter(likes__user=user)
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count", "-created_at")
+        [:limit]
+    )
+
+
+def get_explore_projects(user):
+    """3. All other users' public projects ordered by most likes (prepared for pagination)"""
+    return (
+        Project.objects
+        .filter(visibility=Project.PUBLIC)
+        .exclude(owner=user)
+        .exclude(memberships__user=user)
+        .select_related("owner")
+        .prefetch_related(
+            Prefetch(
+                "files",
+                queryset=ProjectFile.objects.order_by("uploaded_at"),
+                to_attr="preview_files"
+            )
+        )
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count", "-created_at")
     )

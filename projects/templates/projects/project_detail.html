@@ -1,16 +1,16 @@
 {% extends "base.html" %} 
 {% load static %}
- {% block content %}
- {% load humanize%} {% load file_tags %}
+{% block content %}
+{% load humanize %} {% load file_tags %}
 
-<div class="max-w-6xl mx-auto p-6 space-y-6">
+<div class="max-w-6xl mx-auto p-2 md:p-3 sm:p-6 space-y-4 sm:space-y-6">
   <!-- ===== BACK BUTTON ===== -->
   <a
     href="{% url 'projects:project-list' %}"
     onclick="history.back()"
-    class="flex items-center gap-2 transition-all hover:opacity-70 text-sm text-gray-500"
+    class="flex items-center gap-2 transition-all hover:opacity-70 text-xs sm:text-sm text-gray-500"
   >
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -23,10 +23,10 @@
 
   <!-- ===== HERO ===== -->
   <div
-    class="rounded-2xl overflow-hidden shadow-lg bg-indigo-500"
+    class="rounded-xl sm:rounded-2xl overflow-hidden shadow-lg bg-indigo-500"
     x-data="{ deleteOpen: false, confirmText: '' }"
   >
-    <div class="relative h-72">
+    <div class="relative h-48 sm:h-64 md:h-72">
       {% with url=project.files.first.file.url|lower %} {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
       <img
         loading="lazy"
@@ -36,21 +36,21 @@
         decoding="async"
       />
       {% else %}
-      <div class="w-full h-full flex items-center justify-center text-6xl">
+      <div class="w-full h-full flex items-center justify-center text-4xl sm:text-6xl">
         📄
       </div>
       {% endif %} {% endwith %}
       <div
-        class="absolute inset-0 bg-linear-to-t from-gray-900/80 via-transparent to-transparent"
+        class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent"
       ></div>
       {% if user == project.owner %}
       <button
         type="button"
         @click="deleteOpen = true"
         title="Delete project"
-        class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 hover:bg-red-500 text-white backdrop-blur-sm"
+        class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 hover:bg-red-500 text-white backdrop-blur-sm"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -60,28 +60,28 @@
         </svg>
       </button>
       {% endif %}
-      <div class="absolute bottom-6 left-6 right-6">
-        <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
           <div>
-            <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 flex-wrap">
               <span
-                class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-indigo-700/80 text-white"
+                class="px-2 py-0.5 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-semibold bg-indigo-700/80 text-white"
               >
                 {{ project.get_visibility_display }}</span
               >
               <span
-                class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600"
+                class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-600"
               >
                 {{ project.get_status_display }}</span
               >
             </div>
             <h1
-              class="text-2xl md:text-3xl font-extrabold text-white tracking-tight"
+              class="text-lg sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight"
             >
               {{ project.title }}
             </h1>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 self-end sm:self-auto">
             <button
               id="likeBtn"
               type="button"
@@ -89,11 +89,11 @@
               data-like-url="{% url 'projects:toggle-like' project.id %}"
               data-liked="{% if is_liked %}true{% else %}false{% endif %}"
               title="{% if is_liked %}Unlike{% else %}Like{% endif %}"
-              class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 backdrop-blur-sm {% if is_liked %}bg-red-500 text-white{% else %}bg-white/15 text-white{% endif %}"
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all hover:scale-105 backdrop-blur-sm {% if is_liked %}bg-red-500 text-white{% else %}bg-white/15 text-white{% endif %}"
             >
               <svg
                 id="likeIcon"
-                class="w-4 h-4"
+                class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                 fill="{% if is_liked %}currentColor{% else %}none{% endif %}"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -108,12 +108,11 @@
             </button>
 
             {% if user == project.owner %}
-            
             <a href="{% url 'projects:project-edit' project.id %}"
-              class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
               title="Edit project"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -127,10 +126,10 @@
                 data-share-url="{{ request.build_absolute_uri }}"
                 data-email-url="{% url 'projects:share-email' project.id %}"
                 data-share-title="{{ project.title }}"
-                class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
+                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
               >
                 <svg
-                  class="w-4 h-4"
+                  class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -147,24 +146,24 @@
               <div
                 id="shareMenu"
                 style="color-scheme: light;"
-                class="hidden absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-xl shadow-lg border border-gray-200 py-1 z-50"
+                class="hidden absolute right-0 mt-2 w-60 sm:w-64 bg-white text-gray-800 rounded-xl shadow-lg border border-gray-200 py-1 z-50"
               >
                 <button
                   type="button"
                   id="shareGmailBtn"
-                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
+                  class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
                 >
                   📧 Share via Gmail
                 </button>
                 <button
                   type="button"
                   id="shareCopyBtn"
-                  class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
+                  class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-gray-50 flex items-center gap-2 dark:text-white"
                 >
                   🔗 Copy Link
                 </button>
                 <div class="border-t border-gray-200 mt-1 pt-2 px-3 pb-3">
-                  <label class="text-xs text-gray-500 font-medium">Or send directly:</label>
+                  <label class="text-[10px] sm:text-xs text-gray-500 font-medium">Or send directly:</label>
                   <div class="flex gap-1.5 mt-1.5">
                     <input
                       type="email"
@@ -181,15 +180,14 @@
                       Send
                     </button>
                   </div>
-                  <p id="shareEmailStatus" class="text-xs mt-1 text-gray-500"></p>
+                  <p id="shareEmailStatus" class="text-[10px] sm:text-xs mt-1 text-gray-500"></p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-        </div>
+    </div>
 
     {% if user == project.owner %}
     <div
@@ -197,26 +195,26 @@
       x-cloak
       x-transition.opacity
       style="color-scheme: light; background: rgba(15, 23, 42, 0.5);"
-      class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4"
     >
       <div
         @click.outside="deleteOpen = false"
         x-transition
-        class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+        class="bg-white rounded-xl sm:rounded-2xl shadow-xl max-w-md w-full p-4 sm:p-6"
       >
         <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-600 shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
           </div>
 
           <div class="min-w-0">
-            <h3 class="text-base font-bold text-gray-900">
+            <h3 class="text-sm sm:text-base font-bold text-gray-900">
               Delete "{{ project.title }}"?
             </h3>
 
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">
               This will permanently delete the project,
               all {{ project.files.count }} file(s),
               comments, and remove all collaborators.
@@ -232,7 +230,7 @@
         >
           {% csrf_token %}
 
-          <label class="text-xs font-medium text-gray-600">
+          <label class="text-[11px] sm:text-xs font-medium text-gray-600">
             Type
             <span class="font-bold text-gray-900">
               {{ project.title }}
@@ -246,13 +244,13 @@
             x-model="confirmText"
             autocomplete="off"
             style="color-scheme: light;"
-            class="w-full mt-1.5 px-3 py-2 text-sm border border-gray-300 rounded-xl outline-none bg-white text-gray-900 focus:ring-2 focus:ring-red-500"
+            class="w-full mt-1.5 px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg sm:rounded-xl outline-none bg-white text-gray-900 focus:ring-2 focus:ring-red-500"
           />
-          <div class="flex gap-2 mt-5">
+          <div class="flex gap-2 mt-4 sm:mt-5">
             <button
               type="button"
               @click="deleteOpen=false;confirmText=''"
-              class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
+              class="flex-1 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
             >
               Cancel
             </button>
@@ -263,7 +261,7 @@
               :class="confirmText === '{{ project.title|escapejs }}'
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : 'bg-red-200 text-red-400 cursor-not-allowed'"
-              class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition"
+              class="flex-1 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition"
             >
               Delete Forever
             </button>
@@ -275,16 +273,16 @@
   </div>
 
   <!-- ===== CONTENT GRID ===== -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
     <!-- ===== MAIN CONTENT ===== -->
-    <div class="lg:col-span-2 space-y-5">
+    <div class="lg:col-span-2 space-y-4 sm:space-y-5">
       <!-- Stats Bar -->
       <div
-        class="flex flex-wrap items-center gap-6 rounded-2xl px-6 py-4 bg-white border border-gray-200"
+        class="grid grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4 rounded-xl sm:rounded-2xl p-3 sm:p-4 bg-white border border-gray-200"
       >
         <div class="flex items-center gap-2">
           <svg
-            class="w-4 h-4 text-indigo-600"
+            class="w-4 h-4 text-indigo-600 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -297,15 +295,15 @@
             ></path>
           </svg>
           <div>
-            <div id="statDownloads" class="text-base font-bold text-gray-900">
+            <div id="statDownloads" class="text-sm sm:text-base font-bold text-gray-900 leading-tight">
               {{ project.download_count }}
             </div>
-            <div class="text-xs text-gray-500">Downloads</div>
+            <div class="text-[8px] sm:text-xs text-gray-500">Downloads</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <svg
-            class="w-4 h-4 text-indigo-600"
+            class="w-4 h-4 text-indigo-600 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -318,15 +316,15 @@
             ></path>
           </svg>
           <div>
-            <div id="statLikes" class="text-base font-bold text-gray-900">
+            <div id="statLikes" class="text-sm sm:text-base font-bold text-gray-900 leading-tight">
               {{ project.like_count}}
             </div>
-            <div class="text-xs text-gray-500">Likess</div>
+            <div class="text-[8px] sm:text-xs text-gray-500">Likes</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <svg
-            class="w-4 h-4 text-indigo-600"
+            class="w-4 h-4 text-indigo-600 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -345,15 +343,15 @@
             ></path>
           </svg>
           <div>
-            <div id="statViews" class="text-base font-bold text-gray-900">
+            <div id="statViews" class="text-sm sm:text-base font-bold text-gray-900 leading-tight">
               {{ project.views_count}}
             </div>
-            <div class="text-xs text-gray-500">Views</div>
+            <div class="text-[8px] sm:text-xs text-gray-500">Views</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <svg
-            class="w-4 h-4 text-indigo-600"
+            class="w-4 h-4 text-indigo-600 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -366,27 +364,27 @@
             ></path>
           </svg>
           <div>
-            <div id="statComments" class="text-base font-bold text-gray-900">
+            <div id="statComments" class="text-sm sm:text-base font-bold text-gray-900 leading-tight">
               {{ project.comments.count}}
             </div>
-            <div class="text-xs text-gray-500">Comments ({{ comments.count }})</div>
+            <div class="text-[8px] sm:text-xs text-gray-500 truncate">Comments</div>
           </div>
         </div>
 
       </div>
 
       <!-- Description -->
-      <div class="rounded-2xl p-6 bg-white border border-gray-200">
-        <h2 class="text-base font-bold text-gray-900 mb-3">About</h2>
+      <div class="rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white border border-gray-200">
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 mb-2 sm:mb-3">About</h2>
         <p
           id="projectDesc"
-          class="text-sm text-gray-700 leading-relaxed whitespace-pre-line wrap-break-word"
+          class="text-xs sm:text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words"
         >
           {{ project.description }}
         </p>
-        <div id="tagsContainer" class="flex flex-wrap gap-2 mt-4">
+        <div id="tagsContainer" class="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
           {% for tag in project.tag_list %}
-          <span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-medium">
+          <span class="text-[11px] sm:text-xs bg-indigo-50 text-indigo-600 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full font-medium">
             #{{ tag }}
           </span>
           {% endfor %}
@@ -394,11 +392,11 @@
       </div>
 
       <!-- Tabs -->
-      <div class="rounded-2xl overflow-hidden bg-white border border-gray-200">
+      <div class="rounded-xl sm:rounded-2xl overflow-hidden bg-white border border-gray-200">
         <!-- Tabs -->
-        <div class="flex border-b border-gray-200">
+        <div class="flex border-b border-gray-200 overflow-x-auto">
           <button
-            class="tab-btn px-6 py-4 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+            class="tab-btn px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 whitespace-nowrap"
             onclick="switchTab('files')"
             data-tab="files"
           >
@@ -406,41 +404,38 @@
           </button>
 
           <button
-            class="tab-btn px-6 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700"
+            class="tab-btn px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap"
             onclick="switchTab('comments')"
             data-tab="comments"
           >
             Comments ({{ comments.count }})
           </button>
 
-          
         </div>
 
         <!-- Content -->
-        <div class="p-5">
+        <div class="p-3 sm:p-5">
           <!-- Files -->
           <div id="tab-files" class="tab-panel space-y-2">
-            <div id="fileTree" class="font-mono text-sm"></div>
-            <p id="noFilesMsg" class="text-sm text-gray-500 hidden">No files uploaded</p>
+            <div id="fileTree" class="font-mono text-xs sm:text-sm overflow-x-auto"></div>
+            <p id="noFilesMsg" class="text-xs sm:text-sm text-gray-500 hidden">No files uploaded</p>
             <script id="fileTreeData" type="application/json">{{ file_tree_json|safe }}</script>
 
 
             <div class="grid py-2 w-full">
               <a
                 href="{% url 'projects:download-all' project.id %}"
-                class="flex items-center justify-center gap-2 text-md font-bold px-3 py-2.5 bg-linear-60 to-violet-600 via-violet-700 from-indigo-700 text-white rounded-2xl"
+                class="flex items-center justify-center gap-2 text-xs sm:text-sm font-bold px-3 py-2.5 bg-gradient-to-r from-indigo-700 via-violet-700 to-violet-600 text-white rounded-xl sm:rounded-2xl hover:opacity-95 transition"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  class="w-4 h-4 shrink-0"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="lucide lucide-download-icon lucide-download"
                 >
                   <path d="M12 15V3" />
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -452,7 +447,7 @@
           </div>
 
           <!-- Comments -->
-                    <div id="tab-comments" class="tab-panel hidden space-y-4">
+          <div id="tab-comments" class="tab-panel hidden space-y-3 sm:space-y-4">
             <form method="POST" class="flex gap-2">
               {% csrf_token %}
               <input
@@ -461,36 +456,36 @@
                 placeholder="Add a comment..."
                 maxlength="1000"
                 required
-                class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 bg-gray-50 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                class="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-gray-300 bg-gray-50 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <button
                 type="submit"
                 name="add_comment"
-                class="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all whitespace-nowrap"
+                class="px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition-all whitespace-nowrap"
               >
                 Post
               </button>
             </form>
             {% for comment in comments %}
-            <div class="flex gap-3">
+            <div class="flex gap-2.5 sm:gap-3">
               <div
-                class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs"
+                class="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs shrink-0"
               >
                 {{ comment.user.username|first|upper }}
               </div>
 
               <div>
-                <div class="text-sm font-semibold">
+                <div class="text-xs sm:text-sm font-semibold">
                   {{ comment.user.username }}
                 </div>
-                <div class="text-sm text-gray-600">{{ comment.text }}</div>
-                <div class="text-xs text-gray-400">
+                <div class="text-xs sm:text-sm text-gray-600">{{ comment.text }}</div>
+                <div class="text-[10px] sm:text-xs text-gray-400 mt-0.5">
                   {{ comment.created_at|timesince }} ago
                 </div>
               </div>
             </div>
             {% empty %}
-            <p class="text-sm text-gray-500">No comments yet</p>
+            <p class="text-xs sm:text-sm text-gray-500">No comments yet</p>
             {% endfor %}
           </div>
           
@@ -498,28 +493,28 @@
         
       </div>
       <!-- Related Projects -->
-      <div class="rounded-2xl p-5 bg-white border border-gray-200">
-        <h3 class="text-sm font-bold text-gray-900 mb-3">Related Projects</h3>
+      <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 bg-white border border-gray-200">
+        <h3 class="text-xs sm:text-sm font-bold text-gray-900 mb-3">Related Projects</h3>
         <div class="space-y-3">
           {% for related in related_projects %}
           <a
             href="{% url 'projects:project-detail' related.id %}"
-            class="flex items-center gap-3 group"
+            class="flex items-center gap-2.5 sm:gap-3 group"
           >
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-lg shrink-0">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-indigo-50 flex items-center justify-center text-base sm:text-lg shrink-0">
               📄
             </div>
             <div class="min-w-0">
-              <div class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+              <div class="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
                 {{ related.title }}
               </div>
-              <div class="text-xs text-gray-400 truncate">
+              <div class="text-[10px] sm:text-xs text-gray-400 truncate">
                 {{ related.owner.username }}
               </div>
             </div>
           </a>
           {% empty %}
-          <p class="text-xs text-gray-500">No related projects yet.</p>
+          <p class="text-[11px] sm:text-xs text-gray-500">No related projects yet.</p>
           {% endfor %}
         </div>
       </div>
@@ -529,89 +524,89 @@
     <div class="space-y-4">
       <!-- Owner Card -->
 
-      <div class="rounded-2xl p-5 bg-white border border-gray-200">
-        <h3 class="text-sm font-bold text-gray-900 mb-4">Creator</h3>
+      <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 bg-white border border-gray-200">
+        <h3 class="text-xs sm:text-sm font-bold text-gray-900 mb-3 sm:mb-4">Creator</h3>
         <a
           href="{% url 'users:profile' project.owner.username %}"
           class="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
           <div
             id="ownerAvatar"
-            class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-white text-base font-bold bg-gradient-to-r from-indigo-600 to-purple-600"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 text-white text-sm sm:text-base font-bold bg-gradient-to-r from-indigo-600 to-purple-600"
           >
             {{ project.owner.username|slice:":2"|upper }}
           </div>
           <div>
-            <div class="text-sm font-bold text-gray-900">
+            <div class="text-xs sm:text-sm font-bold text-gray-900">
               {{ project.owner.username }}
             </div>
-            <div id="ownerRole" class="text-xs text-gray-500">
+            <div id="ownerRole" class="text-[10px] sm:text-xs text-gray-500">
               {{ project.created_at }}
             </div>
           </div>
         </a>
-        <p id="ownerBio" class="text-xs text-gray-500 leading-relaxed mt-3">{{ project.owner.bio|default:"" }}</p>
-        <div class="flex gap-4 mt-4">
+        <p id="ownerBio" class="text-[11px] sm:text-xs text-gray-500 leading-relaxed mt-2.5 sm:mt-3">{{ project.owner.bio|default:"" }}</p>
+        <div class="flex gap-4 mt-3 sm:mt-4">
           <div>
-            <div id="ownerProjects" class="text-base font-bold text-gray-900">
+            <div id="ownerProjects" class="text-sm sm:text-base font-bold text-gray-900">
               {{ project_count }}
             </div>
-            <div class="text-xs text-gray-500">Projects</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Projects</div>
           </div>
           <div>
-            <div id="ownerFollowers" class="text-base font-bold text-gray-900">
+            <div id="ownerFollowers" class="text-sm sm:text-base font-bold text-gray-900">
               {{ owner_follower_count }}
             </div>
-            <div class="text-xs text-gray-500">Followers</div>
+            <div class="text-[10px] sm:text-xs text-gray-500">Followers</div>
           </div>
         </div>
-        <div class="flex gap-2 mt-4">
+        <div class="flex gap-2 mt-3 sm:mt-4">
           {% if user != project.owner %}
           <button
             id="followBtn"
             type="button"
             data-follow-url="{% url 'users:toggle-follow' project.owner.username %}"
             data-following="{% if is_following_owner %}true{% else %}false{% endif %}"
-            class="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 {% if is_following_owner %}bg-gray-100 text-gray-700{% else %}bg-indigo-600 text-white{% endif %}"
+            class="flex-1 rounded-lg sm:rounded-xl py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all hover:opacity-90 {% if is_following_owner %}bg-gray-100 text-gray-700{% else %}bg-indigo-600 text-white{% endif %}"
           >
             <span id="followLabel">{% if is_following_owner %}Following{% else %}+ Follow{% endif %}</span>
           </button>
           {% endif %}
           <a
             href="{% url 'users:profile' project.owner.username %}"
-            class="flex-1 block text-center rounded-xl py-2.5 text-sm font-semibold transition-all hover:opacity-90 bg-indigo-50 text-indigo-600"
+            class="flex-1 block text-center rounded-lg sm:rounded-xl py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all hover:opacity-90 bg-indigo-50 text-indigo-600"
           >
             View Profile
           </a>
         </div>
-        </div>
+      </div>
         
       <!-- Collaborators -->
-      <div class="rounded-2xl p-5 bg-white border border-gray-200">
+      <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 bg-white border border-gray-200">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-bold text-gray-900">Collaborators</h3>
-          <span class="text-xs text-gray-400">{{ project.member_count }}</span>
+          <h3 class="text-xs sm:text-sm font-bold text-gray-900">Collaborators</h3>
+          <span class="text-[10px] sm:text-xs text-gray-400">{{ project.member_count }}</span>
         </div>
 
         <div class="space-y-3">
           {% for membership in members %}
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
-              <a href="{% url 'users:profile' membership.user.username %}">
-              <div
-                class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600"
-              >
-                {{ membership.user.username|slice:":2"|upper }}
-              </div>
-              <div class="min-w-0">
-                <div class="text-sm font-medium text-gray-900 truncate">
-                  {{ membership.user.username }}
+              <a href="{% url 'users:profile' membership.user.username %}" class="flex items-center gap-2 min-w-0">
+                <div
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 text-white text-[10px] sm:text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600"
+                >
+                  {{ membership.user.username|slice:":2"|upper }}
                 </div>
-                <div class="text-xs text-gray-400">
-                  Joined {{ membership.joined_at|timesince }} ago
+                <div class="min-w-0">
+                  <div class="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                    {{ membership.user.username }}
+                  </div>
+                  <div class="text-[10px] sm:text-xs text-gray-400 truncate">
+                    Joined {{ membership.joined_at|timesince }} ago
+                  </div>
                 </div>
-                </a>
-              </div>
+              </a>
             </div>
 
             {% if user == project.owner %}
@@ -623,10 +618,10 @@
               <button
                 type="submit"
                 title="Remove collaborator"
-                class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
               >
                 <svg
-                  class="w-3.5 h-3.5"
+                  class="w-3 h-3 sm:w-3.5 sm:h-3.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -643,7 +638,7 @@
             {% endif %}
           </div>
           {% empty %}
-          <p class="text-xs text-gray-500">No collaborators yet.</p>
+          <p class="text-[11px] sm:text-xs text-gray-500">No collaborators yet.</p>
           {% endfor %}
         </div>
 
@@ -651,22 +646,22 @@
 
         {% if pending_invitations %}
         <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
-          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          <div class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wide">
             Pending invites
           </div>
           {% for invitation in pending_invitations %}
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-gray-500 bg-gray-100 text-xs">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 text-gray-500 bg-gray-100 text-xs">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <div class="min-w-0">
-                <div class="text-sm font-medium text-gray-900 truncate">
+                <div class="text-xs sm:text-sm font-medium text-gray-900 truncate">
                   {{ invitation.email }}
                 </div>
-                <div class="text-xs text-amber-500 font-medium">
+                <div class="text-[10px] sm:text-xs text-amber-500 font-medium truncate">
                   Pending &middot; sent {{ invitation.created_at|timesince }} ago
                 </div>
               </div>
@@ -679,9 +674,9 @@
               <button
                 type="submit"
                 title="Cancel invite"
-                class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -693,24 +688,24 @@
 
         <form method="POST" class="mt-4 pt-4 border-t border-gray-200">
           {% csrf_token %}
-          <label class="text-xs text-gray-500 font-medium">Invite a collaborator</label>
+          <label class="text-[10px] sm:text-xs text-gray-500 font-medium">Invite a collaborator</label>
           <div class="flex gap-1.5 mt-1.5">
             <input
               type="text"
               name="identifier"
               placeholder="Username or email"
               style="color-scheme: light;"
-              class="flex-1 min-w-0 px-3 py-2 text-xs border border-gray-300 rounded-lg outline-none bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500"
+              class="flex-1 min-w-0 px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg outline-none bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500"
             />
             <button
               type="submit"
               name="invite_member"
-              class="px-3 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 whitespace-nowrap"
+              class="px-2.5 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 whitespace-nowrap"
             >
               Invite
             </button>
           </div>
-          <p class="text-xs text-gray-400 mt-1.5">
+          <p class="text-[10px] sm:text-xs text-gray-400 mt-1">
             We'll email them a link. They join once they accept it.
           </p>
 
@@ -724,29 +719,29 @@
       </div>
 
       <!-- Project Info -->
-      <div class="rounded-2xl p-5 bg-white border border-gray-200">
-        <h3 class="text-sm font-bold text-gray-900 mb-3">Details</h3>
-        <div class="flex justify-between py-2 border-b border-gray-200">
-          <span class="text-xs text-gray-500">Files</span>
-          <span id="detailFiles" class="text-xs font-semibold text-gray-900">
+      <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 bg-white border border-gray-200">
+        <h3 class="text-xs sm:text-sm font-bold text-gray-900 mb-3">Details</h3>
+        <div class="flex justify-between py-1.5 sm:py-2 border-b border-gray-200">
+          <span class="text-[11px] sm:text-xs text-gray-500">Files</span>
+          <span id="detailFiles" class="text-[11px] sm:text-xs font-semibold text-gray-900">
             {{ project.files.count }}</span
           >
         </div>
-        <div class="flex justify-between py-2 border-b border-gray-200">
-          <span class="text-xs text-gray-500">Total Size</span>
-          <span id="detailSize" class="text-xs font-semibold text-gray-900"
+        <div class="flex justify-between py-1.5 sm:py-2 border-b border-gray-200">
+          <span class="text-[11px] sm:text-xs text-gray-500">Total Size</span>
+          <span id="detailSize" class="text-[11px] sm:text-xs font-semibold text-gray-900"
             >{{ total_size|filesizeformat }}</span
           >
         </div>
-        <div class="flex justify-between py-2 border-b border-gray-200">
-          <span class="text-xs text-gray-500">Published</span>
-          <span id="detailCreated" class="text-xs font-semibold text-gray-900">
+        <div class="flex justify-between py-1.5 sm:py-2 border-b border-gray-200">
+          <span class="text-[11px] sm:text-xs text-gray-500">Published</span>
+          <span id="detailCreated" class="text-[11px] sm:text-xs font-semibold text-gray-900">
             {{ project.created_at|date:"Y, F j, g:i A" }}
           </span>
         </div>
-        <div class="flex justify-between py-2">
-          <span class="text-xs text-gray-500">Last Update</span>
-          <span id="detailUpdated" class="text-xs font-semibold text-gray-900">
+        <div class="flex justify-between py-1.5 sm:py-2">
+          <span class="text-[11px] sm:text-xs text-gray-500">Last Update</span>
+          <span id="detailUpdated" class="text-[11px] sm:text-xs font-semibold text-gray-900">
             {{ project.updated_at|date:"Y, F j, g:i A" }} 
           </span>
         </div>

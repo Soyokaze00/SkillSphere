@@ -1,4 +1,3 @@
-console.time("pl-js");
 
 function setView(view) {
     const container = document.getElementById('projectContainer');
@@ -12,7 +11,7 @@ function setView(view) {
 document.querySelectorAll('.category-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         document.querySelectorAll('.category-btn').forEach(b => {
-            b.className = 'category-btn px-3 py-1 rounded-lg text-xs bg-gray-100 text-gray-700';
+            b.className = 'category-btn px-3 py-1 rounded-lg text-xs bg-gray-100 text-gray-700 dark:text-black ';
         });
         this.className = 'category-btn px-3 py-1 rounded-lg text-xs bg-indigo-600 text-white';
 
@@ -93,4 +92,5 @@ document.getElementById('sort').addEventListener('change', function() {
 });
 
 
-console.timeEnd("pl-js");
+
+
