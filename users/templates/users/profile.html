@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="max-w-5xl mx-auto p-6 space-y-6">
+
+  <!-- PROFILE HEADER -->
+  <div class="rounded-2xl p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+    {% if profile_user.profile_image %}
+    <img
+      src="{{ profile_user.profile_image.url }}"
+      class="w-20 h-20 rounded-full object-cover shrink-0"
+      alt="{{ profile_user.username }}"
+    />
+    {% elif profile_user.avatar_seed %}
+    <img
+      src="https://api.dicebear.com/9.x/identicon/svg?seed={{ profile_user.avatar_seed }}"
+      class="w-20 h-20 rounded-full shrink-0 bg-gray-100 dark:bg-gray-700"
+      alt="{{ profile_user.username }}"
+    />
+    {% else %}
+    <div class="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0 text-white text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600">
+      {{ profile_user.username|slice:":2"|upper }}
+    </div>
+    {% endif %}
+
+    <div class="flex-1 min-w-0">
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ profile_user.username }}</h1>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        Member since {{ profile_user.date_joined|date:"F Y" }}
+      </p>
+      {% if profile_user.bio %}
+      <p class="text-sm text-gray-700 dark:text-gray-300 mt-3 whitespace-pre-line">{{ profile_user.bio }}</p>
+      {% endif %}
+
+      <div class="flex gap-5 mt-4">
+        <div>
+          <span class="text-base font-bold text-gray-900 dark:text-white">{{ project_count }}</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">Projects</span>
+        </div>
+        <div>
+          <span id="followerCount" class="text-base font-bold text-gray-900 dark:text-white">{{ profile_user.followers.count }}</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">Followers</span>
+        </div>
+        <div>
+          <span class="text-base font-bold text-gray-900 dark:text-white">{{ profile_user.following.count }}</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">Following</span>
+        </div>
+      </div>
+    </div>
+
+    {% if is_own_profile %}
+    <a href="{% url 'users:edit-profile' %}"
+    class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all whitespace-nowrap"
+    >
+    Edit Profile
+    </a>
+    {% else %}
+    <button
+    id="followBtn"
+    type="button"
+    data-follow-url="{% url 'users:toggle-follow' profile_user.username %}"
+    data-following="{% if is_following %}true{% else %}false{% endif %}"
+    class="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 whitespace-nowrap {% if is_following %}bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300{% else %}bg-indigo-600 text-white{% endif %}"
+    >
+    <span id="followLabel">{% if is_following %}Following{% else %}+ Follow{% endif %}</span>
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- PROJECTS -->
+  <div>
+    <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">
+      {% if is_own_profile %}Your Projects{% else %}Projects{% endif %} ({{ project_count }})
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {% for project in projects %}
+      
+      <a href="{% url 'projects:project-detail' project.id %}"
+        class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg transition-all"
+      >
+        <div class="h-32 bg-gradient-to-br from-indigo-100 dark:from-indigo-900/30 to-purple-100 dark:to-purple-900/30 flex items-center justify-center text-4xl">
+          {% with url=project.files.first.file.url|lower %}
+          {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
+          <img src="{{ project.files.first.file.url }}" class="w-full h-full object-cover" alt="{{ project.title }}" />
+          {% else %}
+          <span class="dark:text-gray-400">📄</span>
+          {% endif %}
+          {% endwith %}
+        </div>
+        <div class="p-4">
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ project.title }}</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ project.description|truncatechars:80 }}</p>
+          <div class="flex items-center gap-2 mt-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+              {{ project.get_status_display }}
+            </span>
+            {% if project.owner == profile_user %}
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400">Owner</span>
+            {% else %}
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">Collaborator</span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <p class="text-sm text-gray-500 dark:text-gray-400 col-span-full">
+        {% if is_own_profile %}You haven't created any projects yet.{% else %}No public projects yet.{% endif %}
+      </p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

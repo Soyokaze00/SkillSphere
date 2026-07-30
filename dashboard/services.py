@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -9,12 +11,14 @@ from django.db.models import Q
 from notifications.models import Notification
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
 
 def get_dashboard_data(user,projects):
-
-
     total_projects = projects.count()
-    
     now = timezone.now()
     first_day_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
@@ -23,7 +27,12 @@ def get_dashboard_data(user,projects):
     ).count()
     
 
-    
+    today = timezone.localdate()
+    week_start = today - timedelta(days=6)
+    week_end = today
+
+    weekly_activity = get_weekly_activity(user)
+   
     banner_stats = [
         {
             "label": "Total Projects",
@@ -33,17 +42,17 @@ def get_dashboard_data(user,projects):
         {
             "label": "Total Downloads",
             "value": 45,
-            "delta": "+12% ↑"  # فعلاً همین بمونه
+            "delta": "+12% ↑"  
         },
         {
             "label": "Profile Views",
             "value": 55,
-            "delta": "+8% ↑"  # فعلاً همین بمونه
+            "delta": "+8% ↑"  
         },
         {
             "label": "Followers",
             "value": 21,
-            "delta": "+47 this week"  # فعلاً همین بمونه
+            "delta": "+47 this week"  
         },
 
         
@@ -95,17 +104,30 @@ def get_dashboard_data(user,projects):
      ]
     
 
-    return { 'banner_stats': banner_stats ,    
+    return { 'banner_stats': get_banner_stats(user) ,    
             "stats": get_stats(user),
             "weekly_activity": get_weekly_activity(user),
             "project_perf": get_project_perf(projects),
             "recent_activity": get_recent_activity(user),
             "quick_actions": quick_actions,
             "storage_pie": get_project_storage(projects,user),
-            "recent_projects": get_recent_projects(projects),}
+            "recent_projects": get_recent_projects(projects),
+            "page_title": "Dashboard",
+            "explore_projects": get_explore_projects(user),
+            "week_start": week_start,
+            "week_end": week_end,
+
+
+            }
     
     
 
+def format_bytes(size):
+    for unit in ["B", "KB", "MB", "GB"]:
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} TB"
 
 def get_stats(user):
 
@@ -136,7 +158,7 @@ def get_stats(user):
         },
         {
             "label": "Storage",
-            "value": sum(f.file.size for f in files),
+            "value": format_bytes(sum(f.file.size for f in files)),
             "sub": "Bytes used",
             "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>',
             "icon_bg": "bg-green-50",
@@ -145,8 +167,8 @@ def get_stats(user):
         },
         {
             "label": "Followers",
-            "value": 0,
-            "sub": "Coming soon",
+            "value": user.followers.count(),
+            "sub": "People following you",
             "icon": '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-round-icon lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg>',
             "icon_bg": "bg-amber-50",
             "icon_color": "text-amber-500",
@@ -154,15 +176,69 @@ def get_stats(user):
         },
     ]
     
-    
+ 
 
+def get_banner_stats(user):
+    projects = Project.objects.filter(
+        Q(owner=user) | Q(memberships__user=user)
+    ).distinct()
+
+    now = timezone.now()
+    month_ago = now - timedelta(days=30)
+    week_ago = now - timedelta(days=7)
+
+    total_projects = projects.count()
+
+    projects_this_month = projects.filter(
+        created_at__gte=month_ago
+    ).count()
+
+    total_downloads = projects.aggregate(
+        total=Sum("download_count")
+    )["total"] or 0
+
+    downloads_this_month = projects.filter(
+        created_at__gte=month_ago
+    ).aggregate(
+        total=Sum("download_count")
+    )["total"] or 0
+
+    total_views = projects.aggregate(
+        total=Sum("views_count")
+    )["total"] or 0
+
+    followers = user.followers.count()
+
+    return [
+        {
+            "label": "Total Projects",
+            "value": total_projects,
+            "delta": f"+{projects_this_month} this month"
+        },
+        {
+            "label": "Total Downloads",
+            "value": total_downloads,
+            "delta": f"+{downloads_this_month} this month"
+        },
+        {
+            "label": "Profile Views",
+            "value": total_views,
+            "delta": "Total project views"
+        },
+        {
+            "label": "Followers",
+            "value": followers,
+            "delta": "Your community"
+        },
+    ]
+    
 def get_project_perf(projects):
 
     return [
         {
             "name": p.title,
-            "downloads": p.files.count(),
-            "stars": 0
+            "downloads": p.download_count,
+            "likes": p.like_count
         }
         for p in projects[:5]
     ]
@@ -266,28 +342,70 @@ def get_recent_projects(projects):
     return projects.order_by('-created_at')[:4]
 
 
+
+
 def get_weekly_activity(user):
 
     today = timezone.now().date()
     start_date = today - timedelta(days=6)
 
-    files = ProjectFile.objects.filter(
-        uploaded_by=user,
-        uploaded_at__date__gte=start_date
-    )
+    projects = Project.objects.filter(
+        Q(owner=user) | Q(memberships__user=user)
+    ).distinct()
 
     data = []
 
     for i in range(7):
         day = start_date + timedelta(days=i)
 
-        count = files.filter(uploaded_at__date=day).count()
+        uploads = ProjectFile.objects.filter(
+            uploaded_by=user,
+            uploaded_at__date=day
+        ).count()
+
+
+        downloads = projects.filter(
+            created_at__date=day
+        ).aggregate(
+            total=Sum("download_count")
+        )["total"] or 0
+
+
+        views = projects.filter(
+            created_at__date=day
+        ).aggregate(
+            total=Sum("views_count")
+        )["total"] or 0
+
 
         data.append({
             "day": day.strftime("%a"),
-            "uploads": count,
-            "downloads": 0,
-            "views": 0
+            "uploads": uploads,
+            "downloads": downloads,
+            "views": views,
         })
 
+
     return data
+
+
+
+def get_explore_projects(user, limit=4):
+    """Public projects from other users, sorted by most likes first."""
+    return (
+        Project.objects
+        .filter(visibility=Project.PUBLIC)
+        .exclude(owner=user)
+        .exclude(memberships__user=user)
+        .select_related("owner")
+        .prefetch_related(
+            Prefetch(
+                "files",
+                queryset=ProjectFile.objects.order_by("uploaded_at"),
+                to_attr="preview_files"
+            )
+        )
+        .annotate(likes_count=Count("likes"))  
+        .order_by("-likes_count", "-created_at")
+        [:limit]
+    )

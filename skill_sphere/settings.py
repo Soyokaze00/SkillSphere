@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import shutil
 
 load_dotenv()
 
@@ -30,6 +31,9 @@ SECRET_KEY = "django-insecure-dbkr0+sg794zid3%&k$q*j+ied-45llwua0662t8xn*i&zwnj8
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+DATA_UPLOAD_MAX_NUMBER_FILES = 5000
 
 
 # Application definition
@@ -57,7 +61,7 @@ INSTALLED_APPS = [
     'search', 
 
     'theme',  
-        'lucide', # <-- این خط را اضافه کنید
+        'lucide', 
 
 ]
 
@@ -65,7 +69,7 @@ TAILWIND_APP_NAME = 'theme'
 
 NPM_BIN_PATH = r"/usr/local/bin/npm"
 
-SITE_ID = 1
+SITE_ID = 2
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -109,9 +113,13 @@ WSGI_APPLICATION = "skill_sphere.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -205,6 +213,8 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
-# خذف کن
+
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+NPM_BIN_PATH = shutil.which("npm") or "npm"

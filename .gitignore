@@ -1,58 +1,33 @@
 # -----------------------
 # Python
-# -----------------------
 __pycache__/
 *.py[cod]
 *$py.class
 
-# -----------------------
 # Virtual Environments
-# -----------------------
 venv/
 venv2/
 .venv/
 .venv2/
-
-# -----------------------
 # Django
-# -----------------------
 db.sqlite3
 media/
 staticfiles/
-
-# -----------------------
 # Environment Variables
-# -----------------------
 .env
-
-# -----------------------
 # IDEs
-# -----------------------
 .vscode/
 .idea/
-
-# -----------------------
 # Windows
-# -----------------------
 Thumbs.db
 Desktop.ini
-
-# -----------------------
 # Django Migrations
 # Migration files must be committed
-# -----------------------
-
-# -----------------------
 # Tailwind / Node
-# -----------------------
 theme/node_modules/
 theme/static/css/dist/
-
-# اگر از static_src استفاده می‌کنی:
 theme/static_src/node_modules/
-
-# -----------------------
 # Logs
-# -----------------------
-*.log.DS_Store
+*.lognode_modules/
+node_modules/
 .DS_Store

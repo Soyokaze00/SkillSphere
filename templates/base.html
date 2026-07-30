@@ -1,134 +1,154 @@
-{% load tailwind_tags %} {% tailwind_css %}
+{% load tailwind_tags %} {% tailwind_css %} {% load static %}
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en" class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %}">
-<head>
+  <head>
     <script
-  src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-  defer
-></script>
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+
     <!-- <script src="https://unpkg.com/lucide@latest"></script> -->
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    
-    <div x-data="layout()" x-cloak class="min-h-screen over">
-  {% if show_loader %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+<div x-data="layout({{ unread_count|default:0 }})" x-cloak class="min-h-screen over">      {% if show_loader %}
 
-  <div id="boot-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
-  
-  <div class="relative flex flex-col items-center gap-6">
+      <div
+        id="boot-loader"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-white"
+      >
+        <div class="relative flex flex-col items-center gap-6">
+          <div
+            class="absolute w-24 h-24 bg-indigo-400/20 blur-2xl rounded-full animate-pulse"
+          ></div>
 
-    <div class="absolute w-24 h-24 bg-indigo-400/20 blur-2xl rounded-full animate-pulse"></div>
+          <div class="w-14 h-14 rounded-full border-4 border-gray-200 relative">
+            <div
+              class="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-600 border-r-purple-500 animate-spin"
+            ></div>
+          </div>
 
-    <div class="w-14 h-14  rounded-full border-4 border-gray-200 relative">
-      <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-600 border-r-purple-500 animate-spin"></div>
-    </div>
+          <div class="text-sm text-gray-500 font-medium tracking-wide">
+            Loading dashboard...
+          </div>
+        </div>
+      </div>
+      {% endif %} {% include "includes/sidebar.html" %} 
+      {% include  "includes/navbar.html" %}
+      {% include  "notifications/notification_drawer.html" %}
 
-    <div class="text-sm  text-gray-500 font-medium tracking-wide">
-      Loading dashboard...
-    </div>
-
-  </div>
-</div>
-  {% endif %} 
-  {% include "includes/sidebar.html" %} 
-  {% include "includes/navbar.html" %} 
-  {% include "notifications/notification_drawer.html" %}
-
-<main
-    :style="{
-        marginLeft: '256px',
+      <main
+        :style="{
+        marginLeft: sidebarCollapsed ? '80px' : '256px',
         marginRight: notificationOpen ? '320px' : '0px'
     }"
-    class="transition-all duration-300 pt-16 min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden"
->
-    <div class="w-full p-6">
-    {% block content %} {% endblock %}
+        class="transition-all duration-300 pt-16 min-h-screen bg-[#f8fafc] dark:bg-[#0f172a] overflow-hidden"
+      >
+        <div class="w-full md:p-6 px-1 py-2">{% block content %} {% endblock %}</div>
+        {% block extra_js %} {% endblock %}
+      </main>
     </div>
-    {% block extra_js %} {% endblock %}
-  </main>
-</div>
 
+    <script>
+function layout(unreadCount) {
+  return {
+    notificationOpen: false,
+    showBadge: true,
+    sidebarCollapsed: false,
+    unreadCount: unreadCount,
 
+    init() {
+      const savedSidebar = localStorage.getItem("sidebarCollapsed");
+      if (savedSidebar !== null) {
+        this.sidebarCollapsed = savedSidebar === "true";
+      }
 
-<script>
-  function layout() {
-    return {
-      notificationOpen: false,
+      const seenCount = parseInt(localStorage.getItem("notificationSeenCount") || "0", 10);
+      this.showBadge = this.unreadCount > seenCount;
+    },
 
-      toggleNotification() {
-        this.notificationOpen = !this.notificationOpen;
-      },
-    };
-  }
-</script>
+    toggleNotification() {
+      this.notificationOpen = !this.notificationOpen;
+    },
 
-<script>
-  window.addEventListener("load", function () {
-    const loader = document.getElementById("boot-loader");
+    markNotificationsSeen() {
+      this.showBadge = false;
+      localStorage.setItem("notificationSeenCount", this.unreadCount);
+    },
 
-    if (!loader) return;
-
-    loader.style.transition = "opacity 0.4s ease";
-    loader.style.opacity = "0";
-
-    setTimeout(() => {
-      loader.remove();
-    }, 400);
-  });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        
-        function getTheme() {
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                const [name, value] = cookie.trim().split('=');
-                if (name === 'theme') return value;
-            }
-            return null;
-        }
-        
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-            document.cookie = `theme=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
-        }
-        
-        function toggleTheme() {
-            const currentTheme = getTheme();
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        }
-        
-        const savedTheme = getTheme();
-        if (savedTheme === 'dark') {
-            setTheme('dark');
-        } else {
-            setTheme('light');
-        }
-        
-        toggleBtn.addEventListener('click', toggleTheme);
-    });
-</script>
-<style>
-    [x-cloak] {
-  display: none !important;
+    toggleSidebar() {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+      localStorage.setItem("sidebarCollapsed", this.sidebarCollapsed);
+    },
+  };
 }
+    </script>
 
-</style>
-</body>
+    <script>
+      window.addEventListener("load", function () {
+        const loader = document.getElementById("boot-loader");
 
+        if (!loader) return;
 
+        loader.style.transition = "opacity 0.4s ease";
+        loader.style.opacity = "0";
+
+        setTimeout(() => {
+          loader.remove();
+        }, 400);
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("themeToggle");
+        const html = document.documentElement;
+
+        function getTheme() {
+          const cookies = document.cookie.split(";");
+          for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split("=");
+            if (name === "theme") return value;
+          }
+          return null;
+        }
+
+        function setTheme(theme) {
+          if (theme === "dark") {
+            html.classList.add("dark");
+          } else {
+            html.classList.remove("dark");
+          }
+          document.cookie = `theme=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
+        }
+
+        function toggleTheme() {
+          const currentTheme = getTheme();
+          const newTheme = currentTheme === "dark" ? "light" : "dark";
+          setTheme(newTheme);
+        }
+
+        const savedTheme = getTheme();
+        if (savedTheme === "dark") {
+          setTheme("dark");
+        } else {
+          setTheme("light");
+        }
+
+        toggleBtn.addEventListener("click", toggleTheme);
+      });
+    </script>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </body>
+
+  <script src="{% static 'users/js/follow.js' %}"></script>
 </html>
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 <!-- <style>

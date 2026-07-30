@@ -1,20 +1,16 @@
-const categories = ["Design", "UI/UX", "Templates", "Code", "Other"];
-let selectedCategory = "{{ project_form.category.value|default:'' }}";
-let status = "{{ project_form.status.value|default:'open' }}";
+let status = "{{ project_form.status.value|default:'OPEN' }}";
 let tags = [];
 
 const title = document.getElementById("title");
 const desc = document.getElementById("desc");
 const titleCount = document.getElementById("titleCount");
 const descCount = document.getElementById("descCount");
-const deadline = document.getElementById("deadline");
 const tagInput = document.getElementById("tagInput");
 const tagBox = document.getElementById("tagBox");
 const publishBtn = document.getElementById("publishBtn");
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
 const fileList = document.getElementById("fileList");
-const categoryInput = document.getElementById("categoryInput");
 const statusInput = document.getElementById("statusInput");
 const tagsInput = document.getElementById("tagsInput");
 
@@ -29,32 +25,6 @@ desc.addEventListener("input", updateCounts);
 
 updateCounts();
 
-const catBox = document.getElementById("categories");
-
-categories.forEach((c) => {
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.textContent = c;
-  btn.className = `px-3 py-2 rounded-xl bg-gray-100 text-xs transition ${
-    selectedCategory === c ? "bg-indigo-600 text-white" : ""
-  }`;
-
-  btn.onclick = () => {
-    selectedCategory = c;
-    categoryInput.value = c;
-    [...catBox.children].forEach((x) =>
-      x.classList.remove("bg-indigo-600", "text-white"),
-    );
-    btn.classList.add("bg-indigo-600", "text-white");
-    validate();
-  };
-
-  catBox.appendChild(btn);
-});
-
-if (selectedCategory) {
-  categoryInput.value = selectedCategory;
-}
 
 const statusBtns = document.querySelectorAll(".status-btn");
 
@@ -65,25 +35,18 @@ statusBtns.forEach((btn) => {
 
     statusBtns.forEach((b) => {
       b.classList.remove(
-        "ring-2",
-        "ring-indigo-500",
-        "bg-green-100",
-        "text-green-700",
-        "bg-yellow-100",
-        "text-yellow-700",
-        "bg-gray-100",
-        "text-gray-700",
+        "ring-2", "ring-indigo-500",
+        "bg-green-100", "text-green-700", "dark:bg-green-500/20", "dark:text-green-400",
+        "bg-yellow-100", "text-yellow-700", "dark:bg-yellow-500/20", "dark:text-yellow-400",
+        "bg-gray-100", "text-gray-700", "dark:bg-gray-500/20", "dark:text-gray-300",
       );
 
-      if (b.dataset.status === "open") {
-        b.className =
-          "status-btn w-full px-3 py-2 rounded-xl text-sm bg-green-100 text-green-700";
-      } else if (b.dataset.status === "progress") {
-        b.className =
-          "status-btn w-full px-3 py-2 rounded-xl text-sm bg-yellow-100 text-yellow-700";
+      if (b.dataset.status === "OPEN") {
+        b.className = "status-btn w-full px-3 py-2 rounded-xl text-sm font-medium transition bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400";
+      } else if (b.dataset.status === "IN_PROGRESS") {
+        b.className = "status-btn w-full px-3 py-2 rounded-xl text-sm font-medium transition bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400";
       } else {
-        b.className =
-          "status-btn w-full px-3 py-2 rounded-xl text-sm bg-gray-100 text-gray-700";
+        b.className = "status-btn w-full px-3 py-2 rounded-xl text-sm font-medium transition bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300";
       }
     });
 
@@ -132,20 +95,107 @@ tagInput.addEventListener("keypress", (e) => {
   }
 });
 
-dropzone.onclick = () => fileInput.click();
+const folderInput = document.getElementById("folderInput");
+const folderBtn = document.getElementById("folderBtn");
 
-fileInput.onchange = (e) => {
-  [...e.target.files].forEach((file) => {
+function mergeFilesIntoInput(newFiles) {
+  const dt = new DataTransfer();
+  // keep whatever was already selected...
+  [...fileInput.files].forEach((f) => dt.items.add(f));
+  // ...and add the newly picked/dropped ones on top
+  [...newFiles].forEach((f) => dt.items.add(f));
+  fileInput.files = dt.files;
+  fileInput.dispatchEvent(new Event("change"));
+}
+
+let fileListExpanded = false;
+const FILE_LIST_COLLAPSED_LIMIT = 3;
+
+function renderFileList() {
+  fileList.innerHTML = "";
+
+  const allFiles = [...fileInput.files];
+  const showCount = fileListExpanded
+    ? allFiles.length
+    : Math.min(FILE_LIST_COLLAPSED_LIMIT, allFiles.length);
+
+  allFiles.slice(0, showCount).forEach((file) => {
     const div = document.createElement("div");
     div.className = "p-3 border rounded-xl bg-gray-50 text-sm";
+    const icon = file.name.includes("/") ? "📁 " : "📄 ";
 
     div.textContent =
-      "📄 " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+      icon + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
 
     fileList.appendChild(div);
   });
 
+  if (allFiles.length > FILE_LIST_COLLAPSED_LIMIT) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.className =
+      "w-full text-center text-xs font-semibold text-indigo-600 hover:text-indigo-700 py-2 border border-dashed border-indigo-200 rounded-xl";
+
+    toggleBtn.textContent = fileListExpanded
+      ? "▲ Show less"
+      : `▾ Show ${allFiles.length - FILE_LIST_COLLAPSED_LIMIT} more file(s)`;
+
+    toggleBtn.onclick = () => {
+      fileListExpanded = !fileListExpanded;
+      renderFileList();
+    };
+
+    fileList.appendChild(toggleBtn);
+  }
+
+  const totalBytes = [...fileInput.files].reduce((sum, f) => sum + f.size, 0);
+  const totalEl = document.getElementById("totalSizeMsg");
+  if (totalEl) {
+    if (fileInput.files.length > 0) {
+      const mb = (totalBytes / (1024 * 1024)).toFixed(1);
+      totalEl.textContent = `Total: ${fileInput.files.length} file(s), ~${mb} MB`;
+      totalEl.className =
+        totalBytes > 150 * 1024 * 1024
+          ? "text-xs text-red-500 mt-1 font-semibold"
+          : "text-xs text-gray-500 mt-1";
+    } else {
+      totalEl.textContent = "";
+    }
+  }
+
+  const filePaths = document.getElementById("filePaths");
+  if (filePaths) {
+    filePaths.value = JSON.stringify([...fileInput.files].map((f) => f.name));
+  }
+
   validate();
+}
+
+fileInput.onchange = renderFileList;
+document.getElementById("browseFilesBtn").onclick = () => fileInput.click();
+folderBtn.onclick = () => folderInput.click();
+
+folderInput.onchange = async (e) => {
+  const { kept, skipped, skippedBytes } = await filterFolderFiles(e.target.files);
+
+  const renamed = kept.map((f) => {
+    const relPath = f.webkitRelativePath || f.name;
+    return new File([f], relPath, { type: f.type, lastModified: f.lastModified });
+  });
+
+  mergeFilesIntoInput(renamed);
+  folderInput.value = ""; // allow re-picking the same folder later
+
+  const msgEl = document.getElementById("folderSkipMsg");
+  if (msgEl) {
+    if (skipped > 0) {
+      const mb = (skippedBytes / (1024 * 1024)).toFixed(1);
+      msgEl.textContent =
+        `Skipped ${skipped} file(s) (~${mb} MB) like node_modules, .git, venv, build output, and anything matched by .gitignore.`;
+    } else {
+      msgEl.textContent = "";
+    }
+  }
 };
 
 dropzone.addEventListener("dragover", (e) => {
@@ -159,45 +209,26 @@ dropzone.addEventListener("dragleave", () => {
 
 dropzone.addEventListener("drop", (e) => {
   e.preventDefault();
-
-  const dt = new DataTransfer();
-
-  [...e.dataTransfer.files].forEach(file => {
-    dt.items.add(file);
-  });
-
-  fileInput.files = dt.files;
-  fileInput.dispatchEvent(new Event("change"));
+  dropzone.classList.remove("border-indigo-500", "bg-indigo-50");
+  mergeFilesIntoInput(e.dataTransfer.files);
 });
 
 function validate() {
-  const ok =
-    title.value.trim() &&
-    desc.value.trim() &&
-    selectedCategory &&
-    deadline.value;
+  const ok = title.value.trim() && desc.value.trim();
 
   if (ok) {
     publishBtn.disabled = false;
-
     publishBtn.classList.remove("bg-gray-300", "text-gray-600");
-
     publishBtn.classList.add("bg-indigo-600", "hover:bg-indigo-700");
   } else {
     publishBtn.disabled = true;
-
     publishBtn.classList.remove("bg-indigo-600", "hover:bg-indigo-700");
-
     publishBtn.classList.add("bg-gray-300", "text-gray-600");
   }
 }
 
 document.getElementById("projectForm").addEventListener("submit", function (e) {
-  const ok =
-    title.value.trim() &&
-    desc.value.trim() &&
-    selectedCategory &&
-    deadline.value;
+  const ok = title.value.trim() && desc.value.trim();
 
   if (!ok) {
     e.preventDefault();

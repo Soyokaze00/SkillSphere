@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-md mx-auto mt-16 p-6">
+  <div class="rounded-2xl bg-white border border-gray-200 p-6 text-center">
+    <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl mb-4">
+      📁
+    </div>
+    <h1 class="text-lg font-bold text-gray-900">
+      {{ invitation.invited_by.username }} invited you to collaborate
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">on "{{ project.title }}"</p>
+    <p class="text-xs text-gray-400 mt-3 line-clamp-3">{{ project.description|truncatechars:140 }}</p>
+
+    {% if email_mismatch %}
+    <div class="mt-5 text-xs text-amber-600 bg-amber-50 rounded-xl p-3">
+      This invite was sent to {{ invitation.email }}. Log in with that account to respond.
+    </div>
+    {% else %}
+    <form method="POST" class="flex gap-2 mt-6">
+      {% csrf_token %}
+      <button
+        type="submit"
+        name="decline"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+      >
+        Decline
+      </button>
+      <button
+        type="submit"
+        name="accept"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition"
+      >
+        Accept
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

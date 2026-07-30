@@ -1,17 +1,16 @@
 <aside
   id="sidebar"
-  class="fixed bg-white left-0 top-0 h-screen flex flex-col z-40 transition-all duration-300 border-r border-r-[#0f172a14] dark:bg-gray-900 dark:text-white dark:border-r-gray-700"
-  style="
-    width: 256px;
-    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
-  "
+  class="fixed bg-white dark:bg-gray-900 left-0 top-0 h-screen flex flex-col z-40 transition-all duration-300 border-r border-r-[#0f172a14] dark:border-r-gray-700"
+  :style="{
+    width: sidebarCollapsed ? '80px' : '256px'
+  }"
 >
   <!-- Logo -->
   <div
-    class="flex items-center h-16 px-4 gap-3 border-b border-b-[#0f172a14]"
+    class="flex items-center h-16 px-4 gap-3 border-b border-b-[#0f172a14] dark:border-b-gray-700"
   >
     <div
-      class="w-10 h-10 rounded-full flex items-center justify-center"
+      class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
       style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
     >
       <!-- zap icon -->
@@ -25,18 +24,40 @@
       </svg>
     </div>
 
-    <div>
-      <div class="text-[17px] font-bold tracking-tight text-gray-900">
-        SkillSphere
-      </div>
-    </div>
+   <div 
+  x-show="!sidebarCollapsed"
+  x-transition
+>
+  <div class="text-[17px] font-bold tracking-tight text-gray-900 dark:text-white">
+    SkillSphere
   </div>
+</div>
+  </div>
+<button
+ @click="toggleSidebar()"
 
+  class="absolute -right-3 top-6 w-6 h-6 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow"
+>
+  <svg
+    :class="sidebarCollapsed ? 'rotate-180' : ''"
+    class="w-3.5 h-3.5 text-gray-500 transition-transform"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path 
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M15 19l-7-7 7-7"
+    />
+  </svg>
+</button>
   <!-- Create Project -->
    
   
   <a class="px-3 py-4" href="{% url 'projects:create-project' %}">
-    <d
+    <div
       class="flex items-center gap-2 w-full rounded-3xl text-white transition active:scale-95 px-4 py-3 shadow-lg"
       style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
     >
@@ -50,8 +71,10 @@
         <path stroke-width="2" d="M12 5v14M5 12h14" />
       </svg>
 
-      <span class="text-sm font-semibold">New Project</span>
-    </d>
+<span x-show="!sidebarCollapsed" class="text-sm font-semibold">
+  New Project
+</span>
+    </div>
   </a>
 
   <!-- NAV -->
@@ -59,61 +82,109 @@
 
 <nav class="flex-1 overflow-y-auto px-3 space-y-1 text-sm">
 
-  {% for item in sidebar_items %}
-
-  <a
-    href="{{ item.url }}"
-    class="flex items-center gap-3 w-full rounded-3xl p-3  transition
+  {% for item in sidebar_items %}  
+  <a href="{{ item.url }}"
+    class="flex items-center gap-3 w-full rounded-3xl p-3 transition
     {% if url_name == item.url_name %}
-      bg-indigo-50 text-indigo-500 font-bold
+      bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 font-bold
     {% else %}
-      text-gray-500 hover:bg-gray-100
+      text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700
     {% endif %}"
   >
 
     {{ item.icon|safe }}
 
-    <span>{{ item.name }}</span>
+    <span x-show="!sidebarCollapsed">{{ item.name }}</span>
   </a>
 
   {% endfor %}
+
+  <a href="/notifications/"
+   @click="markNotificationsSeen()"
+    class="flex items-center gap-3 w-full rounded-3xl p-3 transition
+    {% if url_name == 'notification_center' %}
+      bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 font-bold
+    {% else %}
+      text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800
+    {% endif %}"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+    <span x-show="!sidebarCollapsed">Notifications</span>
+  </a>
+  
+  <a href="{% url 'users:profile' request.user.username %}"
+    class="flex items-center gap-3 w-full rounded-3xl p-3 transition
+    {% if url_name == 'profile' %}
+      bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 font-bold
+    {% else %}
+      text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800
+    {% endif %}"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+    <span x-show="!sidebarCollapsed">Profile</span>
+  </a>
 
 </nav>
 
 {% endwith %}
   <!-- Footer -->
   <div
-    class="px-3 pb-4 border-t pt-3"
-    style="border-color: var(--sidebar-border)"
+    class="px-3 pb-4 border-t pt-3 border-t-[#0f172a14] dark:border-t-gray-700"
   >
-    <div
-      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 cursor-pointer"
+    
+    <a href="{% url 'users:profile' request.user.username %}"
+      class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer overflow-hidden"
     >
-      <div
-        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-        style="background: linear-gradient(135deg, #4f46e5, #7c3aed)"
-      >
-        AJ
-      </div>
+      <div class="flex items-center gap-2 rounded-xl px-2 py-1.5 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 max-w-[180px] w-full">
+        <div
+          class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 overflow-hidden
+          {% if user.profile_image or user.avatar_seed %}
+            bg-white dark:bg-gray-800
+          {% else %}
+            bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-[11px] font-bold
+          {% endif %}"
+        >
+          {% if user.profile_image %}
+            <img
+              src="{{ user.profile_image.url }}"
+              class="w-full h-full object-cover"
+              alt="{{ user.username }}"
+            />
+          {% elif user.avatar_seed %}
+            <img
+              src="https://api.dicebear.com/9.x/identicon/svg?seed={{ user.avatar_seed }}"
+              class="w-full h-full"
+              alt="{{ user.username }}"
+            />
+          {% else %}
+          
+            {{ user.username|first|upper }}
+          {% endif %}
+        </div>
 
-      <div class="flex-1">
-        <div class="text-sm font-semibold">{{ user.username }}</div>
-        <div class="text-xs text-gray-500">Pro Plan</div>
-      </div>
+        <div class="flex-1 min-w-0">
+          <div x-show="!sidebarCollapsed" class="text-sm font-semibold text-gray-500 dark:text-gray-300 truncate">{{ user.username }}</div>
+          <div x-show="!sidebarCollapsed" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+            Member since {{ user.date_joined|date:"M Y" }}
+          </div>
+        </div>
 
-      <!-- settings -->
-      <svg
-        class="w-4 h-4 text-gray-500"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-      >
-        <path
-          stroke-width="2"
-          d="M12 1v2m0 18v2m9-11h2M1 12H3m15.364-6.364l1.414-1.414M4.222 19.778l1.414-1.414"
-        />
-      </svg>
-    </div>
+        <!-- settings -->
+        <svg
+          class="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path
+            stroke-width="2"
+            d="M12 1v2m0 18v2m9-11h2M1 12H3m15.364-6.364l1.414-1.414M4.222 19.778l1.414-1.414"
+          />
+        </svg>
+      </div>
+    </a>
   </div>
   
 </aside>

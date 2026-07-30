@@ -23,53 +23,54 @@
     <!-- Lucide Icons -->
     <!-- <script src="https://unpkg.com/lucide@latest"></script> -->
 
-    <div class="px-6 space-y-6">
+    <div class="px-2 md:px-4 sm:px-6 space-y-4 sm:space-y-6">
       <!-- HEADER -->
       <div
-        class="rounded-2xl p-6 text-white relative overflow-hidden"
+        class="rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden"
         style="background: linear-gradient(135deg, #12102c, #262271, #1f054b)"
       >
         <div
-          class="absolute -top-12 -right-12 w-48 h-48 rounded-full opacity-10"
+          class="absolute -top-12 -right-12 w-48 h-48 rounded-full opacity-10 z-0"
           style="background: #fff"
         ></div>
         <div
-          class="absolute bottom-0 right-16 w-32 h-32 rounded-full opacity-10"
+          class="absolute bottom-0 right-16 w-32 h-32 rounded-full opacity-10 z-10"
           style="background: #fff"
         ></div>
-        <div class="flex justify-between items-center">
-          <div class="space-y-2">
-            <div class="text-white/70 text-sm">Good morning</div>
-            <h1 class="text-3xl font-bold">{{ user.username }} :)</h1>
-            <p class="text-white/70 text-sm mt-1">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div class="space-y-1">
+            <div class="text-white/70 text-xs sm:text-sm">Good morning</div>
+            <h1 class="text-2xl sm:text-3xl font-bold">{{ user.username }} :)</h1>
+            <p class="text-white/70 text-xs sm:text-sm mt-0.5">
               3 unread notifications • 2 pending reviews
             </p>
           </div>
 
-          <div class="flex gap-2">
-            <button
-              class="bg-white text-indigo-600 px-4 py-2 rounded-xl font-semibold"
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            <a
+             href="{% url 'projects:create-project' %}"
+              class="bg-white text-indigo-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-semibold text-sm sm:text-base text-center flex-1 sm:flex-none"
             >
               + New Project
-            </button>
-            <button class="bg-white/20 px-4 py-2 rounded-xl">Activity</button>
+            </a>
+            <a  href='/activity/' class="bg-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm sm:text-base text-center flex-1 sm:flex-none z-20">Activity</a>
           </div>
         </div>
 
         <!-- stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mt-4 sm:mt-6">
           {% for s in banner_stats %}
 
-          <div class="rounded-2xl p-3 bg-white/10 backdrop-blur-md">
-            <div class="text-[11px] text-white/60 font-medium">
+          <div class="rounded-2xl p-2 sm:p-3 bg-white/10 backdrop-blur-md">
+            <div class="text-[10px] sm:text-[11px] text-white/60 font-medium">
               {{ s.label }}
             </div>
 
-            <div class="text-[22px] font-extrabold text-white mt-0.5">
+            <div class="text-lg sm:text-[22px] font-extrabold text-white mt-0.5">
               {{ s.value }}
             </div>
 
-            <div class="text-[11px] text-white/50 mt-0.5">{{ s.delta }}</div>
+            <div class="text-[10px] sm:text-[11px] text-white/50 mt-0.5">{{ s.delta }}</div>
           </div>
 
           {% endfor %}
@@ -77,34 +78,32 @@
       </div>
 
       <!-- CARDS -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {% for stat in stats %}
 
         <div
-          class="rounded-2xl p-5 transition-all hover:shadow-lg bg-white border border-slate-200 dark:border-gray-700"
+          class="rounded-2xl p-3 sm:p-5 transition-all hover:shadow-lg bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700"
         >
           <div class="flex items-start justify-between">
             <div
-              class="w-10 h-10 rounded-xl flex items-center justify-center {{ stat.icon_bg }} {{ stat.icon_color }}"
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center {{ stat.icon_bg }} {{ stat.icon_color }}"
             >
-              <div
-              >
+              <div class="text-sm sm:text-base">
                 {{ stat.icon|safe }}
-
+              </div>
             </div>
-            </div>
 
-            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+            <i data-lucide="trending-up" class="w-3 h-3 sm:w-4 sm:h-4 text-green-500"></i>
           </div>
 
-          <div class="text-[26px] font-extrabold mt-3">{{ stat.value }}</div>
+          <div class="text-xl sm:text-[26px] font-extrabold mt-2 sm:mt-3 text-gray-900 dark:text-white">{{ stat.value }}</div>
 
-          <div class="text-sm text-slate-500">{{ stat.label }}</div>
+          <div class="text-xs sm:text-sm text-slate-500 dark:text-gray-400">{{ stat.label }}</div>
 
-          <div class="text-xs font-semibold mt-1 {{ stat.delta_color }}">
+          <div class="text-[10px] sm:text-xs font-semibold mt-1 {{ stat.delta_color }}">
             {{ stat.delta }}
           </div>
-          <div class="text-xs font-semibold mt-1 {{ stat.sub_color }}">
+          <div class="text-[10px] sm:text-xs font-semibold mt-1 {{ stat.sub_color }}">
             {{ stat.sub }}
           </div>
         </div>
@@ -116,75 +115,68 @@
       <div class="grid lg:grid-cols-3 gap-4">
         <!-- LINE CHART -->
         <div
-          class="lg:col-span-2 rounded-2xl bg-white border border-slate-200  dark:border-gray-700 p-5 shadow-sm"
+          class="lg:col-span-2 rounded-2xl bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-4 sm:p-5 shadow-sm"
         >
-          <div class="flex items-center justify-between mb-5">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2">
             <div>
-              <h3 class="font-bold text-[15px]">Weekly Activity</h3>
-
-              <p class="text-xs text-slate-500">June 6 – June 12, 2026</p>
+              <h3 class="font-bold text-sm sm:text-[15px] text-gray-900 dark:text-white">Weekly Activity</h3>
+              <p class="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
+                {{ week_start|date:"F j" }} – {{ week_end|date:"F j, Y" }}
+              </p>
             </div>
 
-            <div class="flex gap-1 rounded-xl p-1 bg-slate-100">
+            <div class="flex gap-1 rounded-xl p-1 bg-slate-100 dark:bg-gray-700 w-full sm:w-auto">
               <button
                 onclick="changeChart('downloads', this)"
-                class="chart-btn px-3 py-1.5 rounded-lg text-xs capitalize transition-all duration-200 bg-white text-indigo-600 font-semibold shadow-sm"
+                class="chart-btn px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs capitalize transition-all duration-200 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm flex-1 sm:flex-none"
               >
                 Downloads
               </button>
 
               <button
                 onclick="changeChart('views', this)"
-                class="chart-btn px-3 py-1.5 rounded-lg text-xs capitalize transition-all duration-200 text-slate-500 hover:bg-white"
+                class="chart-btn px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs capitalize transition-all duration-200 text-slate-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 flex-1 sm:flex-none"
               >
                 Views
               </button>
 
               <button
                 onclick="changeChart('uploads', this)"
-                class="chart-btn px-3 py-1.5 rounded-lg text-xs capitalize transition-all duration-200 text-slate-500 hover:bg-white"
+                class="chart-btn px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs capitalize transition-all duration-200 text-slate-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 flex-1 sm:flex-none"
               >
                 Uploads
               </button>
             </div>
           </div>
 
-          <div id="activityChart"></div>
+          <div id="activityChart" class="min-h-[200px] sm:min-h-[250px]"></div>
         </div>
-        <!-- <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow">
-          <div class="flex justify-between mb-4">
-            <h2 class="font-bold">Weekly Activity</h2>
-          </div>
-
-          <canvas id="lineChart"></canvas>
-        </div> -->
 
         <!-- PIE -->
         <!-- Storage Usage -->
-        <div class="bg-white p-5 rounded-2xl shadow">
-          <h3 class="font-bold text-[15px]">Storage Usage</h3>
-          <div id="storageChart"></div>
-           <div id="storageLegend"></div>
-
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl shadow border border-slate-200 dark:border-gray-700">
+          <h3 class="font-bold text-sm sm:text-[15px] text-gray-900 dark:text-white">Storage Usage</h3>
+          <div id="storageChart" class="min-h-[180px] sm:min-h-[220px]"></div>
+          <div id="storageLegend" class="flex flex-wrap justify-center gap-2 mt-2 text-xs text-gray-600 dark:text-gray-400"></div>
         </div>
       </div>
 
       <!-- BAR CHART -->
-      <div class="rounded-2xl p-5 bg-white border border-slate-200  dark:border-gray-700 shadow-sm">
-        <div class="flex items-center justify-between mb-5">
+      <div class="rounded-2xl p-4 sm:p-5 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2">
           <div>
-            <h3 class="text-[15px] font-bold text-slate-900">
+            <h3 class="text-sm sm:text-[15px] font-bold text-slate-900 dark:text-white">
               Project Performance
             </h3>
 
-            <p class="text-xs text-slate-500 mt-1">
-              Downloads vs Stars per project
+            <p class="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400 mt-1">
+              Downloads vs Likes per project
             </p>
           </div>
 
           <a
             href="{% url 'projects:project-list' %}"
-            class="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:opacity-80"
+            class="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:opacity-80"
           >
             View all
 
@@ -192,22 +184,22 @@
           </a>
         </div>
 
-        <div id="performanceChart"></div>
+        <div id="performanceChart" class="min-h-[200px] sm:min-h-[280px]"></div>
       </div>
 
       <!-- BOTTOM -->
       <div class="grid lg:grid-cols-3 gap-4">
         <!-- PROJECTS -->
         <div
-          class="lg:col-span-2 rounded-2xl p-5 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
+          class="lg:col-span-2 rounded-2xl p-4 sm:p-5 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm"
         >
           <!-- header -->
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-slate-900">Recent Projects</h3>
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Recent Projects</h3>
 
             <a
               href="/projects/"
-              class="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:opacity-80"
+              class="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:opacity-80"
             >
               View all
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -215,15 +207,15 @@
           </div>
 
           <!-- grid -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-2 sm:gap-3">
             {% for p in recent_projects %}
 
             <div
               onclick="window.location.href='/projects/{{ p.id }}/'"
-              class="rounded-xl overflow-hidden cursor-pointer border border-slate-200  dark:border-gray-700 hover:shadow-md transition group"
+              class="rounded-xl overflow-hidden cursor-pointer border border-slate-200 dark:border-gray-700 hover:shadow-md transition group bg-white dark:bg-gray-800"
             >
               <!-- image -->
-              <div class="h-32 overflow-hidden relative">
+              <div class="h-24 sm:h-32 overflow-hidden relative">
                 {% with url=p.files.first.file.url|lower %} 
                 {% if ".jpg" in url or ".jpeg" in url or ".png" in url or ".gif" in url or ".webp" in url %}
           <img
@@ -235,22 +227,23 @@
 
           />
           {% else %}
-          <div class="w-full h-full flex items-center justify-center text-6xl">
+          <div class="w-full h-full flex items-center justify-center text-4xl sm:text-6xl bg-gray-100 dark:bg-gray-700">
             📄
           </div>
-          {% endif %} {% endwith %}
+          {% endif %} 
+          {% endwith %}
                  
                 <!-- status badge -->
-                <div class="absolute top-2 right-2">
+                <div class="absolute top-1 right-1 sm:top-2 sm:right-2">
                   {% if p.status == 'published' %}
                   <span
-                    class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-600 font-semibold"
+                    class="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-semibold"
                   >
                     published
                   </span>
                   {% else %}
                   <span
-                    class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-600 font-semibold"
+                    class="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-xs rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-semibold"
                   >
                     draft
                   </span>
@@ -259,26 +252,26 @@
               </div>
 
               <!-- content -->
-              <div class="p-3">
-                <div class="text-sm font-semibold text-slate-900 truncate">
+              <div class="p-2 sm:p-3">
+                <div class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white truncate">
                   {{ p.title }}
                 </div>
 
                 <div
-                  class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500"
+                  class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-[10px] sm:text-[11px] text-slate-500 dark:text-gray-400"
                 >
-                  <span class="flex items-center gap-1">
-                    <i data-lucide="download" class="w-3 h-3"></i>
+                  <span class="flex items-center gap-0.5 sm:gap-1">
+                    <i data-lucide="download" class="w-2.5 h-2.5 sm:w-3 sm:h-3"></i>
                     {{ p.downloads }}
                   </span>
 
-                  <span class="flex items-center gap-1">
-                    <i data-lucide="star" class="w-3 h-3"></i>
+                  <span class="flex items-center gap-0.5 sm:gap-1">
+                    <i data-lucide="star" class="w-2.5 h-2.5 sm:w-3 sm:h-3"></i>
                     {{ p.stars }}
                   </span>
 
-                  <span class="flex items-center gap-1 ml-auto">
-                    <i data-lucide="clock" class="w-3 h-3"></i>
+                  <span class="flex items-center gap-0.5 sm:gap-1 ml-auto">
+                    <i data-lucide="clock" class="w-2.5 h-2.5 sm:w-3 sm:h-3"></i>
                     {{ p.updated_at }}
                   </span>
                 </div>
@@ -291,63 +284,58 @@
 
         <div class="space-y-4">
           <!-- Quick Actions -->
-          <div
-            class="rounded-2xl p-3 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
+          <!-- <div
+            class="rounded-2xl p-3 sm:p-4 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm"
           >
-            <h3 class="text-sm font-bold text-slate-900 mb-3">Quick Actions</h3>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">Quick Actions</h3>
 
             <div class="grid grid-cols-2 gap-2">
               {% for a in quick_actions %}
 
               <a
                 href="{{ a.page }}"
-                class="rounded-3xl p-3  text-left transition-all hover:opacity-80 active:scale-95 border {{ a.bg }} {{ a.border_color }}"
+                class="rounded-2xl p-2 sm:p-3 text-left transition-all hover:opacity-80 active:scale-95 border {{ a.bg }} {{ a.border_color }}"
               >
-                <!-- icon -->
                 <div
-                  class="w-7 h-7  flex items-center justify-start  {{ a.text_color }}"
+                  class="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-start {{ a.text_color }}"
                 >
-                <div>
+                <div class="text-sm sm:text-base">
                   {{ a.icon|safe }}
                 </div>
                 </div>
-
-                <!-- title -->
-                <div class="text-xs font-semibold text-slate-900">
+                <div class="text-[10px] sm:text-xs font-semibold text-slate-900 dark:text-white leading-tight">
                   {{ a.label }}
                 </div>
-
-                <!-- desc -->
-                <div class="text-[11px] text-slate-500">{{ a.desc }}</div>
+                <div class="text-[9px] sm:text-[11px] text-slate-500 dark:text-gray-400 leading-tight">{{ a.desc }}</div>
               </a>
 
               {% endfor %}
             </div>
-          </div>
+          </div> -->
           <!-- ACTIVITY -->
           <div
-            class="rounded-2xl p-4 bg-white border border-slate-200  dark:border-gray-700 shadow-sm"
+            class="rounded-2xl p-3 sm:p-4 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm"
           >
-            <h3 class="text-sm font-bold text-slate-900 mb-3">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
               Recent Activity
             </h3>
 
-            <div class="space-y-3">
+            <div class="space-y-2 sm:space-y-3">
               {% for a in recent_activity %}
 
-              <div class="flex items-start gap-3">
+              <div class="flex items-start gap-2 sm:gap-3">
                  <div class="shrink-0 mt-0.5">
           <div
-            class="w-10 h-10 rounded-full {{ a.style.color }} flex items-center justify-center"
+            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full {{ a.style.color }} flex items-center justify-center text-xs sm:text-sm"
           >
             {{ a.style.icon|safe }}
           </div>
         </div>
 
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs text-slate-900 leading-5">{{ a.title }}</p>
+                  <p class="text-[10px] sm:text-xs text-slate-900 dark:text-white leading-5">{{ a.title }}</p>
 
-                  <p class="text-[11px] text-slate-500 mt-0.5">{{ a.created_at|timesince }} ago </p>
+                  <p class="text-[9px] sm:text-[11px] text-slate-500 dark:text-gray-400 mt-0.5">{{ a.created_at|timesince }} ago </p>
                 </div>
               </div>
 
@@ -356,14 +344,37 @@
 
             <a 
               href="/notifications/"
-              class="w-full mt-3 flex justify-center rounded-xl py-2 text-xs font-semibold bg-slate-100 text-indigo-600 hover:bg-slate-200 transition"
+              class="w-full mt-2 sm:mt-3 flex justify-center rounded-xl py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold bg-slate-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-slate-200 dark:hover:bg-gray-600 transition"
             >
               View Full Activity
             </a>
           </div>
         </div>
       </div>
+
+
+      <!-- ===== EXPLORE ===== -->
+<div class="mt-6 sm:mt-8">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-1 sm:gap-2">
+    <div>
+      <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Explore</h2>
+      <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Projects from the community</p>
     </div>
+    <a href="{% url 'projects:explore' %}?visibility=public" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+      View all
+    </a>
+  </div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 md:p-4 p-2">
+{% for project in explore_projects %}
+
+    {% include "projects/project_card.html" with project=project %}
+
+{% endfor %}
+
+</div>
+ </div>
+</div>
 
 
 <script src="{% static 'dashboard/js/dashboard_charts.js' %}" defer></script>
