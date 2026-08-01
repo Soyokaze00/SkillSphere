@@ -251,26 +251,13 @@ def toggle_follow(request, username):
             title="New follower",
             message=f"{request.user.username} started following you.",
             notification_type="follow",
-            link=f"/users/profile/{target.username}/",
+            link=f"/users/profile/{request.user.username}/",
         )
 
     return JsonResponse({
         "following": following,
         "follower_count": target.followers.count(),
     })
-
-
-@login_required
-def edit_profile_view(request):
-    if request.method == "POST":
-        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect("users:profile", username=request.user.username)
-    else:
-        form = ProfileEditForm(instance=request.user)
-
-    return render(request, "users/edit_profile.html", {"form": form , "page_title":"Edit Profile"})
 
 
 @login_required
