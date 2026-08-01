@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'tailwind',
     "django.contrib.humanize",
     'search', 
+    "django_elasticsearch_dsl",
 
     'theme',  
         'lucide', 
@@ -120,7 +121,7 @@ DATABASES = {
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'PORT': os.environ.get('DB_PORT', '5433'),
     }
 }
 
@@ -219,4 +220,14 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_ALWAYS_EAGER = False
 CELERY_TASK_EAGER_PROPAGATES = False
 
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
+
+# elastic
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://localhost:9200'
+    },
+}
 NPM_BIN_PATH = shutil.which("npm") or "npm"

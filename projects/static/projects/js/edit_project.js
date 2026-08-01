@@ -59,16 +59,24 @@ tagInput.addEventListener("keypress", (e) => {
   }
 });
 
-document.getElementById("editProjectForm").addEventListener("submit", function (e) {
-  const ok = title.value.trim() && desc.value.trim();
-  if (!ok) {
-    e.preventDefault();
-    alert("Please fill all required fields");
-    return;
-  }
-  saveBtn.textContent = "⏳ Saving...";
-  saveBtn.disabled = true;
-});
+if (editProjectForm) {
+  editProjectForm.addEventListener("submit", function (e) {
+    const isTitleValid = title ? title.value.trim().length > 0 : true;
+    const isDescValid = desc ? desc.value.trim().length > 0 : true;
+
+    if (!isTitleValid || !isDescValid) {
+      e.preventDefault();
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = "⏳ Saving...";
+    }
+  });
+}
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const label = document.querySelector(".file-upload-label");

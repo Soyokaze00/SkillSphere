@@ -34,6 +34,10 @@ class ProjectFileForm(forms.ModelForm):
         model = ProjectFile
         fields = ['file']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file'].required = False
+
 
 class InviteMemberForm(forms.Form):
     """

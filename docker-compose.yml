@@ -1,6 +1,23 @@
+# services:
+#   db:
+#     image: pgvector/pgvector:pg16
+#     container_name: skillsphere_db
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_DB: ${DB_NAME}
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+
+# volumes:
+#   pgdata:
+
 services:
   db:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: skillsphere_db
     restart: unless-stopped
     environment:
@@ -8,9 +25,22 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.2
+    container_name: skillsphere_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
 volumes:
   pgdata:
+  esdata:
