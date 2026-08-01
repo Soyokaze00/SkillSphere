@@ -59,13 +59,20 @@ tagInput.addEventListener("keypress", (e) => {
   }
 });
 
-document.getElementById("editProjectForm").addEventListener("submit", function (e) {
-  const ok = title.value.trim() && desc.value.trim();
-  if (!ok) {
-    e.preventDefault();
-    alert("Please fill all required fields");
-    return;
-  }
-  saveBtn.textContent = "⏳ Saving...";
-  saveBtn.disabled = true;
-});
+if (editProjectForm) {
+  editProjectForm.addEventListener("submit", function (e) {
+    const isTitleValid = title ? title.value.trim().length > 0 : true;
+    const isDescValid = desc ? desc.value.trim().length > 0 : true;
+
+    if (!isTitleValid || !isDescValid) {
+      e.preventDefault();
+      alert("لطفاً تمامی فیلدهای ضروری (عنوان و توضیحات) را پر کنید.");
+      return;
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = true; // فوری، نه با تاخیر
+      saveBtn.textContent = "⏳ Saving...";
+    }
+  });
+}

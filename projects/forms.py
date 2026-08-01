@@ -38,6 +38,10 @@ class ProjectFileForm(forms.ModelForm):
             'file': MultipleFileInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file'].required = False
+
 
 class InviteMemberForm(forms.Form):
     """

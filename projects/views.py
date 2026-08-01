@@ -230,6 +230,14 @@ def project_detail(request, project_id):
                         fail_silently=False,
                     )
                     messages.success(request, f"Invite sent to {email}.")
+                    if matched_user:
+                        create_notification(
+                            user=matched_user,
+                            title="Project Invitation",
+                            message=f"{request.user.username} invited you to collaborate on '{project.title}'.",
+                            notification_type="invite",
+                            link=f"/projects/{project.id}/"
+                        )
                 except Exception:
                     invitation.delete()
                     messages.error(
