@@ -8,7 +8,6 @@ from django.http import HttpResponseForbidden, JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.db.models import Q
-from dashboard.services import get_explore_projects
 from notifications.utils import create_notification
 from projects.tasks import process_uploaded_file, send_project_invite_email
 from django.utils import timezone
@@ -19,7 +18,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from users.models import Follow
-from .services import get_followed_users_most_liked_projects, get_similar_projects, get_user_top_projects
+from .services import get_similar_projects
 from django.core.paginator import Paginator
 
 
@@ -660,23 +659,3 @@ def delete_project(request, project_id):
 
 
 
-@login_required
-def explore_projects(request):
-    user = request.user
-
-    my_top_projects = get_user_top_projects(user, limit=4)
-
-    followed_top_projects = get_followed_users_most_liked_projects(user, limit=4)
-
-    explore_queryset = get_explore_projects(user)
-    paginator = Paginator(explore_queryset, 20)
-    page_obj = paginator.get_page(request.GET.get("page"))
-
-    context = {
-        "my_top_projects": my_top_projects,
-        "followed_top_projects": followed_top_projects,
-        "page_obj": page_obj,
-        "page_title": "Explore",
-    }
-
-    return render(request, "projects/explore.html", context)

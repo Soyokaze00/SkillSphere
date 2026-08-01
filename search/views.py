@@ -9,10 +9,9 @@ from django.db.models.functions import Greatest
 from django.contrib.postgres.search import TrigramSimilarity
 
 from projects.models import Project
-from projects.documents import ProjectDocument
 from users.models import CustomUser
 from search.models import SearchHistory
-
+from search.documents import ProjectDocument, UserDocument
 
 def search_projects(query):
 
@@ -87,7 +86,6 @@ def search_projects(query):
 
 
 def search_users(query):
-    from users.documents import UserDocument
 
     s = UserDocument.search().query(
     "bool",
@@ -279,7 +277,6 @@ def get_user_suggestions_es(query, limit=5):
     if not query:
         return []
 
-    from users.documents import UserDocument
 
     search = (
         UserDocument.search()

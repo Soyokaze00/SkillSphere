@@ -17,6 +17,8 @@ from datetime import timedelta
 from django.db.models import Prefetch
 from django.db.models import Count, Prefetch
 
+from users.models import Follow
+
 def get_dashboard_data(user,projects):
     total_projects = projects.count()
     now = timezone.now()
@@ -113,10 +115,9 @@ def get_dashboard_data(user,projects):
             "storage_pie": get_project_storage(projects,user),
             "recent_projects": get_recent_projects(projects),
             "page_title": "Dashboard",
-            "explore_projects": get_explore_projects(user),
             "week_start": week_start,
             "week_end": week_end,
-
+            "explore_projects": get_explore_projects(user, limit=4)
 
             }
     
@@ -390,9 +391,39 @@ def get_weekly_activity(user):
 
 
 
-def get_explore_projects(user, limit=4):
-    """Public projects from other users, sorted by most likes first."""
+
+# Explore    
+
+def get_user_top_projects(user, limit=4):
+    """1. User's top public projects ordered by most likes"""
     return (
+        Project.objects
+        .filter(owner=user, visibility=Project.PUBLIC)
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count", "-created_at")
+        [:limit]
+    )
+
+
+def get_followed_users_most_liked_projects(user, limit=4):
+    """2. Public projects from followed users, ordered by total likes"""
+    followed_ids = Follow.objects.filter(follower=user).values_list("following_id", flat=True)
+
+    return (
+        Project.objects
+        .filter(owner_id__in=followed_ids, visibility=Project.PUBLIC)
+        .annotate(likes_count=Count("likes", distinct=True))
+        .order_by("-likes_count", "-created_at")
+        [:limit]
+    )
+    
+def get_explore_projects(user, limit=None):
+    """
+    Public projects from other users, ordered by most likes.
+    Pass `limit` for a capped preview (e.g. dashboard widget);
+    leave it None for the full pagination-ready queryset (explore page).
+    """
+    queryset = (
         Project.objects
         .filter(visibility=Project.PUBLIC)
         .exclude(owner=user)
@@ -405,7 +436,11 @@ def get_explore_projects(user, limit=4):
                 to_attr="preview_files"
             )
         )
-        .annotate(likes_count=Count("likes"))  
+        .annotate(likes_count=Count("likes", distinct=True))
         .order_by("-likes_count", "-created_at")
-        [:limit]
     )
+
+    if limit is not None:
+        queryset = queryset[:limit]
+
+    return queryset
