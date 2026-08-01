@@ -183,6 +183,6 @@ def get_explore_projects(user):
                 to_attr="preview_files"
             )
         )
-        .annotate(likes_count=Count("likes"))
-        .order_by("-likes_count", "-created_at")
+       .annotate(likes_count=Count("likes", distinct=True))
+       .order_by("-likes_count", "-created_at")
     )
