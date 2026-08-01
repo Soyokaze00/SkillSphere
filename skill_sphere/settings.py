@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import shutil
 
 load_dotenv()
 
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
+    'django_celery_results',
     'tailwind',
     "django.contrib.humanize",
     'search', 
@@ -209,15 +211,17 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
 
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_EAGER_PROPAGATES = False
 
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
-
-NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 
 # elastic
@@ -226,3 +230,4 @@ ELASTICSEARCH_DSL = {
         'hosts': 'http://localhost:9200'
     },
 }
+NPM_BIN_PATH = shutil.which("npm") or "npm"

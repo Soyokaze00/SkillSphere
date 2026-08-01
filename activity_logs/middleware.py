@@ -1,5 +1,5 @@
 from .models import ActivityLog
-from .services import log_activity
+from .services import classify_request, log_activity
 
 
 class ActivityLogMiddleware:
@@ -17,11 +17,9 @@ class ActivityLogMiddleware:
     IGNORED_PATH_PREFIXES = (
         "/static/",
         "/media/",
-        "/admin/jsi18n/",
-        "/admin/login/",
-        "/admin/logout/",
-        "/accounts/login/",
-        "/accounts/logout/",
+        "/admin/",
+        "/users/login/",
+        "/users/logout/",
     )
 
     def __init__(self, get_response):
@@ -31,12 +29,11 @@ class ActivityLogMiddleware:
         response = self.get_response(request)
 
         if self.should_log(request, response):
+            action, description = classify_request(request, response)
             log_activity(
                 request=request,
-                action=ActivityLog.Action.OTHER,
-                description=(
-                    f"{request.method} request to {request.path}"
-                ),
+                action=action,
+                description=description,
                 status_code=response.status_code,
             )
 

@@ -12,6 +12,13 @@ class ActivityLog(models.Model):
         UPLOAD_FILE = "UPLOAD_FILE", "Upload File"
         DOWNLOAD_FILE = "DOWNLOAD_FILE", "Download File"
         SEND_FEEDBACK = "SEND_FEEDBACK", "Send Feedback"
+        LIKE_PROJECT = "LIKE_PROJECT", "Like Project"
+        SHARE_PROJECT = "SHARE_PROJECT", "Share Project"
+        POST_COMMENT = "POST_COMMENT", "Post Comment"
+        FOLLOW_USER = "FOLLOW_USER", "Follow User"
+        EDIT_PROFILE = "EDIT_PROFILE", "Edit Profile"
+        DELETE_ACCOUNT = "DELETE_ACCOUNT", "Delete Account"
+        MANAGE_INVITE = "MANAGE_INVITE", "Manage Invite"
         OTHER = "OTHER", "Other"
 
     user = models.ForeignKey(
