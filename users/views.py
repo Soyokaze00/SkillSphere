@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from .models import EmailVerification, CustomUser, Follow
-from .utils import generate_code, send_verification_email
+from .utils import generate_code
+from .tasks import send_verification_email
 from .forms import EmailRequestForm, CodeVerificationForm, SignupForm, ProfileEditForm
 from django.utils import timezone
 from datetime import timedelta
@@ -31,7 +32,7 @@ def email_verification_view(request):
                 email=email,
                 defaults={'code': code, 'is_verified': False, 'created_at': timezone.now()}
             )
-            send_verification_email(email, code)
+            send_verification_email.delay(email, code)
             request.session['email'] = email
             context['code_sent'] = True
             context['remaining_seconds'] = 300
@@ -104,7 +105,7 @@ def resend_code(request):
 
     verification.save()
 
-    send_verification_email(email, code)
+    send_verification_email.delay(email, code)
 
     return redirect("users:verify-code")
 
