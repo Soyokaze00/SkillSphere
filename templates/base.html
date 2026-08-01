@@ -2,6 +2,9 @@
 
 <!doctype html>
 
+<link rel="stylesheet" href="{% static 'css/toast.css' %}">
+<script src="{% static 'js/toast.js' %}" defer></script>
+
 <html lang="en" class="{% if request.COOKIES.theme == 'dark' %}dark{% endif %}">
   <head>
     <script
@@ -52,6 +55,15 @@
         {% block extra_js %} {% endblock %}
       </main>
     </div>
+    {% if messages %}
+        <div class="toast-container">
+            {% for message in messages %}
+                <div class="toast {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <script>
 function layout(unreadCount) {
