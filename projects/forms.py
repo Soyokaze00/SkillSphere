@@ -29,14 +29,10 @@ class ProjectForm(forms.ModelForm):
         ]
 
 class ProjectFileForm(forms.ModelForm):
+    file = forms.FileField(required=False, widget=MultipleFileInput())
     class Meta:
         model = ProjectFile
         fields = ['file']
-        widgets = {
-            # See MultipleFileInput above for why this isn't a plain
-            # ClearableFileInput(attrs={'multiple': True}).
-            'file': MultipleFileInput(),
-        }
 
 
 class InviteMemberForm(forms.Form):

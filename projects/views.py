@@ -598,16 +598,12 @@ def edit_project(request, project_id):
 
     file_form = ProjectFileForm()
 
-    if request.method == "POST" and "file_upload" in request.POST:
+    if request.method == "POST":
         if request.FILES.getlist('file'):
             file_errors = _save_uploaded_files(request, project)
             for err in file_errors:
                 messages.warning(request, err)
-        else:
-            messages.warning(request, "No files were selected for upload.")
-        return redirect('projects:project-edit', project_id=project.id)
 
-    if request.method == "POST":
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
             project_form.save()
@@ -620,6 +616,7 @@ def edit_project(request, project_id):
         "project_form": project_form,
         "file_form": file_form,
         "project": project,
+        "files": project.files.all(),
         "tags_json": json.dumps(project.tag_list),
         "page_title": f"Edit {project.title}",
     })
