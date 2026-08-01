@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
+    'django_celery_results',
     'tailwind',
     "django.contrib.humanize",
     'search', 
