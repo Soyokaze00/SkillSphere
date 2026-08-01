@@ -153,21 +153,17 @@ def get_user_top_projects(user, limit=4):
 
 
 def get_followed_users_most_liked_projects(user, limit=4):
-    """
-    2. Public projects from followed users that have been liked by the current user
-    """
-    followed_users = user.following.values_list('id', flat=True)
+    """2. Public projects from followed users, ordered by total likes"""
+    followed_ids = Follow.objects.filter(follower=user).values_list("following_id", flat=True)
 
     return (
         Project.objects
-        .filter(owner_id__in=followed_users, visibility=Project.PUBLIC)
-        .filter(likes__user=user)
-        .annotate(likes_count=Count("likes"))
+        .filter(owner_id__in=followed_ids, visibility=Project.PUBLIC)
+        .annotate(likes_count=Count("likes", distinct=True))
         .order_by("-likes_count", "-created_at")
         [:limit]
     )
-
-
+    
 def get_explore_projects(user):
     """3. All other users' public projects ordered by most likes (prepared for pagination)"""
     return (
