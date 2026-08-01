@@ -308,39 +308,32 @@ Key contributions:
 
 GitHub: [@xElyanax](https://github.com/xElyanax)
 
-**Primary responsibilities: Activity tracking, feedback management, AI recommendations, and backend integration**
+**Primary responsibilities: UI/UX design, frontend implementation, activity tracking, feedback management, AI recommendations, and backend integration**
 
 Key contributions:
 
+- Designed the overall visual language and user interface of SkillSphere
+- Implemented and refined the responsive frontend across the platform
+- Created and improved shared layouts, navigation, cards, forms, and page structures
+- Designed responsive behavior for desktop, tablet, and mobile screens
+- Added dark mode compatibility and consistent component styling
+- Implemented dashboard UI and integrated dynamic backend data into the interface
+- Designed the AI recommendation section and project recommendation cards
+- Added toast notification styling and shared static asset integration
+- Improved the user experience of feedback, profile, authentication, and project-related pages
 - Designed and implemented the `ActivityLog` model
-- Defined platform activity categories
 - Added authentication activity signals
 - Implemented activity logging middleware
 - Created a centralized activity logging service
-- Added request classification logic
-- Stored request metadata and IP information
-- Created the user activity history page
-- Added activity pagination
-- Added activity log database indexes
-- Integrated activity tracking with Django Admin
-- Designed and implemented the feedback model
-- Added feedback categories, ratings, and statuses
-- Built feedback forms and validation
-- Added a transaction-safe feedback creation service
-- Created feedback submission and history views
-- Added feedback statistics
+- Added request classification and metadata tracking
+- Created the user activity history interface
+- Designed and implemented the feedback system
+- Added feedback forms, validation, statuses, ratings, and statistics
 - Integrated feedback submissions with activity tracking
-- Configured feedback administration
-- Designed and implemented the AI project recommendation engine
-- Used TF-IDF vectorization and cosine similarity
-- Added project eligibility and exclusion rules
-- Added recommendation scores and explanations
+- Implemented the AI project recommendation engine using TF-IDF and cosine similarity
+- Added recommendation scores, explanations, eligibility rules, and fallback behavior
 - Integrated AI recommendations into the dashboard
-- Built the responsive recommendation card interface
-- Added toast notification assets and shared static paths
-- Supported dependency integration and merge conflict resolution
-- Validated Celery, Redis, PostgreSQL, and project integration
-
+- Supported dependency integration, testing, debugging, and merge conflict resolution
 ---
 
 ## Getting Started
