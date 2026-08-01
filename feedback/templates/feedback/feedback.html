@@ -1,5 +1,8 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
 
+{% block content %}
+
+{{ form_state|json_script:"feedback-form-state" }}
 <div
   x-data="feedbackPage()"
   class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6"
@@ -49,13 +52,13 @@
                 @click="type = t.value"
                 class="py-2.5 px-4 rounded-xl text-sm text-left border transition-all dark:border-gray-600"
                 :style="type === t.value
-    ? { 
+    ? {
         background: isDark ? t.darkBg : t.bg,
         color: t.color,
         borderColor: t.color + '40',
         fontWeight: 600
       }
-    : { 
+    : {
         background: isDark ? '#1f2937' : '#F1F5F9',
         color: isDark ? '#94a3b8' : '#64748B',
         borderColor: isDark ? '#374151' : '#E2E8F0',
@@ -65,6 +68,16 @@
               ></button>
             </template>
           </div>
+
+          {% if form.type.errors %}
+            <div class="mt-2 space-y-1" role="alert">
+              {% for error in form.type.errors %}
+                <p class="text-xs font-medium text-red-600 dark:text-red-400">
+                  {{ error }}
+                </p>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
 
         <!-- Rating -->
@@ -101,9 +114,29 @@
               x-text="['', 'Very Poor', 'Poor', 'Okay', 'Good', 'Excellent'][rating]"
             ></span>
           </div>
+
+          {% if form.rating.errors %}
+            <div class="mt-2 space-y-1" role="alert">
+              {% for error in form.rating.errors %}
+                <p class="text-xs font-medium text-red-600 dark:text-red-400">
+                  {{ error }}
+                </p>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
 
         <!-- Regular Django POST form, no AJAX -->
+        {% if form.non_field_errors %}
+          <div
+            class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+            role="alert"
+          >
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
         <form
           method="post"
           action="{% url 'feedback' %}"
@@ -114,6 +147,7 @@
           <!-- Hidden inputs synced with Alpine state -->
           <input type="hidden" name="type" :value="type" />
           <input type="hidden" name="rating" :value="rating" />
+
 
           <!-- Subject -->
           <div>
@@ -127,8 +161,20 @@
               type="text"
               required
               placeholder="Brief summary of your feedback"
-              class="w-full rounded-xl px-4 py-3 outline-none text-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-indigo-600 dark:focus:border-indigo-400 transition-colors text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              aria-invalid="{% if form.subject.errors %}true{% else %}false{% endif %}"
+              aria-describedby="{% if form.subject.errors %}subject-errors{% endif %}"
+              class="w-full rounded-xl px-4 py-3 outline-none text-sm bg-gray-100 dark:bg-gray-700 border transition-colors text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 {% if form.subject.errors %}border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-400{% else %}border-gray-200 dark:border-gray-600 focus:border-indigo-600 dark:focus:border-indigo-400{% endif %}"
             />
+
+            {% if form.subject.errors %}
+              <div id="subject-errors" class="mt-1.5 space-y-1" role="alert">
+                {% for error in form.subject.errors %}
+                  <p class="text-xs font-medium text-red-600 dark:text-red-400">
+                    {{ error }}
+                  </p>
+                {% endfor %}
+              </div>
+            {% endif %}
           </div>
 
           <!-- Message -->
@@ -144,12 +190,29 @@
               required
               rows="6"
               placeholder="Describe your feedback in detail. Include steps to reproduce if it's a bug, or specific use cases if it's a feature request..."
-              class="w-full rounded-xl px-4 py-3 outline-none resize-none text-sm leading-relaxed bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-indigo-600 dark:focus:border-indigo-400 transition-colors text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              aria-invalid="{% if form.message.errors %}true{% else %}false{% endif %}"
+              aria-describedby="{% if form.message.errors %}message-errors{% endif %}"
+              class="w-full rounded-xl px-4 py-3 outline-none resize-none text-sm leading-relaxed bg-gray-100 dark:bg-gray-700 border transition-colors text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 {% if form.message.errors %}border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-400{% else %}border-gray-200 dark:border-gray-600 focus:border-indigo-600 dark:focus:border-indigo-400{% endif %}"
             ></textarea>
-            <div
-              class="text-[11px] text-gray-400 dark:text-gray-500 text-right mt-1"
-              x-text="message.length + '/2000'"
-            ></div>
+
+            <div class="mt-1 flex items-start justify-between gap-3">
+              <div>
+                {% if form.message.errors %}
+                  <div id="message-errors" class="space-y-1" role="alert">
+                    {% for error in form.message.errors %}
+                      <p class="text-xs font-medium text-red-600 dark:text-red-400">
+                        {{ error }}
+                      </p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div
+                class="shrink-0 text-[11px] text-gray-400 dark:text-gray-500"
+                x-text="message.length + '/2000'"
+              ></div>
+            </div>
           </div>
 
           <button
@@ -390,70 +453,127 @@
         You haven't submitted any feedback yet.
       </div>
       {% endfor %}
+      {% if page_obj.has_other_pages %}
+      <nav
+        class="mt-5 flex items-center justify-center gap-3"
+        aria-label="Feedback pagination"
+      >
+        {% if page_obj.has_previous %}
+          <a
+            href="?page={{ page_obj.previous_page_number }}"
+            class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
+          >
+            Previous
+          </a>
+        {% else %}
+          <span
+            class="cursor-not-allowed rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-400 opacity-50 dark:border-gray-700"
+          >
+            Previous
+          </span>
+        {% endif %}
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          Page {{ page_obj.number }}
+          of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+          <a
+            href="?page={{ page_obj.next_page_number }}"
+            class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
+          >
+            Next
+          </a>
+        {% else %}
+          <span
+            class="cursor-not-allowed rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-400 opacity-50 dark:border-gray-700"
+          >
+            Next
+          </span>
+        {% endif %}
+      </nav>
+      {% endif %}
     </div>
   </div>
 </div>
 
 <script>
+  const feedbackFormState = JSON.parse(
+    document
+      .getElementById("feedback-form-state")
+      .textContent
+  );
+
   function feedbackPage() {
+    const allowedTypes = [
+      "suggestion",
+      "bug",
+      "feature",
+      "praise",
+    ];
+
+    const initialType = allowedTypes.includes(
+      feedbackFormState.type
+    )
+      ? feedbackFormState.type
+      : "suggestion";
+
+    const initialRating = Math.min(
+      5,
+      Math.max(
+        0,
+        Number(feedbackFormState.rating) || 0
+      )
+    );
+
     return {
-      type: "suggestion",
-      subject: "",
-      message: "",
-      rating: 0,
+      type: initialType,
+      subject: feedbackFormState.subject || "",
+      message: feedbackFormState.message || "",
+      rating: initialRating,
       submitting: false,
       isDark: false,
 
-      init() {
-        this.isDark = document.documentElement.classList.contains("dark");
-
-        const observer = new MutationObserver(() => {
-          this.isDark = document.documentElement.classList.contains("dark");
-        });
-
-        observer.observe(document.documentElement, {
-          attributes: true,
-          attributeFilter: ["class"],
-        });
-      },
       types: [
         {
           value: "suggestion",
-          label: "💡 Suggestion",
+          label: "Suggestion",
           color: "#F59E0B",
           bg: "#FFFBEB",
-          darkBg: "#422006",
+          darkBg: "#451A03",
         },
         {
           value: "bug",
-          label: "🐛 Bug Report",
+          label: "Bug Report",
           color: "#EF4444",
           bg: "#FEF2F2",
-          darkBg: "#450a0a",
+          darkBg: "#450A0A",
         },
         {
           value: "feature",
-          label: "✨ Feature Request",
+          label: "Feature Request",
           color: "#4F46E5",
           bg: "#EEF2FF",
-          darkBg: "#1e1b4b",
+          darkBg: "#1E1B4B",
         },
         {
           value: "praise",
-          label: "🎉 Praise",
-          color: "#22C55E",
+          label: "Praise",
+          color: "#16A34A",
           bg: "#F0FDF4",
-          darkBg: "#052e16",
+          darkBg: "#052E16",
         },
       ],
 
       tips: [
-        "Be specific and descriptive",
-        "Include steps to reproduce bugs",
-        "Suggest the expected behavior",
-        "Mention your browser/device if relevant",
+        "Be clear and specific.",
+        "Explain what happened and what you expected.",
+        "Include steps to reproduce bugs.",
+        "Describe how the feature would help you.",
       ],
     };
   }
 </script>
+
 {% endblock %}

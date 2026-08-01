@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.db import transaction
 
 from activity_logs.models import ActivityLog
@@ -13,23 +15,26 @@ def create_feedback(
     request,
     form: FeedbackForm,
 ) -> Feedback:
-    """
-    Create feedback for the authenticated user and record the activity.
-    """
     feedback = form.save(commit=False)
-
     feedback.user = request.user
-    feedback.status = Feedback.Status.PENDING
 
+
+    feedback.status = Feedback.STATUS_OPEN
     feedback.save()
 
-    log_activity(
-        request=request,
-        action=ActivityLog.Action.SEND_FEEDBACK,
-        description=f"Feedback #{feedback.pk} was submitted.",
-        status_code=201,
-    )
 
     request._activity_logged = True
+
+    transaction.on_commit(
+        partial(
+            log_activity,
+            request=request,
+            user=request.user,
+            action=ActivityLog.Action.SEND_FEEDBACK,
+            description=f"Feedback #{feedback.pk} was submitted.",
+            status_code=201,
+        ),
+        robust=True,
+    )
 
     return feedback
