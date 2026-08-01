@@ -59,13 +59,74 @@ tagInput.addEventListener("keypress", (e) => {
   }
 });
 
-document.getElementById("editProjectForm").addEventListener("submit", function (e) {
-  const ok = title.value.trim() && desc.value.trim();
-  if (!ok) {
-    e.preventDefault();
-    alert("Please fill all required fields");
-    return;
+if (editProjectForm) {
+  editProjectForm.addEventListener("submit", function (e) {
+    const isTitleValid = title ? title.value.trim().length > 0 : true;
+    const isDescValid = desc ? desc.value.trim().length > 0 : true;
+
+    if (!isTitleValid || !isDescValid) {
+      e.preventDefault();
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = "⏳ Saving...";
+    }
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const label = document.querySelector(".file-upload-label");
+  const wrapper = document.querySelector(".file-input-wrapper");
+  const input = wrapper ? wrapper.querySelector('input[type="file"]') : null;
+  const folderBtn = document.getElementById("folderBtn");
+  const folderInput = document.getElementById("folderInput");
+  const filePaths = document.getElementById("filePaths");
+
+  function renderFileNameLabel() {
+    const nameText = document.querySelector(".file-name-text");
+    if (nameText && input) {
+      if (input.files.length === 0) {
+        nameText.textContent = "No file chosen";
+      } else if (input.files.length === 1) {
+        nameText.textContent = input.files[0].name;
+      } else {
+        nameText.textContent = input.files.length + " files selected";
+      }
+    }
+    if (filePaths && input) {
+      filePaths.value = JSON.stringify([...input.files].map((f) => f.name));
+    }
   }
-  saveBtn.textContent = "⏳ Saving...";
-  saveBtn.disabled = true;
+
+  if (label && input) {
+    label.addEventListener("click", function () {
+      input.click();
+    });
+    input.addEventListener("change", renderFileNameLabel);
+  }
+
+  if (folderBtn && folderInput && input) {
+    folderBtn.addEventListener("click", function () {
+      folderInput.click();
+    });
+
+    folderInput.addEventListener("change", function () {
+      const renamed = [...folderInput.files].map(function (f) {
+        const relPath = f.webkitRelativePath || f.name;
+        return new File([f], relPath, { type: f.type, lastModified: f.lastModified });
+      });
+
+      const dt = new DataTransfer();
+      [...input.files].forEach((f) => dt.items.add(f));
+      renamed.forEach((f) => dt.items.add(f));
+      input.files = dt.files;
+
+      renderFileNameLabel();
+      folderInput.value = "";
+    });
+  }
 });

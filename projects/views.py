@@ -2,7 +2,6 @@ import io
 import os
 import json
 import zipfile
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse, HttpResponse
@@ -11,12 +10,11 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q
 from dashboard.services import get_explore_projects
 from notifications.utils import create_notification
-from projects.tasks import process_uploaded_file
+from projects.tasks import process_uploaded_file, send_project_invite_email
 from django.utils import timezone
 from .models import Project, ProjectMember, ProjectFile, ProjectLike, Comment, ProjectInvitation
 from .forms import ProjectForm, ProjectFileForm, InviteMemberForm
 from django.urls import reverse
-from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -214,22 +212,26 @@ def project_detail(request, project_id):
                     reverse("projects:invite-landing", args=[invitation.token])
                 )
                 greeting = f"Hi {matched_user.username}," if matched_user else "Hi there,"
+                subject = f"{request.user.username} invited you to collaborate on {project.title}"
+                message = (
+                    f"{greeting}\n\n"
+                    f"{request.user.username} invited you to collaborate on the "
+                    f"SkillSphere project \"{project.title}\".\n\n"
+                    f"Accept the invite here:\n{accept_url}\n\n"
+                    f"If you weren't expecting this, you can ignore this email."
+                )
 
                 try:
-                    send_mail(
-                        subject=f"{request.user.username} invited you to collaborate on {project.title}",
-                        message=(
-                            f"{greeting}\n\n"
-                            f"{request.user.username} invited you to collaborate on the "
-                            f"SkillSphere project \"{project.title}\".\n\n"
-                            f"Accept the invite here:\n{accept_url}\n\n"
-                            f"If you weren't expecting this, you can ignore this email."
-                        ),
-                        from_email=settings.EMAIL_HOST_USER,
-                        recipient_list=[email],
-                        fail_silently=False,
-                    )
+                    send_project_invite_email.delay(email, subject, message)
                     messages.success(request, f"Invite sent to {email}.")
+                    if matched_user:
+                        create_notification(
+                            user=matched_user,
+                            title="Project Invitation",
+                            message=f"{request.user.username} invited you to collaborate on '{project.title}'.",
+                            notification_type="invite",
+                            link=f"/projects/{project.id}/"
+                        )
                 except Exception:
                     invitation.delete()
                     messages.error(
@@ -461,9 +463,7 @@ def cancel_invite(request, project_id, invitation_id):
 def share_project_email(request, project_id):
     """
     Sends the project link directly to a recipient's inbox using the
-    app's own SMTP account (the same one EMAIL_HOST_USER/PASSWORD in
-    settings already use for verification emails) -- no Gmail app or
-    OS share sheet involved.
+    app's own SMTP account  -- runs in the background via Celery.
     """
     project = get_object_or_404(Project, id=project_id)
 
@@ -489,19 +489,16 @@ def share_project_email(request, project_id):
         reverse("projects:project-detail", args=[project.id])
     )
 
+    subject = f"{request.user.username} shared a project with you: {project.title}"
+    message = (
+        f"{request.user.username} shared a SkillSphere project with you.\n\n"
+        f"{project.title}\n"
+        f"{project.description[:200]}\n\n"
+        f"View it here: {project_url}"
+    )
+
     try:
-        send_mail(
-            subject=f"{request.user.username} shared a project with you: {project.title}",
-            message=(
-                f"{request.user.username} shared a SkillSphere project with you.\n\n"
-                f"{project.title}\n"
-                f"{project.description[:200]}\n\n"
-                f"View it here: {project_url}"
-            ),
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[recipient],
-            fail_silently=False,
-        )
+        send_project_invite_email.delay(recipient, subject, message)
     except Exception:
         return JsonResponse(
             {"error": "Could not send the email right now. Please try again later."},
@@ -609,16 +606,12 @@ def edit_project(request, project_id):
 
     file_form = ProjectFileForm()
 
-    if request.method == "POST" and "file_upload" in request.POST:
+    if request.method == "POST":
         if request.FILES.getlist('file'):
             file_errors = _save_uploaded_files(request, project)
             for err in file_errors:
                 messages.warning(request, err)
-        else:
-            messages.warning(request, "No files were selected for upload.")
-        return redirect('projects:project-edit', project_id=project.id)
 
-    if request.method == "POST":
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
             project_form.save()
@@ -631,6 +624,7 @@ def edit_project(request, project_id):
         "project_form": project_form,
         "file_form": file_form,
         "project": project,
+        "files": project.files.all(),
         "tags_json": json.dumps(project.tag_list),
         "page_title": f"Edit {project.title}",
     })
