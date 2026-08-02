@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from notifications.utils import get_notification_style
-from .models import Notification
+from .models import Notification, NotificationSeen
 
 
 @login_required
@@ -143,3 +145,13 @@ def delete_all_notifications(request):
         )
 
     return redirect("notifications:notification_center")
+
+
+
+@login_required
+@require_POST
+def mark_notifications_seen(request):
+    seen, _ = NotificationSeen.objects.get_or_create(user=request.user)
+    seen.last_seen_at = timezone.now()
+    seen.save(update_fields=["last_seen_at"])
+    return JsonResponse({"status": "ok"})

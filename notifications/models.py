@@ -41,3 +41,13 @@ class Notification(models.Model):
         ordering = ["-created_at"]
     def __str__(self):
         return self.title
+    
+    
+
+class NotificationSeen(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notification_seen"
+    )
+    last_seen_at = models.DateTimeField(null=True, blank=True)
