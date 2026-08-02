@@ -115,11 +115,11 @@
       <div class="grid lg:grid-cols-3 gap-4">
         <!-- LINE CHART -->
         <div
-          class="lg:col-span-2 rounded-2xl bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-4 sm:p-5 shadow-sm"
+          class="lg:col-span-2 rounded-2xl bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-4 sm:p-5 shadow-sm min-w-0 w-full"
         >
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 gap-2 min-w-0">
             <div>
-              <h3 class="font-bold text-sm sm:text-[15px] text-gray-900 dark:text-white">Weekly Activity</h3>
+              <h3 class="font-bold text-sm sm:text-[15px] text-gray-900 dark:text-white ">Weekly Activity</h3>
               <p class="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
                 {{ week_start|date:"F j" }} – {{ week_end|date:"F j, Y" }}
               </p>
@@ -149,7 +149,7 @@
             </div>
           </div>
 
-          <div id="activityChart" class="min-h-[200px] sm:min-h-[250px]"></div>
+          <div id="activityChart" class="min-h-50 sm:min-h-62.5"></div>
         </div>
 
         <!-- PIE -->
@@ -361,7 +361,7 @@
       <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Explore</h2>
       <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Projects from the community</p>
     </div>
-    <a href="{% url 'projects:explore' %}?visibility=public" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+    <a href="{% url 'dashboard:explore' %}?visibility=public" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
       View all
     </a>
   </div>

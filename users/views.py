@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from .models import EmailVerification, CustomUser, Follow
-from .utils import generate_code
 from .tasks import send_verification_email
 from .forms import EmailRequestForm, CodeVerificationForm, SignupForm, ProfileEditForm
 from django.utils import timezone
@@ -13,6 +12,16 @@ from projects.models import Project
 from django.db.models import Q
 from notifications.utils import create_notification
 from django.urls import reverse
+import random
+
+
+
+
+
+
+def generate_code():
+    return str(random.randint(100000, 999999))
+
 
 
 def email_verification_view(request):
