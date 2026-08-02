@@ -3,11 +3,7 @@ from . import views
 app_name = "notifications"
 
 urlpatterns = [
-    # path(
-    #     "notifications/",
-    #     views.notification_drawer,
-    #     name="notification_drawer"
-    # ),
+
     path(
         "",
         views.notification_center,
@@ -16,5 +12,6 @@ urlpatterns = [
     path("read/<int:pk>/", views.mark_as_read, name="mark-as-read"),
     path("delete/<int:pk>/", views.delete_notification, name="delete"),
     path("mark-all-read/", views.mark_all_as_read, name="mark_all_as_read"),
-
+    path("delete-all/", views.delete_all_notifications, name="delete_all"),
+    path("mark-seen/", views.mark_notifications_seen, name="mark_seen"),
 ]
