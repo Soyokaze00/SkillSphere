@@ -219,7 +219,7 @@
             type="submit"
             :disabled="!subject || !message || submitting"
             class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-[15px] font-semibold transition-all active:scale-95"
-            :class="subject && message ? 'text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'"
+            :class="subject && message ? 'text-white bg-black dark:bg-white dark:text-black' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'"
           >
             <template x-if="!submitting">
               <span class="flex items-center gap-2 " >
@@ -534,6 +534,21 @@
       rating: initialRating,
       submitting: false,
       isDark: false,
+
+      init() {
+        this.isDark =
+          document.documentElement.classList.contains("dark");
+
+        const observer = new MutationObserver(() => {
+          this.isDark =
+            document.documentElement.classList.contains("dark");
+        });
+
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      },
 
       types: [
         {
