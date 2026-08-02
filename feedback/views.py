@@ -1,36 +1,89 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.shortcuts import redirect, render
 
 from .forms import FeedbackForm
 from .models import Feedback
+from .services import create_feedback
 
 
 @login_required
 def feedback_center(request):
     if request.method == "POST":
         form = FeedbackForm(request.POST)
+
         if form.is_valid():
-            feedback = form.save(commit=False)
-            feedback.user = request.user
-            feedback.save()
-            messages.success(request, "Your feedback was submitted successfully.")
+            create_feedback(
+                request=request,
+                form=form,
+            )
+
+            messages.success(
+                request,
+                "Your feedback was submitted successfully.",
+            )
             return redirect("feedback")
     else:
-        form = FeedbackForm(initial={"type": "suggestion", "rating": 0})
+        form = FeedbackForm(
+            initial={
+                "type": Feedback.TYPE_SUGGESTION,
+                "rating": 0,
+            }
+        )
 
-    user_feedbacks = Feedback.objects.filter(user=request.user)
+    user_feedbacks = Feedback.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
 
-    stats = {
-        "submitted": user_feedbacks.count(),
-        "resolved": user_feedbacks.filter(status=Feedback.STATUS_RESOLVED).count(),
-        "in_review": user_feedbacks.filter(status=Feedback.STATUS_IN_REVIEW).count(),
-        "planned": user_feedbacks.filter(status=Feedback.STATUS_PLANNED).count(),
+    stats = user_feedbacks.aggregate(
+        submitted=Count("pk"),
+        resolved=Count(
+            "pk",
+            filter=Q(
+                status=Feedback.STATUS_RESOLVED
+            ),
+        ),
+        in_review=Count(
+            "pk",
+            filter=Q(
+                status=Feedback.STATUS_IN_REVIEW
+            ),
+        ),
+        planned=Count(
+            "pk",
+            filter=Q(
+                status=Feedback.STATUS_PLANNED
+            ),
+        ),
+    )
+
+    paginator = Paginator(user_feedbacks, 10)
+    page_obj = paginator.get_page(
+        request.GET.get("page")
+    )
+
+    form_state = {
+        "type": (
+            form["type"].value()
+            or Feedback.TYPE_SUGGESTION
+        ),
+        "rating": form["rating"].value() or 0,
+        "subject": form["subject"].value() or "",
+        "message": form["message"].value() or "",
     }
 
     context = {
         "form": form,
-        "prev_feedback": user_feedbacks[:10],
+        "form_state": form_state,
+        "prev_feedback": page_obj,
+        "page_obj": page_obj,
         "stats": stats,
     }
-    return render(request, "feedback/feedback.html", context)
+
+    return render(
+        request,
+        "feedback/feedback.html",
+        context,
+    )
