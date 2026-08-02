@@ -347,11 +347,11 @@ def toggle_like(request, project_id):
         
     if liked and project.owner != request.user: 
         create_notification(
-                       user=project.owner,
-                       title="New Like",
-                       message=f"{request.user.username} liked your project '{project.title}'.",  # 👈 بگو کی لایک کرد
-                       notification_type="like",
-                       link=f"/projects/{project.id}/",
+            user=project.owner,
+            title="New Like",
+            message=f"{request.user.username} liked your project '{project.title}'.",  # 👈 بگو کی لایک کرد
+            notification_type="like",
+            link=f"/projects/{project.id}/",
         )
         
     return JsonResponse({
@@ -615,6 +615,13 @@ def edit_project(request, project_id):
         if project_form.is_valid():
             project_form.save()
             messages.success(request, "Project updated.")
+            create_notification(
+                user=project.owner,
+                title="Project updated.",
+                message=f"You updated '{project.title}'.",
+                notification_type="project",
+                link=f"/projects/{project.id}/",
+            )
             return redirect('projects:project-detail', project_id=project.id)
     else:
         project_form = ProjectForm(instance=project)

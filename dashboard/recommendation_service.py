@@ -5,7 +5,7 @@ from django.db.models import QuerySet
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from .models import Project
+from projects.models import Project
 
 
 @dataclass
