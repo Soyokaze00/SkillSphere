@@ -1,4 +1,4 @@
-from projects.recommendation_service import recommend_projects_for_user
+from dashboard.recommendation_service import recommend_projects_for_user
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
