@@ -14,27 +14,30 @@
         </p>
       </div>
     </div>
-    <a
-      href="{% url 'notifications:mark_all_as_read' %}"
-      class="rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 gap-2 flex items-center justify-between text-[12px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="lucide lucide-check-check-icon lucide-check-check"
+    <form method="post" action="{% url 'notifications:mark_all_as_read' %}">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 gap-2 flex items-center justify-between text-[12px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors"
       >
-        <path d="M18 6 7 17l-5-5" />
-        <path d="m22 10-7.5 7.5L13 16" />
-      </svg>
-      <p>Mark all read</p>
-    </a>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-check-check-icon lucide-check-check"
+        >
+          <path d="M18 6 7 17l-5-5" />
+          <path d="m22 10-7.5 7.5L13 16" />
+        </svg>
+        <p>Mark all read</p>
+      </button>
+    </form>
     <button @click="toggleNotification()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x text-gray-500 dark:text-gray-400"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
@@ -69,13 +72,13 @@
                     {{ n.title }}
                   </a>
                   <span
-                    class="flex-shrink-0 px-2 py-0.5 {{ style.badge }} dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-[10px] font-medium"
+                    class="shrink-0 px-2 py-0.5 {{ style.badge }} dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-[10px] font-medium"
                   >
                     new
                   </span>
                 </div>
                 <p
-                  class="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed break-words"
+                  class="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed wrap-break-word"
                 >
                   {{ n.message }}
                 </p>
@@ -83,25 +86,28 @@
                   class="flex justify-between items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400"
                 >
                 <span>{{ n.created_at|timesince_precise }} ago</span>
-                <a
-                href="{% url 'notifications:mark-as-read' n.id %}"
-                class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shrink-0"
-                title="Mark as read"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-              </a>
+                <form method="post" action="{% url 'notifications:mark-as-read' n.id %}">
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shrink-0"
+                    title="Mark as read"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </button>
+                </form>
                 </div>
               </div>
             </div>

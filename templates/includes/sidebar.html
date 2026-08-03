@@ -99,18 +99,18 @@
 
   {% endfor %}
 
-  <a href="/notifications/"
+<a href="{% url 'notifications:notification_center' %}"
    @click="markNotificationsSeen()"
-    class="flex items-center gap-3 w-full rounded-3xl p-3 transition
-    {% if url_name == 'notification_center' %}
-      bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 font-bold
-    {% else %}
-      text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800
-    {% endif %}"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-    <span x-show="!sidebarCollapsed">Notifications</span>
-  </a>
+   class="flex items-center gap-3 w-full rounded-3xl p-3 transition
+   {% if url_name == 'notification_center' %}
+     bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 font-bold
+   {% else %}
+     text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800
+   {% endif %}"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+  <span x-show="!sidebarCollapsed">Notifications</span>
+</a>
   
   <a href="{% url 'users:profile' request.user.username %}"
     class="flex items-center gap-3 w-full rounded-3xl p-3 transition
@@ -143,7 +143,7 @@
           {% if user.profile_image or user.avatar_seed %}
             bg-white dark:bg-gray-800
           {% else %}
-            bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-[11px] font-bold
+            bg-linear-to-br from-indigo-600 to-purple-600 text-white text-[11px] font-bold
           {% endif %}"
         >
           {% if user.profile_image %}
