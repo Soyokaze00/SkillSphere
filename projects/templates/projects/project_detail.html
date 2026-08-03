@@ -43,7 +43,7 @@
       <div
         class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent"
       ></div>
-      {% if user == project.owner %}
+      {% if user == project.owner or is_member %}
       <button
         type="button"
         @click="deleteOpen = true"
@@ -106,8 +106,7 @@
                 />
               </svg>
             </button>
-
-            {% if user == project.owner %}
+            {% if user == project.owner or is_member %}
             <a href="{% url 'projects:project-edit' project.id %}"
               class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all hover:scale-105 bg-white/15 text-white backdrop-blur-sm"
               title="Edit project"
@@ -189,7 +188,7 @@
       </div>
     </div>
 
-    {% if user == project.owner %}
+    {% if user == project.owner or is_member %}
     <div
       x-show="deleteOpen"
       x-cloak
