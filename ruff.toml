@@ -1,0 +1,23 @@
+line-length = 800
+
+exclude = [
+    ".venv",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__",
+    "migrations",
+    "**/migrations/*.py",
+    "media",
+    "static",
+]
+
+[lint]
+select = ["E", "F", "I"]
+
+[lint.per-file-ignores]
+"skill_sphere/settings/development.py" = ["F403", "F405"]
+"skill_sphere/settings/production.py" = ["F403", "F405"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
