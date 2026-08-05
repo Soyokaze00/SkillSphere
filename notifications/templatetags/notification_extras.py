@@ -1,8 +1,10 @@
 from django import template
-from notifications.utils import get_notification_style
 from django.utils import timezone
 
+from notifications.utils import get_notification_style
+
 register = template.Library()
+
 
 @register.filter
 def notification_style(notification_type):
