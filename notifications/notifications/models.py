@@ -1,0 +1,40 @@
+from django.conf import settings
+from django.db import models
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+
+    TYPE_CHOICES = [
+        ("project", "Project"),
+        ("comment", "Comment"),
+        ("feedback", "Feedback"),
+        ("invite", "Invite"),
+        ("member", "Member"),
+        ("follow", "Follow"),
+        ("like", "Like"),
+        ("system", "System"),
+    ]
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="system")
+    link = models.CharField(max_length=255, blank=True, null=True)
+
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+
+class NotificationSeen(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notification_seen",
+    )
+    last_seen_at = models.DateTimeField(null=True, blank=True)
