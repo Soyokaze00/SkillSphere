@@ -21,7 +21,6 @@
   />
 
   <style>
-    /* فقط برای فونت و پرایزم - بقیه همه تلوینده */
     * {
       font-family:
         "Inter",
@@ -139,7 +138,7 @@
           id="pdfPreviewWrapper"
           class="relative min-h-[300px] flex items-center justify-center"
         >
-          <!-- اسپینر -->
+          <!--spinner-->
           <div
             id="pdfPreviewLoader"
             class="absolute inset-0 flex flex-col items-center justify-center gap-3"
@@ -174,10 +173,10 @@
           <i class="fas fa-file-alt"></i>
         </div>
         <h3 class="text-slate-700 font-semibold text-base mb-2">
-          پیش‌نمایش در دسترس نیست
+         Can't show this file 
         </h3>
         <p class="text-slate-500 text-sm mb-5">
-          این نوع فایل قابل نمایش در مرورگر نمی‌باشد.
+         This type of file is not showable in the browser.
         </p>
         <a
           href="{{ project_file.file.url }}"
@@ -185,7 +184,7 @@
           class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all"
         >
           <i class="fas fa-download"></i>
-          دانلود فایل
+         Download File
         </a>
       </div>
 

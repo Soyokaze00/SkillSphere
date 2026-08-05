@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from notifications.utils import create_notification
-from projects.tasks import process_uploaded_file, send_project_invite_email
+from projects.tasks import send_project_invite_email
 from django.utils import timezone
 from .models import Project, ProjectMember, ProjectFile, ProjectLike, Comment, ProjectInvitation
 from .forms import ProjectForm, ProjectFileForm, InviteMemberForm
@@ -18,75 +18,9 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from users.models import Follow
-from .services import get_similar_projects
+from .services import get_similar_projects, user_can_access, save_uploaded_files
 from django.core.paginator import Paginator
 
-
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB per file
-
-
-def _user_can_access(project, user):
-    """Owner and members can always access; PUBLIC projects are open to any
-    logged-in user."""
-    if project.visibility != Project.PRIVATE:
-        return True
-    if project.owner == user:
-        return True
-    return ProjectMember.objects.filter(project=project, user=user).exists()
-
-
-def _split_relative_path(raw_name):
-    """
-    Folder uploads arrive with a name like 'my-project/src/main.py'
-    (see the folderInput JS, which renames each File to its
-    webkitRelativePath before appending it to the form). This pulls that
-    apart into a safe relative path and a bare filename, stripping any
-    '.', '..', or empty segments so nothing can escape the upload folder.
-    """
-    segments = [
-        s for s in raw_name.replace("\\", "/").split("/")
-        if s not in ("", ".", "..")
-    ]
-    if not segments:
-        return "", raw_name
-
-    filename = segments[-1]
-    relative_path = "/".join(segments) if len(segments) > 1 else ""
-    return relative_path, filename
-
-
-def _save_uploaded_files(request, project):
-    """
-    Save every file the user selected and kick off background processing 
-    for each. Returns a list of error stringsfor files that were rejected 
-    (too large), so the view can show them.
-    """
-    errors = []
-    files = request.FILES.getlist('file')
-
-    try:
-        raw_paths = json.loads(request.POST.get('file_paths', '[]'))
-    except (ValueError, TypeError):
-        raw_paths = []
-
-    for i, f in enumerate(files):
-        if f.size > MAX_FILE_SIZE:
-            errors.append(f"{f.name} is too large (max {MAX_FILE_SIZE / (1024 * 1024)} MB).")
-            continue
-
-        raw_name = raw_paths[i] if i < len(raw_paths) and raw_paths[i] else f.name
-        relative_path, filename = _split_relative_path(raw_name)
-        f.name = filename or f.name
-
-        new_file = ProjectFile.objects.create(
-            project=project,
-            file=f,
-            uploaded_by=request.user,
-            relative_path=relative_path,
-        )
-        process_uploaded_file.delay(new_file.id)
-
-    return errors
 
 
 @login_required
@@ -164,7 +98,7 @@ def project_detail(request, project_id):
     project_count = Project.objects.filter(owner=request.user).count()
 
     if project.visibility == Project.PRIVATE:
-        if not _user_can_access(project, request.user):
+        if not user_can_access(project, request.user):
             return HttpResponseForbidden("You don't have access to this project.")
 
     if request.method == "POST" and "add_comment" in request.POST:
@@ -254,6 +188,15 @@ def project_detail(request, project_id):
         and Follow.objects.filter(follower=request.user, following=project.owner).exists()
     )
 
+    is_member = ProjectMember.objects.filter(
+        project=project,
+        user=request.user
+    ).exists()
+
+    # members2 = project.memberships.select_related("user").all()
+
+    # print("members: ", members2, "\nis_member: ", is_member )
+
     return render(request, "projects/project_detail.html", {
         "project": project,
         "invite_form": InviteMemberForm(),
@@ -263,6 +206,7 @@ def project_detail(request, project_id):
         "is_liked": project.is_liked_by(request.user),
         "comments": project.comments.select_related("user").all(),
         "members": project.memberships.select_related("user").all(),
+        "is_member": is_member,
         "pending_invitations": project.invitations.filter(status=ProjectInvitation.PENDING),
         "is_following_owner": is_following_owner,
         "owner_follower_count": project.owner.followers.count(),
@@ -331,7 +275,7 @@ def toggle_like(request, project_id):
     """
     project = get_object_or_404(Project, id=project_id)
 
-    if not _user_can_access(project, request.user):
+    if not user_can_access(project, request.user):
         return HttpResponseForbidden("You don't have access to this project.")
 
     like, created = ProjectLike.objects.get_or_create(
@@ -466,7 +410,7 @@ def share_project_email(request, project_id):
     """
     project = get_object_or_404(Project, id=project_id)
 
-    if not _user_can_access(project, request.user):
+    if not user_can_access(project, request.user):
         return HttpResponseForbidden("You don't have access to this project.")
 
     try:
@@ -514,7 +458,7 @@ def download_all_files(request, project_id):
     """
     project = get_object_or_404(Project, id=project_id)
 
-    if not _user_can_access(project, request.user):
+    if not user_can_access(project, request.user):
         return HttpResponseForbidden("You don't have access to this project.")
 
     files = list(project.files.all())
@@ -600,14 +544,19 @@ def _serialize_tree(node):
 def edit_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    if project.owner != request.user:
-        return HttpResponseForbidden("Only the project owner can edit this project.")
+    is_member = ProjectMember.objects.filter(
+            project=project,
+            user=request.user
+        ).exists()
+
+    if project.owner != request.user and not is_member:
+        return HttpResponseForbidden("Only the project owner and project members can edit this project.")
 
     file_form = ProjectFileForm()
 
     if request.method == "POST":
         if request.FILES.getlist('file'):
-            file_errors = _save_uploaded_files(request, project)
+            file_errors = save_uploaded_files(request, project)
             for err in file_errors:
                 messages.warning(request, err)
 
@@ -618,7 +567,7 @@ def edit_project(request, project_id):
             create_notification(
                 user=project.owner,
                 title="Project updated.",
-                message=f"You updated '{project.title}'.",
+                message=f"{request.user} updated '{project.title}'.",
                 notification_type="project",
                 link=f"/projects/{project.id}/",
             )
@@ -663,6 +612,3 @@ def delete_project(request, project_id):
 
     messages.success(request, f'"{project_title}" was permanently deleted.')
     return redirect('projects:project-list')
-
-
-
