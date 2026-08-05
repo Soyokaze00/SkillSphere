@@ -39,6 +39,9 @@ services:
     container_name: skillsphere_celery
     command: celery -A skill_sphere worker -l info --pool=solo
     restart: unless-stopped
+    profiles:
+      - dev
+      - prod
     depends_on:
       - db
       - redis
