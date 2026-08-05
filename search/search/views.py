@@ -19,19 +19,29 @@ def _execute_search(search, fallback):
         return fallback
 
 
-def search_projects(query):
+def search_projects(query, status=None):
 
     s = (
         ProjectDocument.search()
         .query(
-            "multi_match",
-            query=query,
-            fields=[
-                "title^3",
-                "tags^2",
-                "description",
+            "bool",
+            should=[
+                {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["title^3", "tags^2", "description"],
+                        "fuzziness": "AUTO",
+                        "operator": "and",
+                    }
+                },
+                {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["title_ngram^3", "tags_ngram^2", "description_ngram"],
+                    }
+                },
             ],
-            fuzziness="AUTO",
+            minimum_should_match=1,
         )
         .highlight(
             "title",
@@ -49,20 +59,25 @@ def search_projects(query):
     if not ids:
         return Project.objects.none()
 
-    projects = {p.id: p for p in Project.objects.filter(pk__in=ids).select_related("owner")}
+    projects_qs = Project.objects.filter(pk__in=ids).select_related("owner")
+    if status:
+        projects_qs = projects_qs.filter(status=status)
+
+    projects = {p.id: p for p in projects_qs}
 
     result = []
 
     for hit in response:
-        project = projects[int(hit.meta.id)]
+        pid = int(hit.meta.id)
+        if pid not in projects:
+            continue 
+
+        project = projects[pid]
 
         if hasattr(hit.meta, "highlight"):
             project.highlight_title = hit.meta.highlight.title[0] if "title" in hit.meta.highlight else project.title
-
             project.highlight_description = hit.meta.highlight.description[0] if "description" in hit.meta.highlight else project.description
-
             project.highlight_tags = hit.meta.highlight.tags if "tags" in hit.meta.highlight else project.tag_list
-
         else:
             project.highlight_title = project.title
             project.highlight_description = project.description
@@ -73,6 +88,7 @@ def search_projects(query):
     return result
 
 
+
 def search_users(query):
 
     s = UserDocument.search().query(
@@ -81,14 +97,11 @@ def search_users(query):
             {
                 "multi_match": {
                     "query": query,
-                    "fields": [
-                        "username^3",
-                        "first_name",
-                        "last_name",
-                    ],
+                    "fields": ["username^3", "first_name", "last_name"],
                     "fuzziness": "AUTO",
                 }
             },
+            {"match": {"username_ngram": {"query": query}}},
             {"prefix": {"username.keyword": query.lower()}},
         ],
         minimum_should_match=1,
@@ -123,13 +136,11 @@ def search_view(request):
                 defaults={"query": query},
             )
 
-        all_projects = search_projects(query)
+        all_projects = search_projects(query, status=status)
         all_users = search_users(query)
 
-        if status:
-            all_projects = all_projects.filter(status=status)
-
         projects_count = len(all_projects)
+        
         users_count = len(all_users)
 
         if search_type == "projects":
