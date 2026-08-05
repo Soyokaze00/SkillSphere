@@ -16,6 +16,7 @@ FILE_COLORS = {
     "gif": "bg-pink-50 text-pink-600",
 }
 
+
 @register.filter
 def file_color(file_name):
     ext = file_name.split(".")[-1].lower()

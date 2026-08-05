@@ -18,10 +18,8 @@ def create_feedback(
     feedback = form.save(commit=False)
     feedback.user = request.user
 
-
     feedback.status = Feedback.STATUS_OPEN
     feedback.save()
-
 
     request._activity_logged = True
 

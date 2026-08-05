@@ -1,8 +1,10 @@
-from django.db.models import Q
-from django.db.models import Count, Prefetch
-from .models import Project, ProjectFile, ProjectMember
-from projects.tasks import process_uploaded_file
 import json
+
+from django.db.models import Q
+
+from projects.tasks import process_uploaded_file
+
+from .models import Project, ProjectFile, ProjectMember
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB per file
 
@@ -15,9 +17,7 @@ def get_similar_projects(project, limit=4):
     leak private ones the viewer can't otherwise reach.
     """
 
-    candidates = Project.objects.filter(
-        visibility=Project.PUBLIC
-    ).exclude(id=project.id).select_related("owner")
+    candidates = Project.objects.filter(visibility=Project.PUBLIC).exclude(id=project.id).select_related("owner")
 
     project_tags = set(project.tag_list)
 
@@ -68,10 +68,7 @@ def split_relative_path(raw_name):
     apart into a safe relative path and a bare filename, stripping any
     '.', '..', or empty segments so nothing can escape the upload folder.
     """
-    segments = [
-        s for s in raw_name.replace("\\", "/").split("/")
-        if s not in ("", ".", "..")
-    ]
+    segments = [s for s in raw_name.replace("\\", "/").split("/") if s not in ("", ".", "..")]
     if not segments:
         return "", raw_name
 
@@ -82,15 +79,15 @@ def split_relative_path(raw_name):
 
 def save_uploaded_files(request, project):
     """
-    Save every file the user selected and kick off background processing 
-    for each. Returns a list of error strings for files that were rejected 
+    Save every file the user selected and kick off background processing
+    for each. Returns a list of error strings for files that were rejected
     (too large), so the view can show them.
     """
     errors = []
-    files = request.FILES.getlist('file')
+    files = request.FILES.getlist("file")
 
     try:
-        raw_paths = json.loads(request.POST.get('file_paths', '[]'))
+        raw_paths = json.loads(request.POST.get("file_paths", "[]"))
     except (ValueError, TypeError):
         raw_paths = []
 

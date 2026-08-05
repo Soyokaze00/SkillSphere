@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -71,9 +70,7 @@ class Migration(migrations.Migration):
                         fields=["user", "-created_at"],
                         name="activity_lo_user_id_04b3d2_idx",
                     ),
-                    models.Index(
-                        fields=["action"], name="activity_lo_action_de9b3e_idx"
-                    ),
+                    models.Index(fields=["action"], name="activity_lo_action_de9b3e_idx"),
                 ],
             },
         ),

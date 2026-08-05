@@ -1,10 +1,11 @@
 import json
 import re
+from collections.abc import Callable
+from typing import Any
 
 from django.http import HttpRequest
 
 from .models import ActivityLog
-
 
 _SEGMENT_LABELS = {
     "projects": "Updated a project",
@@ -17,7 +18,6 @@ _SEGMENT_LABELS = {
 def _generic_description(request):
     segments = [s for s in request.path.split("/") if s]
     return _SEGMENT_LABELS.get(segments[0], "Performed an action") if segments else "Performed an action"
-
 
 
 def get_client_ip(request: HttpRequest) -> str | None:
@@ -64,6 +64,7 @@ def _project_label(project_id):
     reason -- this is only ever used for a log message, never critical."""
     try:
         from projects.models import Project
+
         title = Project.objects.filter(id=project_id).values_list("title", flat=True).first()
     except Exception:
         title = None
@@ -78,7 +79,7 @@ def _response_json(response):
         return {}
 
 
-_PATTERNS = []
+_PATTERNS: list[tuple[re.Pattern[str], Any, Callable[..., Any]]] = []
 
 
 def register(pattern, methods=None):
@@ -133,7 +134,10 @@ def _project_detail_post(request, response, match):
     if "add_comment" in post:
         return ActivityLog.Action.POST_COMMENT, f"Commented on project {label}"
     if "invite_member" in post:
-        return ActivityLog.Action.MANAGE_INVITE, f"Invited a collaborator to project {label}"
+        return (
+            ActivityLog.Action.MANAGE_INVITE,
+            f"Invited a collaborator to project {label}",
+        )
 
     return ActivityLog.Action.UPDATE_PROJECT, f"Updated project {label}"
 
@@ -141,7 +145,10 @@ def _project_detail_post(request, response, match):
 @register(r"^/projects/(?P<id>\d+)/remove-member/\d+/$", {"POST"})
 def _remove_member(request, response, match):
     label = _project_label(match.group("id"))
-    return ActivityLog.Action.MANAGE_INVITE, f"Removed a collaborator from project {label}"
+    return (
+        ActivityLog.Action.MANAGE_INVITE,
+        f"Removed a collaborator from project {label}",
+    )
 
 
 @register(r"^/projects/(?P<id>\d+)/invite/\d+/cancel/$", {"POST"})
@@ -208,7 +215,6 @@ def classify_request(request, response):
             return result
 
     return ActivityLog.Action.OTHER, _generic_description(request)
-
 
 
 @register(r"^/accounts/(?P<provider>[^/]+)/login/$", {"POST"})

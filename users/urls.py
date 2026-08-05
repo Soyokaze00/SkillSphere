@@ -1,16 +1,16 @@
 from django.urls import path
+
 from .views import (
-    email_verification_view,
     complete_signup,
+    delete_account_view,
+    edit_profile_view,
+    email_verification_view,
     login_view,
     logout_view,
-    resend_code,
     profile_view,
-    edit_profile_view,
+    resend_code,
     toggle_follow,
-    delete_account_view,
 )
-
 
 app_name = "users"
 

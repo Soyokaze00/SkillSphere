@@ -30,11 +30,7 @@ CATEGORY_MAP = {
 
 @login_required
 def activity_list(request):
-    logs_queryset = (
-        ActivityLog.objects
-        .filter(user=request.user)
-        .order_by("-created_at")[:200]
-    )
+    logs_queryset = ActivityLog.objects.filter(user=request.user).order_by("-created_at")[:200]
 
     logs_data = []
     counts = defaultdict(int)
@@ -42,16 +38,17 @@ def activity_list(request):
     for log in logs_queryset:
         category = CATEGORY_MAP.get(log.action, "other")
         counts[category] += 1
-        logs_data.append({
-            "id": log.id,
-            "type": category,
-            "action_label": log.get_action_display(),
-            "desc": log.description or log.get_action_display(),
-            "ip": log.ip_address or "—",
-            "time": naturaltime(log.created_at),
-            "date": timezone.localtime(log.created_at).strftime("%b %d, %Y %H:%M"),
-        })
-
+        logs_data.append(
+            {
+                "id": log.id,
+                "type": category,
+                "action_label": log.get_action_display(),
+                "desc": log.description or log.get_action_display(),
+                "ip": log.ip_address or "—",
+                "time": naturaltime(log.created_at),
+                "date": timezone.localtime(log.created_at).strftime("%b %d, %Y %H:%M"),
+            }
+        )
 
     today = timezone.localdate()
     week_start = today - timedelta(days=6)
@@ -97,6 +94,10 @@ def activity_list(request):
         },
     }
 
-    return render(request, "activity_logs/activity_list.html", {
-        "activity_data": activity_data,
-    })
+    return render(
+        request,
+        "activity_logs/activity_list.html",
+        {
+            "activity_data": activity_data,
+        },
+    )

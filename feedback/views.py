@@ -33,42 +33,29 @@ def feedback_center(request):
             }
         )
 
-    user_feedbacks = Feedback.objects.filter(
-        user=request.user
-    ).order_by("-created_at")
+    user_feedbacks = Feedback.objects.filter(user=request.user).order_by("-created_at")
 
     stats = user_feedbacks.aggregate(
         submitted=Count("pk"),
         resolved=Count(
             "pk",
-            filter=Q(
-                status=Feedback.STATUS_RESOLVED
-            ),
+            filter=Q(status=Feedback.STATUS_RESOLVED),
         ),
         in_review=Count(
             "pk",
-            filter=Q(
-                status=Feedback.STATUS_IN_REVIEW
-            ),
+            filter=Q(status=Feedback.STATUS_IN_REVIEW),
         ),
         planned=Count(
             "pk",
-            filter=Q(
-                status=Feedback.STATUS_PLANNED
-            ),
+            filter=Q(status=Feedback.STATUS_PLANNED),
         ),
     )
 
     paginator = Paginator(user_feedbacks, 10)
-    page_obj = paginator.get_page(
-        request.GET.get("page")
-    )
+    page_obj = paginator.get_page(request.GET.get("page"))
 
     form_state = {
-        "type": (
-            form["type"].value()
-            or Feedback.TYPE_SUGGESTION
-        ),
+        "type": (form["type"].value() or Feedback.TYPE_SUGGESTION),
         "rating": form["rating"].value() or 0,
         "subject": form["subject"].value() or "",
         "message": form["message"].value() or "",

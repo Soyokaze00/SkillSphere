@@ -1,4 +1,3 @@
-from .models import ActivityLog
 from .services import classify_request, log_activity
 
 
