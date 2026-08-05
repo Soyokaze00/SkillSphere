@@ -1,8 +1,11 @@
-from celery import shared_task
-from .models import ProjectFile
-from django.core.mail import send_mail
-from django.conf import settings
 import os
+
+from celery import shared_task
+from django.conf import settings
+from django.core.mail import send_mail
+
+from .models import ProjectFile
+
 
 @shared_task
 def process_uploaded_file(file_id):
@@ -64,7 +67,6 @@ def process_uploaded_file(file_id):
     print(f"Finished processing: {file_name}")
 
     return True
-
 
 
 @shared_task

@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.core.validators import validate_email
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import validate_email
+
 from .models import Project, ProjectFile
 
 User = get_user_model()
@@ -13,6 +14,7 @@ class MultipleFileInput(forms.ClearableFileInput):
     attr (they raise ValueError). This is the pattern Django's own docs
     recommend: a widget subclass that opts in via allow_multiple_selected.
     """
+
     allow_multiple_selected = True
 
 
@@ -28,15 +30,17 @@ class ProjectForm(forms.ModelForm):
             "tags",
         ]
 
+
 class ProjectFileForm(forms.ModelForm):
     file = forms.FileField(required=False, widget=MultipleFileInput())
+
     class Meta:
         model = ProjectFile
-        fields = ['file']
+        fields = ["file"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['file'].required = False
+        self.fields["file"].required = False
 
 
 class InviteMemberForm(forms.Form):
@@ -68,9 +72,7 @@ class InviteMemberForm(forms.Form):
             if not matched_user:
                 raise forms.ValidationError("No user found with that username.")
             if not matched_user.email:
-                raise forms.ValidationError(
-                    f"{matched_user.username} doesn't have an email on file."
-                )
+                raise forms.ValidationError(f"{matched_user.username} doesn't have an email on file.")
             email = matched_user.email.lower()
 
         self.matched_user = matched_user

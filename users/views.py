@@ -1,72 +1,74 @@
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
-from django.views.decorators.http import require_POST
-from .models import EmailVerification, CustomUser, Follow
-from .tasks import send_verification_email
-from .forms import EmailRequestForm, CodeVerificationForm, SignupForm, ProfileEditForm
-from django.utils import timezone
+import secrets
 from datetime import timedelta
-from projects.models import Project
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from notifications.utils import create_notification
+from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-import random
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
+from notifications.utils import create_notification
+from projects.models import Project
 
-
-
+from .forms import CodeVerificationForm, EmailRequestForm, ProfileEditForm, SignupForm
+from .models import CustomUser, EmailVerification, Follow
+from .tasks import send_verification_email
 
 
 def generate_code():
-    return str(random.randint(100000, 999999))
-
+    return str(secrets.randbelow(900000) + 100000)
 
 
 def email_verification_view(request):
 
     email_form = EmailRequestForm(request.POST or None)
     code_form = CodeVerificationForm(request.POST or None)
-    context = {'email_form': email_form, 'code_form': code_form}
+    context = {"email_form": email_form, "code_form": code_form}
 
-    if 'send_code' in request.POST and email_form.is_valid():
-        email = email_form.cleaned_data['email']
+    if "send_code" in request.POST and email_form.is_valid():
+        email = email_form.cleaned_data["email"]
 
         if CustomUser.objects.filter(email=email).exists():
-            email_form.add_error('email', "User with this email already exists.")
+            email_form.add_error("email", "User with this email already exists.")
         else:
             code = generate_code()
             verification, _ = EmailVerification.objects.update_or_create(
                 email=email,
-                defaults={'code': code, 'is_verified': False, 'created_at': timezone.now()}
+                defaults={
+                    "code": code,
+                    "is_verified": False,
+                    "created_at": timezone.now(),
+                },
             )
             send_verification_email.delay(email, code)
-            request.session['email'] = email
-            context['code_sent'] = True
-            context['remaining_seconds'] = 300
+            request.session["email"] = email
+            context["code_sent"] = True
+            context["remaining_seconds"] = 300
 
-    elif 'verify_code' in request.POST and code_form.is_valid():
-        email = request.session.get('email')
-        code = code_form.cleaned_data['code']
-        
+    elif "verify_code" in request.POST and code_form.is_valid():
+        email = request.session.get("email")
+        code = code_form.cleaned_data["code"]
+
         if not email:
-            return redirect('users:email-verification')
+            return redirect("users:email-verification")
 
         verification = EmailVerification.objects.filter(email=email).first()
-        
+
         if verification and verification.code == code:
             if timezone.now() < (verification.created_at + timedelta(minutes=5)):
                 verification.is_verified = True
                 verification.save()
-                return redirect('users:signup')
+                return redirect("users:signup")
             else:
-                context['error'] = "Code expired. Please request a new one."
+                context["error"] = "Code expired. Please request a new one."
         else:
-            context['error'] = "Invalid code."
-            context['code_sent'] = True
+            context["error"] = "Invalid code."
+            context["code_sent"] = True
 
-    return render(request, 'users/email_verification.html', context)
+    return render(request, "users/email_verification.html", context)
 
 
 def resend_code(request):
@@ -75,17 +77,13 @@ def resend_code(request):
     if not email:
         return redirect("users:email-verification")
 
-    verification = EmailVerification.objects.filter(
-        email=email
-    ).first()
+    verification = EmailVerification.objects.filter(email=email).first()
 
     if verification:
         expiration_time = verification.created_at + timedelta(minutes=5)
 
         if timezone.now() < expiration_time:
-            remaining_seconds = int(
-                (expiration_time - timezone.now()).total_seconds()
-            )
+            remaining_seconds = int((expiration_time - timezone.now()).total_seconds())
 
             form = CodeVerificationForm()
 
@@ -93,20 +91,15 @@ def resend_code(request):
                 request,
                 "users/verify_code.html",
                 {
-                    'form': form,
-                    "error": (
-                        f"You can request a new code in "
-                        f"{remaining_seconds} seconds."
-                    ),
+                    "form": form,
+                    "error": (f"You can request a new code in {remaining_seconds} seconds."),
                     "remaining_seconds": remaining_seconds,
-                }
+                },
             )
 
     code = generate_code()
 
-    verification, created = EmailVerification.objects.get_or_create(
-        email=email
-    )
+    verification, created = EmailVerification.objects.get_or_create(email=email)
 
     verification.code = code
     verification.is_verified = False
@@ -132,27 +125,22 @@ def complete_signup(request):
         password = form.cleaned_data["password"]
 
         if CustomUser.objects.filter(email=email).exists():
-            return render(request, "users/signup.html", {
-                "form": form,
-                "error": "User already exists"
-            })
+            return render(
+                request,
+                "users/signup.html",
+                {"form": form, "error": "User already exists"},
+            )
 
-        verification = EmailVerification.objects.filter(
-            email=email,
-            is_verified=True
-        ).first()
+        verification = EmailVerification.objects.filter(email=email, is_verified=True).first()
 
         if not verification:
-            return render(request, "users/signup.html", {
-                "form": form,
-                "error": "Email not verified"
-            })
+            return render(
+                request,
+                "users/signup.html",
+                {"form": form, "error": "Email not verified"},
+            )
 
-        CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
+        CustomUser.objects.create_user(username=username, email=email, password=password)
 
         request.session.pop("email", None)
 
@@ -175,11 +163,9 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect("dashboard:home") 
+            return redirect("dashboard:home")
         else:
-            return render(request, "users/login.html", {
-                "error": "Invalid credentials"
-            })
+            return render(request, "users/login.html", {"error": "Invalid credentials"})
 
     return render(request, "users/login.html")
 
@@ -190,13 +176,12 @@ def logout_view(request):
     return redirect("users:login")
 
 
-
 @login_required
 @require_POST
 def delete_account_view(request):
     user = request.user
-    logout(request) 
-    user.delete()  
+    logout(request)
+    user.delete()
     return redirect(f"{reverse('users:login')}?account_deleted=1")
 
 
@@ -204,31 +189,29 @@ def profile_view(request, username):
     profile_user = get_object_or_404(CustomUser, username=username)
     is_own_profile = request.user == profile_user
 
-    projects = Project.objects.filter(
-        Q(owner=profile_user) | Q(memberships__user=profile_user)
-    ).distinct()
+    projects = Project.objects.filter(Q(owner=profile_user) | Q(memberships__user=profile_user)).distinct()
 
     if not is_own_profile:
         projects = projects.filter(visibility=Project.PUBLIC)
-        
+
     projects = projects.order_by("-created_at")
 
-    is_following = (
-        request.user.is_authenticated
-        and not is_own_profile
-        and Follow.objects.filter(follower=request.user, following=profile_user).exists()
-    )
+    is_following = request.user.is_authenticated and not is_own_profile and Follow.objects.filter(follower=request.user, following=profile_user).exists()
 
-    return render(request, "users/profile.html", {
-        "profile_user": profile_user,
-        "projects": projects,
-        "project_count": projects.count(),
-        "is_own_profile": is_own_profile,
-        "is_following": is_following,
-        "follower_count": profile_user.followers.count(),
-        "following_count": profile_user.following.count(),
-        "page_title":"Profile"
-    })
+    return render(
+        request,
+        "users/profile.html",
+        {
+            "profile_user": profile_user,
+            "projects": projects,
+            "project_count": projects.count(),
+            "is_own_profile": is_own_profile,
+            "is_following": is_following,
+            "follower_count": profile_user.followers.count(),
+            "following_count": profile_user.following.count(),
+            "page_title": "Profile",
+        },
+    )
 
 
 @login_required
@@ -263,10 +246,12 @@ def toggle_follow(request, username):
             link=f"/users/profile/{request.user.username}/",
         )
 
-    return JsonResponse({
-        "following": following,
-        "follower_count": target.followers.count(),
-    })
+    return JsonResponse(
+        {
+            "following": following,
+            "follower_count": target.followers.count(),
+        }
+    )
 
 
 @login_required
@@ -286,4 +271,4 @@ def edit_profile_view(request):
     else:
         form = ProfileEditForm(instance=request.user)
 
-    return render(request, "users/edit_profile.html", {"form": form , "page_title":"Edit Profile"})
+    return render(request, "users/edit_profile.html", {"form": form, "page_title": "Edit Profile"})

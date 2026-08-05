@@ -1,15 +1,15 @@
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
 import secrets
 
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
 
 
 def generate_invitation_token():
     return secrets.token_urlsafe(32)
 
-class Project(models.Model):
 
+class Project(models.Model):
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
 
@@ -30,20 +30,12 @@ class Project(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="owned_projects"
+        related_name="owned_projects",
     )
 
-    visibility = models.CharField(
-        max_length=10,
-        choices=VISIBILITY_CHOICES,
-        default="PUBLIC"
-    )
+    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default="PUBLIC")
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="OPEN"
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="OPEN")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -51,16 +43,15 @@ class Project(models.Model):
     tags = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Comma-separated tags, e.g. 'django,react,api'"
+        help_text="Comma-separated tags, e.g. 'django,react,api'",
     )
 
     views_count = models.PositiveIntegerField(default=0)
     download_count = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ["-created_at"]  
+        ordering = ["-created_at"]
 
-    
     def __str__(self):
         return self.title
 
@@ -90,15 +81,8 @@ class Project(models.Model):
 
 
 class ProjectMember(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="memberships"
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="memberships")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -124,18 +108,14 @@ class ProjectInvitation(models.Model):
         (CANCELLED, "Cancelled"),
     ]
 
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="invitations"
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
 
     email = models.EmailField()
 
     invited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="sent_invitations"
+        related_name="sent_invitations",
     )
 
     token = models.CharField(
@@ -176,16 +156,8 @@ class ProjectInvitation(models.Model):
 
 
 class ProjectLike(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="likes"
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="project_likes"
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="project_likes")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -195,20 +167,14 @@ class ProjectLike(models.Model):
         return f"{self.user.username} likes {self.project.title}"
 
 
-
-
 class ProjectFile(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="files"
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="files")
     file = models.FileField(upload_to="project_files/%Y/%m/%d/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="uploaded_project_files"
+        related_name="uploaded_project_files",
     )
 
     relative_path = models.CharField(max_length=500, blank=True)
@@ -216,6 +182,7 @@ class ProjectFile(models.Model):
     @property
     def filename(self):
         import os
+
         return os.path.basename(self.file.name)
 
     @property
@@ -229,15 +196,8 @@ class ProjectFile(models.Model):
 
 
 class Comment(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="comments"
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

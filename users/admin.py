@@ -30,7 +30,7 @@ class CustomUserAdmin(UserAdmin):
     )
     ordering = ("id",)
 
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = list(UserAdmin.fieldsets or []) + [
         (
             "Extra Info",
             {
@@ -41,7 +41,7 @@ class CustomUserAdmin(UserAdmin):
                 )
             },
         ),
-    )
+    ]
 
     add_fieldsets = UserAdmin.add_fieldsets + (
         (
@@ -86,9 +86,7 @@ class FollowAdmin(admin.ModelAdmin):
         "following",
         "created_at",
     )
-    list_filter = (
-        "created_at",
-    )
+    list_filter = ("created_at",)
     search_fields = (
         "follower__username",
         "follower__email",
