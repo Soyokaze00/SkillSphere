@@ -6,4 +6,4 @@ class ActivityLogsConfig(AppConfig):
     name = "activity_logs"
 
     def ready(self):
-        import activity_logs.signals
+        pass

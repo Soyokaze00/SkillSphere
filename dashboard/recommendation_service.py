@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 from django.db.models import QuerySet
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,9 +24,7 @@ def recommend_projects_for_user(
     to the user's profile.
     """
 
-    candidate_projects = list(
-        _get_candidate_projects(user)[:50]
-    )
+    candidate_projects = list(_get_candidate_projects(user)[:50])
 
     if not candidate_projects:
         return []
@@ -39,10 +37,7 @@ def recommend_projects_for_user(
             limit=limit,
         )
 
-    project_texts = [
-        _build_project_text(project)
-        for project in candidate_projects
-    ]
+    project_texts = [_build_project_text(project) for project in candidate_projects]
 
     try:
         vectorizer = TfidfVectorizer(
@@ -51,9 +46,7 @@ def recommend_projects_for_user(
             max_features=1500,
         )
 
-        document_matrix = vectorizer.fit_transform(
-            [user_text, *project_texts]
-        )
+        document_matrix = vectorizer.fit_transform([user_text, *project_texts])
 
         similarity_scores = cosine_similarity(
             document_matrix[0:1],
@@ -96,8 +89,7 @@ def recommend_projects_for_user(
 
 def _get_candidate_projects(user) -> QuerySet:
     return (
-        Project.objects
-        .filter(
+        Project.objects.filter(
             visibility=Project.PUBLIC,
             status="OPEN",
         )
@@ -144,33 +136,17 @@ def _build_reason(
     user_text: str,
     project: Project,
 ) -> str:
-    user_terms = {
-        word
-        for word in user_text.split()
-        if len(word) >= 3
-    }
+    user_terms = {word for word in user_text.split() if len(word) >= 3}
 
-    project_terms = {
-        word
-        for word in _build_project_text(project).split()
-        if len(word) >= 3
-    }
+    project_terms = {word for word in _build_project_text(project).split() if len(word) >= 3}
 
-    matches = sorted(
-        user_terms.intersection(project_terms)
-    )[:3]
+    matches = sorted(user_terms.intersection(project_terms))[:3]
 
     if matches:
-        return (
-            "Matches your profile: "
-            + ", ".join(matches)
-        )
+        return "Matches your profile: " + ", ".join(matches)
 
     if project.tags:
-        return (
-            "Suggested from project topics: "
-            + ", ".join(project.tag_list[:3])
-        )
+        return "Suggested from project topics: " + ", ".join(project.tag_list[:3])
 
     return "Suggested based on your profile and project content"
 

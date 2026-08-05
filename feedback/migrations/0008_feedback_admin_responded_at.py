@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("feedback", "0007_remove_feedback_admin_responded_at"),
     ]

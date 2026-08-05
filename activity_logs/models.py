@@ -3,6 +3,8 @@ from django.db import models
 
 
 class ActivityLog(models.Model):
+    objects: models.Manager["ActivityLog"]
+
     class Action(models.TextChoices):
         LOGIN = "LOGIN", "Login"
         LOGOUT = "LOGOUT", "Logout"

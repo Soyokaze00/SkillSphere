@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         (
             "feedback",
@@ -19,11 +18,11 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 choices=[
-                    ("", "بدون ری\u200cاکشن"),
-                    ("👍", "👍 موافقم"),
-                    ("❤️", "❤️ عالیه"),
-                    ("👀", "👀 بررسیش می\u200cکنیم"),
-                    ("🎉", "🎉 انجام شد"),
+                    ("", "No reaction"),
+                    ("👍", "👍 Agree"),
+                    ("❤️", "❤️ Great"),
+                    ("👀", "👀 We'll review it"),
+                    ("🎉", "🎉 Done"),
                 ],
                 default="",
                 max_length=10,

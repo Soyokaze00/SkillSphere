@@ -70,22 +70,13 @@ class FeedbackAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        response_changed = (
-            "admin_response" in form.changed_data
-            or "admin_reaction" in form.changed_data
-        )
+        response_changed = "admin_response" in form.changed_data or "admin_reaction" in form.changed_data
 
-        cleaned_response = (
-            obj.admin_response or ""
-        ).strip()
+        cleaned_response = (obj.admin_response or "").strip()
 
-        has_response = bool(
-            cleaned_response or obj.admin_reaction
-        )
+        has_response = bool(cleaned_response or obj.admin_reaction)
 
-        responded_now = (
-            response_changed and has_response
-        )
+        responded_now = response_changed and has_response
 
         if responded_now:
             obj.admin_responded_at = timezone.now()
@@ -102,13 +93,6 @@ class FeedbackAdmin(admin.ModelAdmin):
                 user=obj.user,
                 type="feedback",
                 title="Your feedback got a response",
-                message=(
-                    cleaned_response
-                    or (
-                        f"The team reacted "
-                        f"{obj.admin_reaction} "
-                        f"to your feedback."
-                    )
-                ),
+                message=(cleaned_response or (f"The team reacted {obj.admin_reaction} to your feedback.")),
                 link="/feedback/",
             )
