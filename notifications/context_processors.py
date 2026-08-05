@@ -1,5 +1,6 @@
 from notifications.models import NotificationSeen
 
+
 def notifications(request):
     if not request.user.is_authenticated:
         return {

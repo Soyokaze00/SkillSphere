@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("notifications", "0003_notification_link_alter_notification_type"),
     ]

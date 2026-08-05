@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const isDark = isDarkMode();
 
     // Update activity chart
-    // Update activity chart
     if (
       activityChartInstance &&
       typeof activityChartInstance.updateOptions === "function"

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("notifications", "0004_alter_notification_type"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

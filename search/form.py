@@ -1,28 +1,24 @@
 from django.contrib.postgres.search import (
-    SearchVector,
     SearchQuery,
     SearchRank,
+    SearchVector,
 )
-from django.db.models import F, query
+from django.db.models import F
 
 from projects.models import Project
 
-projects = (
-    Project.objects.annotate(
-        search=SearchVector(
-            "title",
-            weight="A"
-        ) + SearchVector(
-            "description",
-            weight="B"
+
+def search_projects(query):
+    projects = (
+        Project.objects.annotate(search=SearchVector("title", weight="A") + SearchVector("description", weight="B"))
+        .annotate(
+            rank=SearchRank(
+                F("search"),
+                SearchQuery(query),
+            )
         )
+        .filter(rank__gte=0.1)
+        .order_by("-rank")
     )
-    .annotate(
-        rank=SearchRank(
-            F("search"),
-            SearchQuery(query)
-        )
-    )
-    .filter(rank__gte=0.1)
-    .order_by("-rank")
-)
+
+    return projects

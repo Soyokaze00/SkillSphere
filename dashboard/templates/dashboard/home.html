@@ -12,17 +12,6 @@
 
 
 
-    <!-- {% tailwind_css %} -->
-
-    <!-- Tailwind -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-
-    <!-- Chart.js -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-
-    <!-- Lucide Icons -->
-    <!-- <script src="https://unpkg.com/lucide@latest"></script> -->
-
     <div class="px-2 md:px-4 sm:px-6 space-y-4 sm:space-y-6">
       <!-- HEADER -->
       <div
@@ -41,9 +30,7 @@
           <div class="space-y-1">
             <div class="text-white/70 text-xs sm:text-sm">Good morning</div>
             <h1 class="text-2xl sm:text-3xl font-bold">{{ user.username }} :)</h1>
-            <p class="text-white/70 text-xs sm:text-sm mt-0.5">
-              3 unread notifications • 2 pending reviews
-            </p>
+            
           </div>
 
           <div class="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -283,35 +270,6 @@
         </div>
 
         <div class="space-y-4">
-          <!-- Quick Actions -->
-          <!-- <div
-            class="rounded-2xl p-3 sm:p-4 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm"
-          >
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">Quick Actions</h3>
-
-            <div class="grid grid-cols-2 gap-2">
-              {% for a in quick_actions %}
-
-              <a
-                href="{{ a.page }}"
-                class="rounded-2xl p-2 sm:p-3 text-left transition-all hover:opacity-80 active:scale-95 border {{ a.bg }} {{ a.border_color }}"
-              >
-                <div
-                  class="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-start {{ a.text_color }}"
-                >
-                <div class="text-sm sm:text-base">
-                  {{ a.icon|safe }}
-                </div>
-                </div>
-                <div class="text-[10px] sm:text-xs font-semibold text-slate-900 dark:text-white leading-tight">
-                  {{ a.label }}
-                </div>
-                <div class="text-[9px] sm:text-[11px] text-slate-500 dark:text-gray-400 leading-tight">{{ a.desc }}</div>
-              </a>
-
-              {% endfor %}
-            </div>
-          </div> -->
           <!-- ACTIVITY -->
           <div
             class="rounded-2xl p-3 sm:p-4 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 shadow-sm"
