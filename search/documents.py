@@ -50,7 +50,7 @@ class ProjectDocument(Document):
                     },
                     "ngram_filter": {
                         "type": "ngram",
-                        "min_gram": 1,  
+                        "min_gram": 1,
                         "max_gram": 3,
                     },
                 },
@@ -82,8 +82,6 @@ class ProjectDocument(Document):
             "visibility",
             "created_at",
         ]
-
-
 
 
 @registry.register_document

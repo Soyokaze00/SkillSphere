@@ -70,7 +70,7 @@ def search_projects(query, status=None):
     for hit in response:
         pid = int(hit.meta.id)
         if pid not in projects:
-            continue 
+            continue
 
         project = projects[pid]
 
@@ -86,7 +86,6 @@ def search_projects(query, status=None):
         result.append(project)
 
     return result
-
 
 
 def search_users(query):
@@ -140,7 +139,7 @@ def search_view(request):
         all_users = search_users(query)
 
         projects_count = len(all_projects)
-        
+
         users_count = len(all_users)
 
         if search_type == "projects":
