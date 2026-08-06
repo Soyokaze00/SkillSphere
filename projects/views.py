@@ -635,9 +635,10 @@ def delete_project(request, project_id):
     just POSTing directly.
     """
     project = get_object_or_404(Project, id=project_id)
+    is_member = ProjectMember.objects.filter(project=project, user=request.user).exists()
 
-    if project.owner != request.user:
-        return HttpResponseForbidden("Only the project owner can delete this project.")
+    if project.owner != request.user and not is_member:
+        return HttpResponseForbidden("Only the project owner and members can delete this project.")
 
     confirm_title = request.POST.get("confirm_title", "").strip()
     if confirm_title != project.title:
