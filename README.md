@@ -88,6 +88,7 @@ The project was developed collaboratively by a three-person team, with each memb
 - Project and community statistics
 - Responsive dashboard cards
 - AI-powered project recommendations
+ - Interactive charts (ApexCharts)
 - Dark mode support
 - Mobile-friendly layouts
 
@@ -205,6 +206,8 @@ Recommendation rules:
 | Icons | Lucide |
 | Development Services | Docker, Docker Compose |
 | Email | Django SMTP backend |
+| Charts | ApexCharts |
+| Linting & Typing | Ruff, mypy |
 
 ---
 
@@ -428,13 +431,16 @@ http://localhost:9200
 
 Redis is used by Celery as its message broker.
 
-Using Docker:
+Prefer starting Redis via `docker compose` (the Redis service is included in the repository's `docker-compose.yml`):
 
 ```bash
-docker run \
-  --name skillsphere_redis \
-  -p 6379:6379 \
-  -d redis:7-alpine
+docker compose up -d db redis elasticsearch
+```
+
+This will start PostgreSQL, Redis, and Elasticsearch together. Alternatively you can run Redis standalone with Docker:
+
+```bash
+docker run --name skillsphere_redis -p 6379:6379 -d redis:7-alpine
 ```
 
 Verify Redis:
@@ -448,6 +454,8 @@ Expected output:
 ```text
 PONG
 ```
+
+The `docker-compose.yml` also defines a `celery` service which can be started via `docker compose` when desired.
 
 ### 7. Run database migrations
 
@@ -475,7 +483,34 @@ python manage.py search_index --rebuild
 python manage.py tailwind install
 ```
 
+If you modify frontend packages (for example `apexcharts`), run `npm install` in the project root before building assets.
+
 ---
+
+## Developer Tools & Code Quality
+
+- **Frontend dependencies**: The project includes `apexcharts` for dashboard charts. If you modify frontend packages, run:
+
+```bash
+npm install
+```
+
+- **Linting**: `ruff` is configured via `ruff.toml`. To run linting locally:
+
+```bash
+pip install ruff
+ruff .
+```
+
+- **Static typing**: `mypy` is configured with `mypy.ini`. To run type checks:
+
+```bash
+pip install mypy
+mypy
+```
+
+These tools are optional for running the app but recommended before commits or pull requests.
+
 
 ## Running the Application
 
@@ -484,18 +519,22 @@ The development environment uses multiple processes.
 ### Terminal 1 — PostgreSQL and Elasticsearch
 
 ```bash
-docker compose up -d db elasticsearch
+docker compose up -d db redis elasticsearch
 ```
 
 ### Terminal 2 — Redis
 
 ```bash
-docker start skillsphere_redis
+docker compose up -d redis
 ```
 
 ### Terminal 3 — Celery Worker
 
 ```bash
+# Option A: start the compose-defined celery service
+docker compose up -d celery
+
+# Option B: run a local celery worker in the virtualenv
 source .venv/bin/activate
 python -m celery -A skill_sphere worker --loglevel=info
 ```
@@ -602,6 +641,18 @@ docker exec skillsphere_redis redis-cli ping
 
 ```bash
 python -m celery -A skill_sphere worker --loglevel=info
+```
+
+### Lint with ruff
+
+```bash
+ruff .
+```
+
+### Type check with mypy
+
+```bash
+mypy
 ```
 
 ### Build Tailwind once
